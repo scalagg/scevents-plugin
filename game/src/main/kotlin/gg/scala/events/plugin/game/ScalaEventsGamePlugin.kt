@@ -1,7 +1,9 @@
 package gg.scala.events.plugin.game
 
+import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.commons.ExtendedScalaPlugin
-import gg.scala.commons.config.annotations.ContainerConfig
+import gg.scala.commons.annotations.container.ContainerEnable
+import gg.scala.flavor.binder.FlavorBinderContainer
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
@@ -19,5 +21,24 @@ import me.lucko.helper.plugin.ap.PluginDependency
         PluginDependency("cloudsync", soft = true)
     ]
 )
-@ContainerConfig("config", ScalaEventsGameConfig::class)
 class ScalaEventsGamePlugin : ExtendedScalaPlugin()
+{
+    @ContainerEnable
+    fun containerEnable()
+    {
+        val engine = ScalaEventsGameEngine(this)
+        engine.initialLoad()
+
+        val module = object : FlavorBinderContainer()
+        {
+            override fun populate()
+            {
+                bind(engine)
+                    .to<ScalaEventsGameEngine>()
+                    .to<CgsGameEngine<*>>()
+            }
+        }
+
+        flavor().inherit(module)
+    }
+}
