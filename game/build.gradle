@@ -1,6 +1,6 @@
 dependencies {
     api project(":shared")
 
-    compileOnly "gg.scala.cgs:game:1.1.5"
-    compileOnly "gg.scala.cgs:common:1.1.5"
+    compileOnly "gg.scala.cgs:game:1.1.6"
+    compileOnly "gg.scala.cgs:common:1.1.6"
 }

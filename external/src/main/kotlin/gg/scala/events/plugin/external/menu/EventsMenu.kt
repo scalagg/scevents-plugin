@@ -1,12 +1,15 @@
 package gg.scala.events.plugin.external.menu
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.events.shared.ScalaEventsChannel
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.entity.Player
+import java.util.*
 
 /**
  * @author GrowlyX
@@ -14,6 +17,20 @@ import org.bukkit.entity.Player
  */
 class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
 {
+    data class EventStatus(
+        val type: String,
+        val initiator: UUID,
+        val startTime: Long,
+        val serverId: String
+    )
+
+    private val status = ScalaEventsChannel
+        .kv().sync()
+        .get("events:status")
+        ?.let {
+            Serializers.gson.fromJson(it, EventStatus::class.java)
+        }
+
     override fun size(buttons: Map<Int, Button>) = 27
 
     override fun getButtons(player: Player): Map<Int, Button>
@@ -27,7 +44,8 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.WHITE}Join an active event!",
                 "",
                 "${CC.GRAY}Active event:",
-                "${CC.RED}None",
+                if (status != null)
+                    "${CC.GREEN}${status.type}" else "${CC.RED}None",
                 "",
                 "${CC.GREEN}Click to join!"
             )
@@ -42,7 +60,8 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.WHITE}Spectate an active event!",
                 "",
                 "${CC.GRAY}Active event:",
-                "${CC.RED}None",
+                if (status != null)
+                    "${CC.GREEN}${status.type}" else "${CC.RED}None",
                 "",
                 "${CC.GREEN}Click to join!"
             )
@@ -59,8 +78,6 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.AQUA}Prime${CC.WHITE} rank is",
                 "${CC.WHITE}required to host events.",
                 "",
-                "${CC.RED}Event hosting is temporarily disabled!",
-                "",
                 "${CC.GREEN}Click to view events!"
             )
             .toButton { _, _ ->
@@ -70,7 +87,7 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                         "${CC.RED}You don't have permission to host events!"
                     )
                     player.sendMessage(
-                        "${CC.RED}Purchase the ${CC.AQUA}Prime${CC.RED} rank on ${CC.YELLOW}store.minequest.gg${CC.RED} to host events!"
+                        "${CC.RED}Purchase the ${CC.AQUA}Prime${CC.RED} rank on ${CC.YELLOW}store.liftgate.io${CC.RED} to host events!"
                     )
                     return@toButton
                 }

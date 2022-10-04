@@ -10,6 +10,6 @@ import kotlin.reflect.KClass
 @Target(
     AnnotationTarget.CLASS
 )
-annotation class EventModuleBindType(
+annotation class EventBind(
     val value: KClass<out EventType>
 )

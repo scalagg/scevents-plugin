@@ -1,5 +1,8 @@
 package gg.scala.events.plugin.external.menu
 
+import gg.scala.aware.message.AwareMessage
+import gg.scala.aware.thread.AwareThreadContext
+import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.events.shared.type.EventType
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -57,7 +60,18 @@ class EventsViewMenu : Menu(
                         "${CC.GREEN}Click to host!"
                     )
                     .toButton { _, _ ->
-                        player.sendMessage("${CC.D_RED}This event isn't ready to be played yet!")
+                        player.sendMessage("${CC.D_GREEN}Preparing an event for you...")
+
+                        AwareMessage
+                            .of(
+                                "start-event",
+                                ScalaEventsChannel.channel(),
+                                "uniqueId" to player.uniqueId,
+                                "eventType" to type.javaClass.name
+                            )
+                            .publish(
+                                AwareThreadContext.ASYNC
+                            )
                     }
         }
 

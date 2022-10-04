@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.game.module
 
-import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
+import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
@@ -18,10 +19,11 @@ object EventOmnibus
     @Inject
     lateinit var module: EventModule
 
-    private val bindings =
-        mutableMapOf<EventType, EventModule>()
+    @Inject
+    lateinit var engine: ScalaEventsGameEngine
 
-    private var eventStarted = false
+    val bindings =
+        mutableMapOf<EventType, EventModule>()
 
     fun bind(type: EventType, module: EventModule)
     {
@@ -43,14 +45,9 @@ object EventOmnibus
     @Configure
     fun configure()
     {
-        ScalaEventsChannel.channel()
-            .listen("start-event") {
-                if (eventStarted)
-                {
-                    return@listen
-                }
+        CgsGameArenaHandler.configure(module.type.mode)
+        engine.gameArena = CgsGameArenaHandler.arena
 
 
-            }
     }
 }

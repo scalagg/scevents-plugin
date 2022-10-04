@@ -19,5 +19,10 @@ object ScalaEventsChannel
             .build()
     }
 
+    private val connection by lazy {
+        aware.internal().connect()
+    }
+
+    fun kv() = connection
     fun channel() = aware
 }

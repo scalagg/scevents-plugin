@@ -2,12 +2,14 @@ package gg.scala.events.plugin.game
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.annotations.container.ContainerDisable
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.annotations.container.ContainerPreEnable
 import gg.scala.commons.annotations.custom.CustomAnnotationProcessors
 import gg.scala.events.plugin.game.module.EventModule
-import gg.scala.events.plugin.game.module.EventModuleBindType
+import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventOmnibus
+import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.flavor.binder.FlavorBinderContainer
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
@@ -32,10 +34,10 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
     fun containerPreEnable()
     {
         CustomAnnotationProcessors
-            .process<EventModuleBindType> {
+            .process<EventBind> {
                 val annotation = it.javaClass
                     .getAnnotation(
-                        EventModuleBindType::class.java
+                        EventBind::class.java
                     )
 
                 EventOmnibus.bind(
@@ -63,5 +65,13 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
             }
 
         flavor().inherit(module)
+    }
+
+    @ContainerDisable
+    fun containerDisable()
+    {
+        ScalaEventsChannel
+            .kv().sync()
+            .del("events:status")
     }
 }

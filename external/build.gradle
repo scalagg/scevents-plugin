@@ -2,5 +2,5 @@ dependencies {
     api project(":shared")
 
     // yes, we want to shade this in
-    api "gg.scala.cgs:common:1.1.5"
+    api "gg.scala.cgs:common:1.1.6"
 }

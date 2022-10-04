@@ -4,6 +4,7 @@ import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.annotations.container.flavor.LazyStartup
 import gg.scala.events.plugin.external.feature.CloudSyncFeature
+import gg.scala.events.shared.ScalaEventsChannel
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
@@ -25,5 +26,10 @@ class ScalaEventsExternalPlugin : ExtendedScalaPlugin()
     fun containerEnable()
     {
         flavor().inject(CloudSyncFeature)
+
+        ScalaEventsChannel.channel().connect()
+            .thenRun {
+                ScalaEventsChannel.kv()
+            }
     }
 }
