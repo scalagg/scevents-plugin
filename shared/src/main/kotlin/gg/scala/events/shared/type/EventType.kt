@@ -62,4 +62,9 @@ sealed interface EventType
             gameModes = listOf(mode)
         )
     }
+
+    companion object
+    {
+        val TYPES = mutableListOf<EventType>(OneInTheChamber)
+    }
 }
