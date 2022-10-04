@@ -41,10 +41,13 @@ object OneInTheChamberModule : EventModule
             player: Player, state: CgsGameState
         )
         {
-            lines += ""
-            lines += "${CC.WHITE}Starts in: ${CC.GREEN}2:00"
-            lines += ""
-            lines += "${CC.YELLOW}www.liftgate.io"
+            if (state == CgsGameState.WAITING)
+            {
+                lines += ""
+                lines += "${CC.WHITE}Starts in: ${CC.GREEN}2:00"
+                lines += ""
+                lines += "${CC.YELLOW}www.liftgate.io"
+            }
         }
     }
 
