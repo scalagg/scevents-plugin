@@ -3,6 +3,7 @@ package gg.scala.events.plugin.external.menu
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.events.plugin.external.feature.EventStatusFeature
 import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.events.shared.type.EventType
 import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -10,6 +11,7 @@ import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import net.evilblock.cubed.util.time.TimeUtil
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -19,12 +21,44 @@ import java.util.*
  */
 class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
 {
+    init
+    {
+        autoUpdate = true
+        placeholder = true
+    }
+
     override fun size(buttons: Map<Int, Button>) = 27
 
     override fun getButtons(player: Player): Map<Int, Button>
     {
         val buttons = mutableMapOf<Int, Button>()
         val status = EventStatusFeature.status()
+
+        val additionalDescription = mutableListOf<String>()
+        additionalDescription += "${CC.GRAY}Active event:"
+
+        if (status == null)
+        {
+            additionalDescription += "${CC.D_GRAY}No event is running!"
+        } else
+        {
+            val type = Class.forName(status.type)
+                .kotlin.objectInstance as EventType
+
+            additionalDescription += "${CC.GRAY}Event: ${CC.WHITE}${
+                type.info.fancyNameRender
+            }"
+            additionalDescription += "${CC.GRAY}Started: ${CC.WHITE}${
+                TimeUtil.formatIntoMMSS(
+                    ((System.currentTimeMillis() - status.startTime) / 1000).toInt()
+                )
+            }"
+        }
+
+        additionalDescription += ""
+        additionalDescription += "${CC.GREEN}${
+            if (status == null) "${CC.RED}No event is running." else "Click to join!"
+        }"
 
         buttons[11] = ItemBuilder
             .of(XMaterial.LIME_DYE)

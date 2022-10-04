@@ -53,18 +53,7 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
         val engine = ScalaEventsGameEngine(this)
         engine.initialLoad()
 
-        val module =
-            object : FlavorBinderContainer()
-            {
-                override fun populate()
-                {
-                    bind(engine)
-                        .to<ScalaEventsGameEngine>()
-                        .to<CgsGameEngine<*>>()
-                }
-            }
-
-        flavor().inherit(module)
+        flavor().bind<ScalaEventsGameEngine>() to engine
     }
 
     @ContainerDisable
