@@ -4,6 +4,7 @@ import gg.scala.cgs.common.player.CgsGamePlayer
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
+import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
@@ -15,6 +16,7 @@ import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -44,7 +46,9 @@ object OneInTheChamberModule : EventModule
             if (state == CgsGameState.WAITING)
             {
                 lines += ""
-                lines += "${CC.WHITE}Starts in: ${CC.GREEN}2:00"
+                lines += "${CC.WHITE}Starts in: ${CC.GREEN}${
+                    TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
+                }"
                 lines += ""
                 lines += "${CC.YELLOW}www.liftgate.io"
             }
