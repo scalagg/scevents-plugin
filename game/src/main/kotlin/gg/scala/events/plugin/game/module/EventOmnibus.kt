@@ -1,5 +1,7 @@
 package gg.scala.events.plugin.game.module
 
+import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
@@ -16,6 +18,16 @@ object EventOmnibus
     @Inject
     lateinit var module: EventModule
 
+    private val bindings =
+        mutableMapOf<EventType, EventModule>()
+
+    private var eventStarted = false
+
+    fun bind(type: EventType, module: EventModule)
+    {
+        this.bindings[type] = module
+    }
+
     fun module() = kotlin
         .runCatching { module }
         .getOrNull()
@@ -31,6 +43,14 @@ object EventOmnibus
     @Configure
     fun configure()
     {
+        ScalaEventsChannel.channel()
+            .listen("start-event") {
+                if (eventStarted)
+                {
+                    return@listen
+                }
 
+
+            }
     }
 }

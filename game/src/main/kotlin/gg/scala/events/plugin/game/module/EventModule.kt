@@ -16,4 +16,6 @@ interface EventModule
     val nametagProvider: CgsGameNametagAdapter
 
     val gameSnapshot: CgsGameSnapshot
+
+    fun configure()
 }
