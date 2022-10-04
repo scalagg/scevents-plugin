@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.external
 
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.annotations.container.flavor.LazyStartup
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
@@ -15,4 +16,5 @@ import me.lucko.helper.plugin.ap.PluginDependency
         PluginDependency("store-spigot")
     ]
 )
+@LazyStartup
 class ScalaEventsExternalPlugin : ExtendedScalaPlugin()
