@@ -16,6 +16,7 @@ import me.lucko.helper.plugin.ap.PluginDependency
     name = "ScEvents",
     depends = [
         PluginDependency("scala-commons"),
+        PluginDependency("cloudsync", soft = true),
         PluginDependency("store-spigot")
     ]
 )
