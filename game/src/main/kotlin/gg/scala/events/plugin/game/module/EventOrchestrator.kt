@@ -78,7 +78,9 @@ object EventOrchestrator
                     )
 
                 plugin.flavor {
+                    inject(mapping)
                     bind<EventModule>() to mapping
+
                     inject(EventOmnibus)
                 }
 

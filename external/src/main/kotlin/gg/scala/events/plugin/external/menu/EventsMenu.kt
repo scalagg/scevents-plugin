@@ -1,7 +1,9 @@
 package gg.scala.events.plugin.external.menu
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.events.plugin.external.feature.EventStatusFeature
 import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.serializers.Serializers
@@ -17,25 +19,12 @@ import java.util.*
  */
 class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
 {
-    data class EventStatus(
-        val type: String,
-        val initiator: UUID,
-        val startTime: Long,
-        val serverId: String
-    )
-
-    private val status = ScalaEventsChannel
-        .kv().sync()
-        .get("events:status")
-        ?.let {
-            Serializers.gson.fromJson(it, EventStatus::class.java)
-        }
-
     override fun size(buttons: Map<Int, Button>) = 27
 
     override fun getButtons(player: Player): Map<Int, Button>
     {
         val buttons = mutableMapOf<Int, Button>()
+        val status = EventStatusFeature.status()
 
         buttons[11] = ItemBuilder
             .of(XMaterial.LIME_DYE)
@@ -50,6 +39,12 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.GREEN}Click to join!"
             )
             .toButton { _, _ ->
+                if (status != null)
+                {
+                    VelocityRedirectSystem.redirect(player, status.serverId)
+                    return@toButton
+                }
+
                 player.sendMessage("${CC.RED}There is no event running!")
             }
 
@@ -66,6 +61,12 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.GREEN}Click to join!"
             )
             .toButton { _, _ ->
+                if (status != null)
+                {
+                    VelocityRedirectSystem.redirect(player, status.serverId)
+                    return@toButton
+                }
+
                 player.sendMessage("${CC.RED}There is no event running!")
             }
 
@@ -81,6 +82,12 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 "${CC.GREEN}Click to view events!"
             )
             .toButton { _, _ ->
+                if (status != null)
+                {
+                    player.sendMessage("${CC.RED}An event has already started!")
+                    return@toButton
+                }
+
                 if (!player.hasPermission("scevents.host-events"))
                 {
                     player.sendMessage(

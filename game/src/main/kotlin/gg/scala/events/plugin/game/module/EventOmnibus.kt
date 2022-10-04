@@ -48,6 +48,6 @@ object EventOmnibus
         CgsGameArenaHandler.configure(module.type.mode)
         engine.gameArena = CgsGameArenaHandler.arena
 
-
+        module.configure()
     }
 }

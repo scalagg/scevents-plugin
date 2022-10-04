@@ -6,8 +6,11 @@ import gg.scala.cgs.common.information.CgsGameGeneralInfo
 import gg.scala.cgs.common.information.arena.CgsGameArena
 import gg.scala.cgs.common.information.mode.CgsGameMode
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import java.nio.file.Path
 
 /**
  * @author GrowlyX
@@ -32,7 +35,28 @@ sealed interface EventType
 
         override val mode = object : CgsGameMode
         {
-            override fun getArenas() = listOf<CgsGameArena>()
+            override fun getArenas() = listOf(
+                object : CgsGameArena
+                {
+                    override fun getBukkitWorldName() = "bw-test-two"
+                    override fun getDescription() = ""
+
+                    override fun getDirectory(): Path? = null
+                    override fun getId() = "bw-test-two"
+
+                    override fun getMaterial() = Material.ARROW to 1
+                    override fun getName() = "OITC"
+
+                    override fun getPreLobbyLocation() = Location(
+                        Bukkit.getWorld("world"),
+                        0.5, 150.0, 0.5
+                    )
+
+                    override fun getSpectatorLocation() = Location(
+                        Bukkit.getWorld(getBukkitWorldName()), 0.5, Bukkit.getWorld(getBukkitWorldName()).getHighestBlockYAt(0, 0) + 15.0, 0.5
+                    )
+                }
+            )
             override fun getDescription() = "oitc."
 
             override fun getId() = "oitc"

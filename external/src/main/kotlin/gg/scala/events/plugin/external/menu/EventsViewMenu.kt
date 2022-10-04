@@ -2,6 +2,7 @@ package gg.scala.events.plugin.external.menu
 
 import gg.scala.aware.message.AwareMessage
 import gg.scala.aware.thread.AwareThreadContext
+import gg.scala.events.plugin.external.feature.EventStatusFeature
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.events.shared.type.EventType
 import net.evilblock.cubed.menu.Button
@@ -42,6 +43,7 @@ class EventsViewMenu : Menu(
     override fun getButtons(player: Player): Map<Int, Button>
     {
         val buttons = mutableMapOf<Int, Button>()
+        val status = EventStatusFeature.status()
 
         for (type in EventType.TYPES)
         {
@@ -60,7 +62,14 @@ class EventsViewMenu : Menu(
                         "${CC.GREEN}Click to host!"
                     )
                     .toButton { _, _ ->
+                        if (status != null)
+                        {
+                            player.sendMessage("${CC.RED}An event has already started!")
+                            return@toButton
+                        }
+
                         player.sendMessage("${CC.D_GREEN}Preparing an event for you...")
+                        player.closeInventory()
 
                         AwareMessage
                             .of(
