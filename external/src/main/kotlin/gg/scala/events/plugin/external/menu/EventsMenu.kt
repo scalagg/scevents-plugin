@@ -13,6 +13,7 @@ import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.time.TimeUtil
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
 /**
@@ -35,11 +36,18 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
         val status = EventStatusFeature.status()
 
         val additionalDescription = mutableListOf<String>()
+        additionalDescription += ""
         additionalDescription += "${CC.GRAY}Active event:"
+
+        val material: ItemStack
 
         if (status == null)
         {
             additionalDescription += "${CC.D_GRAY}No event is running!"
+
+            material = ItemBuilder
+                .of(XMaterial.GRAY_DYE)
+                .build()
         } else
         {
             val type = Class.forName(status.type)
@@ -53,6 +61,8 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                     ((System.currentTimeMillis() - status.startTime) / 1000).toInt()
                 )
             }"
+
+            material = type.icon
         }
 
         additionalDescription += ""
@@ -61,16 +71,13 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
         }"
 
         buttons[11] = ItemBuilder
-            .of(XMaterial.LIME_DYE)
+            .copyOf(material)
             .name("${CC.B_GREEN}Join event")
             .addToLore(
-                "${CC.WHITE}Join an active event!",
-                "",
-                "${CC.GRAY}Active event:",
-                if (status != null)
-                    "${CC.GREEN}${status.type}" else "${CC.RED}None",
-                "",
-                "${CC.GREEN}Click to join!"
+                "${CC.WHITE}Join an active event!"
+            )
+            .addToLore(
+                *additionalDescription.toTypedArray()
             )
             .toButton { _, _ ->
                 if (status != null)
@@ -86,13 +93,10 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
             .of(XMaterial.COMPASS)
             .name("${CC.B_GREEN}Spectate event")
             .addToLore(
-                "${CC.WHITE}Spectate an active event!",
-                "",
-                "${CC.GRAY}Active event:",
-                if (status != null)
-                    "${CC.GREEN}${status.type}" else "${CC.RED}None",
-                "",
-                "${CC.GREEN}Click to join!"
+                "${CC.WHITE}Spectate an active event!"
+            )
+            .addToLore(
+                *additionalDescription.toTypedArray()
             )
             .toButton { _, _ ->
                 if (status != null)

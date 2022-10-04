@@ -3,6 +3,7 @@ package gg.scala.events.plugin.game.module
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
 import gg.scala.cgs.common.runnable.state.EndedStateRunnable
+import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.shared.type.EventType
@@ -59,6 +60,8 @@ object EventOmnibus
 
         module.configure()
         engine.gameState = CgsGameState.STARTING
+
+        StartingStateRunnable.doWeCareAboutThis = false
 
         Events
             .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
