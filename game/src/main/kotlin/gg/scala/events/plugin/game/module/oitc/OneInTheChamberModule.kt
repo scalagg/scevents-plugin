@@ -24,6 +24,7 @@ import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
@@ -125,6 +126,22 @@ object OneInTheChamberModule : EventModule
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
                 it.player.sendMessage("Welcome to OITC")
+            }
+
+        Events
+            .subscribe(PlayerDeathEvent::class.java)
+            .handler {
+                kotlin.runCatching {
+                    kills[it.entity.killer.uniqueId] =
+                        kills[it.entity.killer.uniqueId]!! + 1
+                }
+
+                it.entity.spigot().respawn()
+                it.entity.teleport(spawnLocation)
+
+                it.entity.inventory.addItem(
+                    ItemStack(Material.STONE_SWORD)
+                )
             }
 
         Events

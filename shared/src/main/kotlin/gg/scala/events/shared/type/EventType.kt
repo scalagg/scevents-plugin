@@ -80,7 +80,7 @@ sealed interface EventType
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,
-            spectateOnDeath = true,
+            spectateOnDeath = false,
             showTabHearts = false,
             showNameHearts = true,
             usesCustomArenaWorld = true,

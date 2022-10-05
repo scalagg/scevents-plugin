@@ -83,7 +83,7 @@ object EventOmnibus
                     .of(
                         "event-alert",
                         ScalaEventsChannel.channel(),
-                        "player" to it.player.displayName,
+                        "player" to QuickAccess.coloredName(it.player.uniqueId),
                         "event" to module.type.info.fancyNameRender,
                         "server" to ServerSync.local.id
                     )

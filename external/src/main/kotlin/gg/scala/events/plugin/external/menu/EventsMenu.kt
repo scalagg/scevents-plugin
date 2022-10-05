@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.external.menu
 
 import com.cryptomorin.xseries.XMaterial
+import gg.scala.events.plugin.external.feature.EventPlayerFeature
 import gg.scala.events.plugin.external.feature.EventStatusFeature
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.events.shared.type.EventType
@@ -12,6 +13,7 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.time.TimeUtil
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
@@ -70,7 +72,7 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
             if (status == null) "${CC.RED}No event is running." else "Click to join!"
         }"
 
-        buttons[12] = ItemBuilder
+        buttons[11] = ItemBuilder
             .copyOf(material)
             .name("${CC.B_GREEN}Play")
             .addToLore(
@@ -89,7 +91,24 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 player.sendMessage("${CC.RED}There is no event running!")
             }
 
-        buttons[14] = ItemBuilder
+        val profile = EventPlayerFeature.find(player)
+
+        if (profile != null)
+        {
+            buttons[13] = ItemBuilder
+                .of(Material.EMERALD)
+                .name("${CC.B_GREEN}Statistics")
+                .addToLore(
+                    "${CC.WHITE}Kills: ${CC.GOLD}${profile.kills.value}",
+                    "${CC.WHITE}Deaths: ${CC.GOLD}${profile.deaths.value}",
+                    "",
+                    "${CC.WHITE}Wins: ${CC.GOLD}${profile.wins.value}",
+                    "${CC.WHITE}Losses: ${CC.GOLD}${profile.losses.value}"
+                )
+                .toButton()
+        }
+
+        buttons[15] = ItemBuilder
             .of(XMaterial.PAPER)
             .name("${CC.B_GREEN}Host")
             .addToLore(
