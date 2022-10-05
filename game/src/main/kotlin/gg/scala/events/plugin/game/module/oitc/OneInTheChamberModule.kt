@@ -303,7 +303,7 @@ object OneInTheChamberModule : EventModule
                     val thing = locations.random()
                     thing.y = (Bukkit.getWorld("world")
                         .getHighestBlockAt(thing)
-                        .y + 1).toDouble()
+                        .y + 3).toDouble()
 
                     it.entity.spigot().respawn()
                     it.entity.teleport(
@@ -322,7 +322,7 @@ object OneInTheChamberModule : EventModule
                         val thing = locations.random()
                         thing.y = (Bukkit.getWorld("world")
                             .getHighestBlockAt(thing)
-                            .y + 1).toDouble()
+                            .y + 3).toDouble()
 
                         player.teleport(
                             locations.random()
