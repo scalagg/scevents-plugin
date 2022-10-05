@@ -132,7 +132,7 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                         "${CC.RED}You don't have permission to host events!"
                     )
                     player.sendMessage(
-                        "${CC.RED}Purchase the ${CC.AQUA}Prime${CC.RED} rank on ${CC.YELLOW}store.liftgate.io${CC.RED} to host events!"
+                        "${CC.RED}Purchase the ${CC.AQUA}Prime${CC.RED} rank on ${CC.YELLOW}store.minequest.gg${CC.RED} to host events!"
                     )
                     return@toButton
                 }

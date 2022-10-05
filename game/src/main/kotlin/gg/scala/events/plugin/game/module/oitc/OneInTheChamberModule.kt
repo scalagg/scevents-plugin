@@ -10,8 +10,8 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
-import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventBind
+import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
@@ -19,7 +19,6 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import gg.scala.lemon.util.QuickAccess
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
-import me.lucko.helper.terminable.composite.CompositeTerminable
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
@@ -29,10 +28,9 @@ import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
-import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -74,9 +72,11 @@ object OneInTheChamberModule : EventModule
 
         override fun onRun()
         {
-            Bukkit.broadcastMessage("${CC.SEC}Invincibility will wear off in ${CC.PRI}${
-                DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
-            }${CC.SEC}.")
+            Bukkit.broadcastMessage(
+                "${CC.SEC}Invincibility will wear off in ${CC.PRI}${
+                    DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
+                }${CC.SEC}."
+            )
         }
     }
 
@@ -115,15 +115,17 @@ object OneInTheChamberModule : EventModule
 
         override fun onRun()
         {
-            Bukkit.broadcastMessage("${CC.SEC}The event will end in ${CC.PRI}${
-                DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
-            }${CC.SEC}.")
+            Bukkit.broadcastMessage(
+                "${CC.SEC}The event will end in ${CC.PRI}${
+                    DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
+                }${CC.SEC}."
+            )
         }
     }
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_YELLOW}OITC Event"
+        override fun getTitle() = "${CC.B_AQUA}OITC Event"
 
         override fun render(
             lines: LinkedList<String>,
@@ -137,7 +139,7 @@ object OneInTheChamberModule : EventModule
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                 }"
                 lines += ""
-                lines += "${CC.YELLOW}www.liftgate.io"
+                lines += "${CC.AQUA}www.minequest.gg"
             }
 
             if (state == CgsGameState.STARTED)
@@ -178,7 +180,7 @@ object OneInTheChamberModule : EventModule
                 }
 
                 lines += ""
-                lines += "${CC.YELLOW}www.liftgate.io"
+                lines += "${CC.AQUA}www.minequest.gg"
             }
         }
     }
@@ -236,7 +238,43 @@ object OneInTheChamberModule : EventModule
         Events
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
+                it.player.inventory.clear()
                 it.player.sendMessage("Welcome to OITC")
+            }
+
+        fun populateInventory(player: Player)
+        {
+            player.inventory.clear()
+            player.inventory.addItem(
+                ItemStack(Material.STONE_SWORD)
+            )
+            player.inventory.addItem(
+                ItemStack(Material.BOW)
+            )
+            player.inventory.addItem(
+                ItemStack(Material.ARROW)
+            )
+        }
+
+        Events
+            .subscribe(EntityDamageByEntityEvent::class.java)
+            .handler { event ->
+                val player = event.entity
+                val arrow = event.damager
+
+                if (arrow is Arrow && player is Player)
+                {
+                    val shooter = arrow.shooter
+
+                    if (shooter is Player)
+                    {
+                        if (arrow.getName() != shooter.name)
+                        {
+                            // it kills.
+                            event.damage = 100.0
+                        }
+                    }
+                }
             }
 
         Events
@@ -247,14 +285,21 @@ object OneInTheChamberModule : EventModule
                 kotlin.runCatching {
                     kills[it.entity.killer.uniqueId] =
                         kills[it.entity.killer.uniqueId]!! + 1
+
+                    if (it.entity.killer.isOnline)
+                    {
+                        it.entity.killer.inventory.addItem(
+                            ItemStack(Material.ARROW)
+                        )
+                    }
                 }
 
-                it.entity.spigot().respawn()
-                it.entity.teleport(spawnLocation)
+                Tasks.delayed(1L) {
+                    it.entity.spigot().respawn()
+                    it.entity.teleport(spawnLocation)
 
-                it.entity.inventory.addItem(
-                    ItemStack(Material.STONE_SWORD)
-                )
+                    populateInventory(it.entity)
+                }
             }
 
         Events
@@ -263,10 +308,7 @@ object OneInTheChamberModule : EventModule
                 Players.all()
                     .forEach { player ->
                         player.teleport(spawnLocation)
-
-                        player.inventory.addItem(
-                            ItemStack(Material.STONE_SWORD)
-                        )
+                        populateInventory(player)
 
                         kills[player.uniqueId] = 0
 
@@ -285,12 +327,6 @@ object OneInTheChamberModule : EventModule
             .handler {
                 if (it.player.location.y < 20)
                 {
-                    if (engine.gameState == CgsGameState.STARTED)
-                    {
-                        it.player.health = 0.0
-                        return@handler
-                    }
-
                     it.player.teleport(spawnLocation)
                 }
             }
