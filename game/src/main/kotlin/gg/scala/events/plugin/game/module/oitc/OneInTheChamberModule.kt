@@ -16,14 +16,19 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import gg.scala.lemon.util.QuickAccess
+import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
+import me.lucko.helper.terminable.composite.CompositeTerminable
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
+import org.apache.commons.lang.time.DurationFormatUtils
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -107,7 +112,24 @@ object OneInTheChamberModule : EventModule
 
     object GameSnapshot : CgsGameSnapshot
     {
-        override fun getExtraInformation() = listOf<String>()
+        override fun getExtraInformation(): List<String>
+        {
+            val info = mutableListOf<String>()
+
+            var index = 0
+            val entries = kills.entries
+                .sortedByDescending { it.value }
+                .take(3)
+
+            for (entry in entries)
+            {
+                info += "  ${CC.GREEN}#${++index}. ${
+                    QuickAccess.coloredName(entry.key)
+                }${CC.WHITE}: ${entry.value}"
+            }
+
+            return info
+        }
     }
 
     override val gameSnapshot = GameSnapshot
@@ -131,6 +153,8 @@ object OneInTheChamberModule : EventModule
         Events
             .subscribe(PlayerDeathEvent::class.java)
             .handler {
+                it.drops.clear()
+
                 kotlin.runCatching {
                     kills[it.entity.killer.uniqueId] =
                         kills[it.entity.killer.uniqueId]!! + 1
@@ -157,6 +181,33 @@ object OneInTheChamberModule : EventModule
 
                         kills[player.uniqueId] = 0
                     }
+
+                val terminable = CompositeTerminable.create()
+
+                Events.subscribe(EntityDamageEvent::class.java)
+                    .handler {
+                        it.isCancelled = true
+                    }
+                    .bindWith(terminable)
+
+                object : DiminutionRunnable(16)
+                {
+                    override fun getSeconds() = listOf(15, 10, 5, 4, 3, 2, 1)
+
+                    override fun onEnd()
+                    {
+                        terminable.closeAndReportException()
+
+                        Bukkit.broadcastMessage("${CC.SEC}Invincibility is now disabled!")
+                    }
+
+                    override fun onRun()
+                    {
+                        Bukkit.broadcastMessage("${CC.SEC}Invincibility will wear off in ${CC.PRI}${
+                            DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
+                        }${CC.SEC}.")
+                    }
+                }.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
             }
 
         Events
