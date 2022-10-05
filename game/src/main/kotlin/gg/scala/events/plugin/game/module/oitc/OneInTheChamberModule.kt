@@ -8,6 +8,7 @@ import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
 import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
+import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventBind
@@ -22,17 +23,21 @@ import me.lucko.helper.terminable.composite.CompositeTerminable
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.EventPriority
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 
 /**
@@ -49,8 +54,72 @@ object OneInTheChamberModule : EventModule
 
     val kills = mutableMapOf<UUID, Int>()
 
-    var secondsUntilInvincibilityEnds = -1
-    var secondsUntilGameEnds = -1
+    var secondsUntilInvincibilityEnds = object : DiminutionRunnable(16)
+    {
+        override fun getSeconds() = listOf(15, 10, 5, 4, 3, 2, 1)
+
+        override fun onEnd()
+        {
+            Players.all()
+                .forEach { player ->
+                    player.removeMetadata(
+                        "invincible", engine.plugin
+                    )
+                }
+
+            Bukkit.broadcastMessage("${CC.B_GREEN}Invincibility is now disabled! Good luck!")
+
+            secondsUntilGameEnds.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
+        }
+
+        override fun onRun()
+        {
+            Bukkit.broadcastMessage("${CC.SEC}Invincibility will wear off in ${CC.PRI}${
+                DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
+            }${CC.SEC}.")
+        }
+    }
+
+    var secondsUntilGameEnds = object : DiminutionRunnable(301)
+    {
+        override fun getSeconds() = listOf(
+            18000, 14400, 10800, 7200, 3600, 2700, 1800,
+            900, 600, 300, 240, 180, 120, 60, 50, 40, 30,
+            15, 10, 5, 4, 3, 2, 1
+        )
+
+        override fun onEnd()
+        {
+            val winningPlayer = kills.entries
+                .map {
+                    Bukkit.getPlayer(it.key) to it.value
+                }
+                .filter { it.first != null }
+                .maxByOrNull { it.second }
+                ?.first
+
+            Tasks.sync {
+                if (winningPlayer != null)
+                {
+                    engine.winningTeam = CgsGameTeamService
+                        .getTeamOf(winningPlayer)
+                        ?: CgsGameTeamService.teams.values.first()
+                } else
+                {
+                    engine.winningTeam = CgsGameTeamService.teams.values.first()
+                }
+
+                engine.gameState = CgsGameState.ENDED
+            }
+        }
+
+        override fun onRun()
+        {
+            Bukkit.broadcastMessage("${CC.SEC}The event will end in ${CC.PRI}${
+                DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
+            }${CC.SEC}.")
+        }
+    }
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
@@ -73,17 +142,22 @@ object OneInTheChamberModule : EventModule
 
             if (state == CgsGameState.STARTED)
             {
-                if (secondsUntilInvincibilityEnds != -1)
+                if (player.hasMetadata("spectator"))
+                {
+                    lines += ""
+                }
+
+                if (secondsUntilInvincibilityEnds.seconds > 0)
                 {
                     lines += ""
                     lines += "${CC.WHITE}Invincibility ends: ${CC.GREEN}${
-                        TimeUtil.formatIntoMMSS(secondsUntilInvincibilityEnds)
+                        TimeUtil.formatIntoMMSS(secondsUntilInvincibilityEnds.seconds)
                     }"
-                } else if (secondsUntilGameEnds != -1)
+                } else if (secondsUntilGameEnds.seconds > 0)
                 {
                     lines += ""
                     lines += "${CC.WHITE}Game ends: ${CC.GREEN}${
-                        TimeUtil.formatIntoMMSS(secondsUntilGameEnds)
+                        TimeUtil.formatIntoMMSS(secondsUntilGameEnds.seconds)
                     }"
                 }
 
@@ -195,67 +269,14 @@ object OneInTheChamberModule : EventModule
                         )
 
                         kills[player.uniqueId] = 0
+
+                        player.setMetadata(
+                            "invincible",
+                            FixedMetadataValue(engine.plugin, true)
+                        )
                     }
 
-                val terminable = CompositeTerminable.create()
-
-                Events.subscribe(EntityDamageEvent::class.java)
-                    .handler {
-                        it.isCancelled = true
-                    }
-                    .bindWith(terminable)
-
-                secondsUntilInvincibilityEnds = 16
-
-                object : DiminutionRunnable(secondsUntilInvincibilityEnds)
-                {
-                    override fun getSeconds() = listOf(15, 10, 5, 4, 3, 2, 1)
-
-                    override fun onEnd()
-                    {
-                        terminable.closeAndReportException()
-                        secondsUntilInvincibilityEnds = -1
-
-                        Bukkit.broadcastMessage("${CC.SEC}Invincibility is now disabled!")
-
-                        secondsUntilGameEnds = (20 * 60 * 5) + 1
-
-                        object : DiminutionRunnable(secondsUntilGameEnds)
-                        {
-                            override fun getSeconds() = listOf(
-                                18000, 14400, 10800, 7200, 3600, 2700, 1800,
-                                900, 600, 300, 240, 180, 120, 60, 50, 40, 30,
-                                15, 10, 5, 4, 3, 2, 1
-                            )
-
-                            override fun onEnd()
-                            {
-                                terminable.closeAndReportException()
-                                secondsUntilGameEnds = -1
-
-                                engine.gameState = CgsGameState.ENDED
-                            }
-
-                            override fun onRun()
-                            {
-                                secondsUntilGameEnds = seconds
-
-                                Bukkit.broadcastMessage("${CC.SEC}The event will end in ${CC.PRI}${
-                                    DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
-                                }${CC.SEC}.")
-                            }
-                        }.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
-                    }
-
-                    override fun onRun()
-                    {
-                        secondsUntilInvincibilityEnds = seconds
-
-                        Bukkit.broadcastMessage("${CC.SEC}Invincibility will wear off in ${CC.PRI}${
-                            DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
-                        }${CC.SEC}.")
-                    }
-                }.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
+                secondsUntilInvincibilityEnds.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
             }
 
         Events
