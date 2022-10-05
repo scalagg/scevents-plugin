@@ -23,10 +23,12 @@ import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
@@ -231,9 +233,12 @@ object OneInTheChamberModule : EventModule
 
     override fun configure()
     {
-        val spawnLocation = type.info.gameModes
-            .first().getArenas().first()
-            .getPreLobbyLocation()
+        val cuboid = Cuboid(
+            Location(Bukkit.getWorld("world"), 121.232, 74.63, 47.179),
+            Location(Bukkit.getWorld("world"), 182.782, 63.63, -8.179),
+        )
+
+        val locations = cuboid.getBlockLocations()
 
         Events
             .subscribe(PlayerJoinEvent::class.java)
@@ -295,8 +300,15 @@ object OneInTheChamberModule : EventModule
                 }
 
                 Tasks.delayed(1L) {
+                    val thing = locations.random()
+                    thing.y = (Bukkit.getWorld("world")
+                        .getHighestBlockAt(thing)
+                        .y + 1).toDouble()
+
                     it.entity.spigot().respawn()
-                    it.entity.teleport(spawnLocation)
+                    it.entity.teleport(
+                        locations.random()
+                    )
 
                     populateInventory(it.entity)
                 }
@@ -307,7 +319,14 @@ object OneInTheChamberModule : EventModule
             .handler {
                 Players.all()
                     .forEach { player ->
-                        player.teleport(spawnLocation)
+                        val thing = locations.random()
+                        thing.y = (Bukkit.getWorld("world")
+                            .getHighestBlockAt(thing)
+                            .y + 1).toDouble()
+
+                        player.teleport(
+                            locations.random()
+                        )
                         populateInventory(player)
 
                         kills[player.uniqueId] = 0
@@ -319,16 +338,6 @@ object OneInTheChamberModule : EventModule
                     }
 
                 secondsUntilInvincibilityEnds.runTaskTimerAsynchronously(engine.plugin, 0L, 20L)
-            }
-
-        Events
-            .subscribe(PlayerMoveEvent::class.java)
-            .filter(EventUtils::hasPlayerMoved)
-            .handler {
-                if (it.player.location.y < 20)
-                {
-                    it.player.teleport(spawnLocation)
-                }
             }
     }
 }
