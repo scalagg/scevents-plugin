@@ -49,11 +49,12 @@ sealed interface EventType
 
                     override fun getPreLobbyLocation() = Location(
                         Bukkit.getWorld("world"),
-                        0.5, 150.0, 0.5
+                        0.5, 36.0, -0.5
                     )
 
                     override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld(getBukkitWorldName()), 0.5, Bukkit.getWorld(getBukkitWorldName()).getHighestBlockYAt(0, 0) + 15.0, 0.5
+                        Bukkit.getWorld("world"),
+                        0.5, 36.0, -0.5
                     )
                 }
             )
