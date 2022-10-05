@@ -11,7 +11,7 @@ object ScalaEventsGameInfo : CgsGameGeneralInfo(
     fancyNameRender = "Events",
     gameVersion = 1.0F,
     minimumPlayers = 2,
-    startingCountdownSec = 61,
+    startingCountdownSec = 21,
     awards = CgsGameAwardInfo(
         false, 0..100, 0..100
     ),
