@@ -70,9 +70,9 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
             if (status == null) "${CC.RED}No event is running." else "Click to join!"
         }"
 
-        buttons[11] = ItemBuilder
+        buttons[12] = ItemBuilder
             .copyOf(material)
-            .name("${CC.B_GREEN}Join event")
+            .name("${CC.B_GREEN}Play")
             .addToLore(
                 "${CC.WHITE}Join an active event!"
             )
@@ -89,43 +89,24 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                 player.sendMessage("${CC.RED}There is no event running!")
             }
 
-        buttons[13] = ItemBuilder
-            .of(XMaterial.COMPASS)
-            .name("${CC.B_GREEN}Spectate event")
-            .addToLore(
-                "${CC.WHITE}Spectate an active event!"
-            )
-            .addToLore(
-                *additionalDescription.toTypedArray()
-            )
-            .toButton { _, _ ->
-                if (status != null)
-                {
-                    VelocityRedirectSystem.redirect(player, status.serverId)
-                    return@toButton
-                }
-
-                player.sendMessage("${CC.RED}There is no event running!")
-            }
-
-        buttons[15] = ItemBuilder
+        buttons[14] = ItemBuilder
             .of(XMaterial.PAPER)
-            .name("${CC.B_GREEN}Host event")
+            .name("${CC.B_GREEN}Host")
             .addToLore(
                 "${CC.WHITE}Select an event to host.",
                 "",
                 "${CC.AQUA}Prime${CC.WHITE} rank is",
                 "${CC.WHITE}required to host events.",
                 "",
-                "${CC.GREEN}Click to view events!"
+                if (player.hasPermission("scevents.host-events"))
+                {
+                    "${CC.GREEN}Click to view events!"
+                } else
+                {
+                    "${CC.RED}Upgrade your rank to do this!"
+                }
             )
             .toButton { _, _ ->
-                if (status != null)
-                {
-                    player.sendMessage("${CC.RED}An event has already started!")
-                    return@toButton
-                }
-
                 if (!player.hasPermission("scevents.host-events"))
                 {
                     player.sendMessage(
@@ -134,6 +115,12 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                     player.sendMessage(
                         "${CC.RED}Purchase the ${CC.AQUA}Prime${CC.RED} rank on ${CC.YELLOW}store.liftgate.io${CC.RED} to host events!"
                     )
+                    return@toButton
+                }
+
+                if (status != null)
+                {
+                    player.sendMessage("${CC.RED}There's an event running right now! Please wait until it is over before trying to host an event.")
                     return@toButton
                 }
 

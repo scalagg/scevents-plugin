@@ -43,7 +43,7 @@ object OneInTheChamberModule : EventModule
             player: Player, state: CgsGameState
         )
         {
-            if (state == CgsGameState.WAITING)
+            if (state == CgsGameState.STARTING)
             {
                 lines += ""
                 lines += "${CC.WHITE}Starts in: ${CC.GREEN}${

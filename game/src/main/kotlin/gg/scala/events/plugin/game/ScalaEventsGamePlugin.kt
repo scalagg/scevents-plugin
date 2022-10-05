@@ -1,16 +1,14 @@
 package gg.scala.events.plugin.game
 
-import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.annotations.container.ContainerDisable
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.annotations.container.ContainerPreEnable
 import gg.scala.commons.annotations.custom.CustomAnnotationProcessors
-import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventBind
+import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
 import gg.scala.events.shared.ScalaEventsChannel
-import gg.scala.flavor.binder.FlavorBinderContainer
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
@@ -23,6 +21,7 @@ import me.lucko.helper.plugin.ap.PluginDependency
     depends = [
         PluginDependency("scala-commons"),
         PluginDependency("store-spigot"),
+        PluginDependency("Lemon"),
         PluginDependency("CGS-Engine"),
         PluginDependency("SlimeWorldManager"),
         PluginDependency("cloudsync", soft = true)

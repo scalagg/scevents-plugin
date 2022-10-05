@@ -6,6 +6,7 @@ import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.flavor.inject.Inject
+import gg.scala.flavor.inject.condition.Named
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import me.lucko.helper.Events

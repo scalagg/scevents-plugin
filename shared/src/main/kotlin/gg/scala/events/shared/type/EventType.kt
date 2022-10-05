@@ -73,7 +73,7 @@ sealed interface EventType
             fancyNameRender = "One In The Chamber",
             gameVersion = 1.0F,
             minimumPlayers = 2,
-            startingCountdownSec = 121,
+            startingCountdownSec = 120,
             awards = CgsGameAwardInfo(
                 false, 0..100, 0..100
             ),

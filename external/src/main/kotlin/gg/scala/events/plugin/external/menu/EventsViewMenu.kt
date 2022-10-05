@@ -2,9 +2,13 @@ package gg.scala.events.plugin.external.menu
 
 import gg.scala.aware.message.AwareMessage
 import gg.scala.aware.thread.AwareThreadContext
+import gg.scala.commons.agnostic.sync.server.ServerContainer
+import gg.scala.commons.agnostic.sync.server.impl.GameServer
+import gg.scala.commons.agnostic.sync.server.state.ServerState
 import gg.scala.events.plugin.external.feature.EventStatusFeature
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.events.shared.type.EventType
+import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -68,6 +72,24 @@ class EventsViewMenu : Menu(
                             return@toButton
                         }
 
+                        val servers = ServerContainer
+                            .getServersInGroup("event")
+                            .filterIsInstance<GameServer>()
+
+                        if (servers.isEmpty())
+                        {
+                            player.sendMessage("${CC.RED}There aren't any servers for you to start an event on!")
+                            return@toButton
+                        }
+
+                        val gameServer = servers.first()
+
+                        if (gameServer.state != ServerState.Loaded)
+                        {
+                            player.sendMessage("${CC.RED}The event server has not completely loaded yet, please wait.")
+                            return@toButton
+                        }
+
                         player.sendMessage("${CC.D_GREEN}Preparing an event for you...")
                         player.closeInventory()
 
@@ -79,8 +101,12 @@ class EventsViewMenu : Menu(
                                 "eventType" to type.javaClass.name
                             )
                             .publish(
-                                AwareThreadContext.ASYNC
+                                AwareThreadContext.SYNC
                             )
+
+                        Tasks.delayed(10L) {
+                            VelocityRedirectSystem.redirect(player, gameServer.id)
+                        }
                     }
         }
 
