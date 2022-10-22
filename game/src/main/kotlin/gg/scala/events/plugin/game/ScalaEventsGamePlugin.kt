@@ -22,7 +22,7 @@ import me.lucko.helper.plugin.ap.PluginDependency
         PluginDependency("scala-commons"),
         PluginDependency("store-spigot"),
         PluginDependency("Lemon"),
-        PluginDependency("CGS-Engine"),
+        PluginDependency("ScGameFramework"),
         PluginDependency("SlimeWorldManager"),
         PluginDependency("cloudsync", soft = true)
     ]
