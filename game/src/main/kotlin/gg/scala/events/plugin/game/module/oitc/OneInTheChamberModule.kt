@@ -16,12 +16,12 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
+import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.QuickAccess
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
-import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.time.TimeUtil
@@ -35,7 +35,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
@@ -127,7 +126,7 @@ object OneInTheChamberModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_AQUA}OITC Event"
+        override fun getTitle() = "${CC.B_PRI}OITC Event"
 
         override fun render(
             lines: LinkedList<String>,
@@ -141,7 +140,7 @@ object OneInTheChamberModule : EventModule
                     TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                 }"
                 lines += ""
-                lines += "${CC.AQUA}www.minequest.gg"
+                lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
             }
 
             if (state == CgsGameState.STARTED)
@@ -182,7 +181,7 @@ object OneInTheChamberModule : EventModule
                 }
 
                 lines += ""
-                lines += "${CC.AQUA}www.minequest.gg"
+                lines += "${CC.AQUA}${LemonConstants.WEB_LINK}"
             }
         }
     }
