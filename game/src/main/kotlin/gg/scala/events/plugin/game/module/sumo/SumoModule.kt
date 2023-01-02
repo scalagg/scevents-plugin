@@ -19,7 +19,6 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
-import me.lucko.helper.promise.Promise
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
@@ -136,7 +135,11 @@ object SumoModule : EventModule
                     lines += ""
                     lines += "${CC.WHITE}Players: ${CC.GOLD}${Players.all().size}/30"
                 }
-
+                CgsGameState.ENDED ->
+                {
+                    lines += "Thanks for playing!"
+                    lines += "${CC.GOLD}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
+                }
                 else ->
                 {
                 }
@@ -181,8 +184,10 @@ object SumoModule : EventModule
     {
         override fun getExtraInformation(): List<String>
         {
+            val active = findAliveParticipants().firstOrNull()?.name
+
             return listOf(
-                "${CC.PINK}${if (winner == null) "N/A" else winner} won the Sumo event!"
+                "${CC.PINK}  ${if (active == null) "N/A" else winner} won the Sumo event!"
             )
         }
     }
