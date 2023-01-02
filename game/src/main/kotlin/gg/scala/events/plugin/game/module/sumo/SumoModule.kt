@@ -35,6 +35,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -368,6 +369,13 @@ object SumoModule : EventModule
                     .handler { event ->
                         event.isCancelled = true
                     }
+            }
+
+        Events
+            .subscribe(PlayerInteractEvent::class.java)
+            .filter(PlayerInteractEvent::hasBlock)
+            .handler { event ->
+                event.isCancelled = true
             }
 
         Events
