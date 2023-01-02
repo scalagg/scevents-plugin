@@ -71,9 +71,6 @@ object EventOmnibus
         engine.gameArena = CgsGameArenaHandler.arena
 
         module.configure()
-        engine.gameState = CgsGameState.STARTING
-
-        StartingStateRunnable.doWeCareAboutThis = false
 
         configureJoinEventHandlers()
 
@@ -103,7 +100,7 @@ object EventOmnibus
             .subscribe(PlayerJoinEvent::class.java)
             .expireIf { hasFirstPlayerJoined }
             .handler {
-                val message =  AwareMessage
+                val message = AwareMessage
                     .of(
                         "event-alert",
                         ScalaEventsChannel.channel(),
@@ -115,7 +112,10 @@ object EventOmnibus
                 Schedulers
                     .sync()
                     .runRepeating({ task ->
-                        if (engine.gameState != CgsGameState.STARTING)
+                        if (
+                            engine.gameState != CgsGameState.WAITING &&
+                            engine.gameState != CgsGameState.STARTING
+                        )
                         {
                             task.closeAndReportException()
                             return@runRepeating
@@ -126,6 +126,5 @@ object EventOmnibus
 
                 hasFirstPlayerJoined = true
             }
-            .bindWith(terminable!!)
     }
 }

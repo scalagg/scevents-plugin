@@ -34,6 +34,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -77,7 +78,7 @@ object SumoModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_PRI}Sumo"
+        override fun getTitle() = "${CC.B_PRI}Events ${CC.GRAY}(BETA)"
 
         override fun render(
             lines: LinkedList<String>,
@@ -140,8 +141,9 @@ object SumoModule : EventModule
                     lines += "Thanks for playing!"
                     lines += "${CC.GOLD}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
                 }
-                else ->
-                {
+                CgsGameState.WAITING -> {
+                    lines += "${CC.WHITE}Waiting for players..."
+                    lines += "${CC.GOLD}${Players.all().size}/30"
                 }
             }
 
@@ -187,7 +189,7 @@ object SumoModule : EventModule
             val active = findAliveParticipants().firstOrNull()?.name
 
             return listOf(
-                "${CC.PINK}  ${if (active == null) "N/A" else winner} won the Sumo event!"
+                "${CC.PINK} ${if (active == null) "N/A" else winner} won the Sumo event!"
             )
         }
     }
@@ -208,10 +210,15 @@ object SumoModule : EventModule
         Events
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
-                it.player.inventory.clear()
+                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
                 it.player.sendMessage("${CC.GREEN}Welcome to the ${CC.GOLD}Sumo${CC.GREEN} event!")
                 it.player.sendMessage("${CC.YELLOW}Please wait for others to join...")
-                it.player.teleport(lobby)
+                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
+
+                if (engine.gameState == CgsGameState.STARTING)
+                {
+                    it.player.teleport(lobby)
+                }
             }
 
         Events
@@ -332,9 +339,6 @@ object SumoModule : EventModule
 
         fun playerLoses(loser: Player)
         {
-            loser.sendMessage("${CC.BD_RED}✘ ${CC.RED}You were eliminated from the event!")
-            loser.sendMessage("${CC.BD_RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.")
-
             Schedulers
                 .sync()
                 .runLater({
@@ -347,6 +351,8 @@ object SumoModule : EventModule
                     val bukkit = Bukkit.getPlayer(opposite.first())
                     bukkit.teleport(lobby)
 
+                    loser.sendMessage("${CC.RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.")
+
                     Schedulers
                         .sync()
                         .runLater({
@@ -355,7 +361,7 @@ object SumoModule : EventModule
                 }, 3L, TimeUnit.SECONDS)
         }
 
-        listOf(BlockBreakEvent::class.java, BlockPlaceEvent::class.java)
+        listOf(BlockBreakEvent::class.java, BlockPlaceEvent::class.java, FoodLevelChangeEvent::class.java)
             .forEach {
                 Events
                     .subscribe(it)

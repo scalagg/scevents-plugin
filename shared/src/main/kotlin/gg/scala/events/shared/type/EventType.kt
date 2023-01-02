@@ -31,7 +31,7 @@ sealed interface EventType
             .build()
 
         override val description =
-            "I don't know, use github copilot"
+            "Fight against other players in a fist-fight to claim the winner role."
 
         override val mode = object : CgsGameMode
         {
@@ -74,7 +74,7 @@ sealed interface EventType
             fancyNameRender = "Sumo",
             gameVersion = 1.0F,
             minimumPlayers = 2,
-            startingCountdownSec = 11,
+            startingCountdownSec = 61,
             awards = CgsGameAwardInfo(
                 false, 0..100, 0..100
             ),
