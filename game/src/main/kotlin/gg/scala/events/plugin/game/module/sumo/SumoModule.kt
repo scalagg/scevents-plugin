@@ -210,6 +210,7 @@ object SumoModule : EventModule
             .handler {
                 it.player.inventory.clear()
                 it.player.sendMessage("${CC.GREEN}Welcome to the ${CC.GOLD}Sumo${CC.GREEN} event!")
+                it.player.sendMessage("${CC.YELLOW}Please wait for others to join...")
                 it.player.teleport(lobby)
             }
 
@@ -331,6 +332,9 @@ object SumoModule : EventModule
 
         fun playerLoses(loser: Player)
         {
+            loser.sendMessage("${CC.BD_RED}✘ ${CC.RED}You were eliminated from the event!")
+            loser.sendMessage("${CC.BD_RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.")
+
             Schedulers
                 .sync()
                 .runLater({

@@ -30,7 +30,7 @@ object EventOrchestrator
     @Inject
     lateinit var engine: ScalaEventsGameEngine
 
-    var eventStarted = false
+    private var eventStarted = false
 
     @Configure
     fun configure()
@@ -108,5 +108,7 @@ object EventOrchestrator
 
         ScalaEventsChannel.kv().sync().del("event:status")
         eventStarted = false
+
+        EventOmnibus.configureJoinEventHandlers()
     }
 }

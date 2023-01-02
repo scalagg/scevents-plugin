@@ -18,6 +18,7 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import gg.scala.lemon.util.QuickAccess
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
+import me.lucko.helper.terminable.composite.CompositeTerminable
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
@@ -74,9 +75,32 @@ object EventOmnibus
 
         StartingStateRunnable.doWeCareAboutThis = false
 
+        configureJoinEventHandlers()
+
+        Events
+            .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
+            .handler {
+                EventOrchestrator.terminateActive()
+            }
+    }
+
+    private var terminable: CompositeTerminable? = null
+
+    fun configureJoinEventHandlers()
+    {
+        terminable = if (terminable == null)
+        {
+            CompositeTerminable.create()
+        } else
+        {
+            terminable!!.closeAndReportException()
+            CompositeTerminable.create()
+        }
+
         var hasFirstPlayerJoined = false
 
-        Events.subscribe(PlayerJoinEvent::class.java)
+        Events
+            .subscribe(PlayerJoinEvent::class.java)
             .expireIf { hasFirstPlayerJoined }
             .handler {
                 val message =  AwareMessage
@@ -102,11 +126,6 @@ object EventOmnibus
 
                 hasFirstPlayerJoined = true
             }
-
-        Events
-            .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
-            .handler {
-                EventOrchestrator.terminateActive()
-            }
+            .bindWith(terminable!!)
     }
 }
