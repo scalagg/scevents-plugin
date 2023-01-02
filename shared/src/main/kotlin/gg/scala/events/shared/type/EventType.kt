@@ -24,65 +24,65 @@ sealed interface EventType
     val info: CgsGameGeneralInfo
     val mode: CgsGameMode
 
-    object OneInTheChamber : EventType
+    object Sumo : EventType
     {
         override val icon = ItemBuilder
-            .of(XMaterial.ARROW)
+            .of(XMaterial.LEAD)
             .build()
 
         override val description =
-            "First to kill the most players win!"
+            "I don't know, use github copilot"
 
         override val mode = object : CgsGameMode
         {
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "bw-test-two"
+                    override fun getBukkitWorldName() = "world"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
-                    override fun getId() = "bw-test-two"
+                    override fun getId() = "world"
 
                     override fun getMaterial() = Material.ARROW to 1
-                    override fun getName() = "OITC"
+                    override fun getName() = "sumo"
 
                     override fun getPreLobbyLocation() = Location(
                         Bukkit.getWorld("world"),
-                        0.5, 36.0, -0.5
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
                     )
 
                     override fun getSpectatorLocation() = Location(
                         Bukkit.getWorld("world"),
-                        0.5, 36.0, -0.5
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
                     )
                 }
             )
-            override fun getDescription() = "oitc."
+            override fun getDescription() = ""
 
-            override fun getId() = "oitc"
+            override fun getId() = "sumo"
 
-            override fun getMaterial() = Material.ARROW to 1
+            override fun getMaterial() = Material.LEASH to 1
 
             override fun getMaxTeams() = 30
             override fun getTeamSize() = 1
 
-            override fun getName() = "OITC"
+            override fun getName() = "Sumo"
         }
 
         override val info = CgsGameGeneralInfo(
-            fancyNameRender = "One In The Chamber",
+            fancyNameRender = "Sumo",
             gameVersion = 1.0F,
             minimumPlayers = 2,
-            startingCountdownSec = 20,
+            startingCountdownSec = 11,
             awards = CgsGameAwardInfo(
                 false, 0..100, 0..100
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,
-            spectateOnDeath = false,
+            spectateOnDeath = true,
             showTabHearts = false,
-            showNameHearts = true,
+            showNameHearts = false,
             usesCustomArenaWorld = true,
             gameModes = listOf(mode)
         )
@@ -90,6 +90,6 @@ sealed interface EventType
 
     companion object
     {
-        val TYPES = mutableListOf<EventType>(OneInTheChamber)
+        val TYPES = mutableListOf(Sumo)
     }
 }
