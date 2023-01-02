@@ -12,6 +12,7 @@ import gg.scala.flavor.service.Service
 import me.lucko.helper.Events
 import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
+import org.bukkit.Bukkit
 import org.bukkit.event.EventPriority
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import java.util.*
@@ -29,7 +30,7 @@ object EventOrchestrator
     @Inject
     lateinit var engine: ScalaEventsGameEngine
 
-    private var eventStarted = false
+    var eventStarted = false
 
     @Configure
     fun configure()
@@ -96,5 +97,16 @@ object EventOrchestrator
 
         // init lazy val
         ScalaEventsChannel.kv()
+    }
+
+    fun terminateActive()
+    {
+        Bukkit.getOnlinePlayers()
+            .forEach { player ->
+                player.kickPlayer("${CC.RED}We were unable to start the event due to a lack of players.")
+            }
+
+        ScalaEventsChannel.kv().sync().del("event:status")
+        eventStarted = false
     }
 }

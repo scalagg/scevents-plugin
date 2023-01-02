@@ -106,17 +106,7 @@ object EventOmnibus
         Events
             .subscribe(CgsGameEngine.CgsGamePreStartCancelEvent::class.java)
             .handler {
-                Bukkit.getOnlinePlayers()
-                    .forEach { player ->
-                        player.kickPlayer("${CC.RED}We were unable to start the event due to a lack of players.")
-                    }
-
-                EndedStateRunnable.ALLOWED_TO_JOIN = false
-
-                Schedulers.sync()
-                    .runLater({
-                        Bukkit.shutdown()
-                    }, 100L)
+                EventOrchestrator.terminateActive()
             }
     }
 }
