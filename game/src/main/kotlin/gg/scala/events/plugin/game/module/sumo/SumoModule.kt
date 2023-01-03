@@ -169,16 +169,6 @@ object SumoModule : EventModule
             target: CgsGamePlayer
         ): NametagInfo?
         {
-            if (currentlyPlaying == null)
-            {
-                return null
-            }
-
-            if (target.uniqueId in currentlyPlaying!!)
-            {
-                return NametagProvider.createNametag(CC.RED, "")
-            }
-
             return null
         }
     }
