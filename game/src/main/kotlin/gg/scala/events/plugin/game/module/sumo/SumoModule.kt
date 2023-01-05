@@ -30,6 +30,7 @@ import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -305,6 +306,7 @@ object SumoModule : EventModule
                     currentlyPlaying!!.forEach {
                         val bukkit = Bukkit.getPlayer(it)
                         bukkit.removeMetadata("frozenaf", plugin)
+                        bukkit.playSound(bukkit.location, Sound.ORB_PICKUP, 1.0F, 1.0F)
                     }
 
                     Bukkit.broadcastMessage("${CC.GREEN}The match has started!")
@@ -312,6 +314,11 @@ object SumoModule : EventModule
 
                 override fun onRun()
                 {
+                    currentlyPlaying!!.forEach {
+                        val bukkit = Bukkit.getPlayer(it)
+                        bukkit.playSound(bukkit.location, Sound.NOTE_STICKS, 1.0F, 1.0F)
+                    }
+
                     Bukkit.broadcastMessage(
                         "${CC.SEC}The match starts in ${CC.PRI}${
                             DurationFormatUtils.formatDurationWords(seconds * 1000L, true, true)
