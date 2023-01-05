@@ -85,7 +85,9 @@ sealed interface EventType
             showNameHearts = false,
             usesCustomArenaWorld = true,
             gameModes = listOf(mode)
-        )
+        ).apply {
+            this.configureSpectatorChat = false
+        }
     }
 
     companion object

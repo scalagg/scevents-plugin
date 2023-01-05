@@ -25,3 +25,9 @@ object ScalaEventsGameInfo : CgsGameGeneralInfo(
         ScalaEventsCustomGameMode
     )
 )
+{
+    init
+    {
+        configureSpectatorChat = false
+    }
+}
