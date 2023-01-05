@@ -175,14 +175,7 @@ object SumoModule : EventModule
 
     object GameSnapshot : CgsGameSnapshot
     {
-        override fun getExtraInformation(): List<String>
-        {
-            val active = findAliveParticipants().firstOrNull()?.name
-
-            return listOf(
-                "${CC.PINK} ${if (active == null) "N/A" else winner} won the Sumo event!"
-            )
-        }
+        override fun getExtraInformation() = listOf<String>()
     }
 
     override val gameSnapshot = GameSnapshot
