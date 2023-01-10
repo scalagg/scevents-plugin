@@ -31,28 +31,41 @@ object ScalaEventsChannel
 
                 val header = "${CC.B_PRI}Event ${CC.B_GRAY}${Constants.DOUBLE_ARROW_RIGHT} "
 
+                fun FancyMessage.style(): FancyMessage
+                {
+                    return apply {
+                        andHoverOf(
+                            "${CC.B_GREEN}Click to join the event!",
+                            "",
+                            "${CC.GREEN}By joining this event, you",
+                            "${CC.GREEN}will be switching to the",
+                            "${CC.GREEN}server ${CC.B_GREEN}$server${CC.GREEN}!",
+                        )
+                        andCommandOf(
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/join $server"
+                        )
+                    }
+                }
+
                 val fancy = FancyMessage()
                     .withMessage(
                         "$header${
                             "${CC.PRI}$alerter${CC.SEC} is hosting a ${CC.WHITE}$event${CC.SEC} event!"
                         }"
                     )
+                    .style()
+
+                val later = FancyMessage()
                     .withMessage(
                         "\n$header${CC.GREEN}(Click to join)"
                     )
-                    .andHoverOf(
-                        "${CC.B_GREEN}Click to join the event!",
-                        "",
-                        "${CC.GREEN}By joining this event, you",
-                        "${CC.GREEN}will be switching to the",
-                        "${CC.GREEN}server ${CC.B_GREEN}$server${CC.GREEN}!",
-                    )
-                    .andCommandOf(
-                        ClickEvent.Action.RUN_COMMAND,
-                        "/join $server"
-                    )
+                    .style()
 
-                Players.all().forEach(fancy::sendToPlayer)
+                Players.all().forEach {
+                    fancy.sendToPlayer(it)
+                    later.sendToPlayer(it)
+                }
             }
 
         aware
