@@ -58,7 +58,7 @@ object ScalaEventsChannel
 
                 val later = FancyMessage()
                     .withMessage(
-                        "\n$header${CC.GREEN}(Click to join)"
+                        "$header${CC.GREEN}(Click to join)"
                     )
                     .style()
 
