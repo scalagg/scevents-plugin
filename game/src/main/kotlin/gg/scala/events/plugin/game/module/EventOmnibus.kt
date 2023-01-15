@@ -112,6 +112,12 @@ object EventOmnibus
                 Schedulers
                     .sync()
                     .runRepeating({ task ->
+                        if (Players.all().isEmpty())
+                        {
+                            task.closeAndReportException()
+                            return@runRepeating
+                        }
+
                         if (
                             engine.gameState != CgsGameState.WAITING &&
                             engine.gameState != CgsGameState.STARTING
