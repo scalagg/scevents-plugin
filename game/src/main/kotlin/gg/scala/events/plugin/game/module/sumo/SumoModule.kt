@@ -342,7 +342,7 @@ object SumoModule : EventModule
                     val bukkit = Bukkit.getPlayer(opposite.first())
                     bukkit.teleport(lobby)
 
-                    loser.sendMessage("${CC.RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.")
+                    loser.sendMessage("${CC.D_RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.")
 
                     Schedulers
                         .sync()

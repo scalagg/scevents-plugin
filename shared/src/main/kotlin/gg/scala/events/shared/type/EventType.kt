@@ -5,6 +5,7 @@ import gg.scala.cgs.common.information.CgsGameAwardInfo
 import gg.scala.cgs.common.information.CgsGameGeneralInfo
 import gg.scala.cgs.common.information.arena.CgsGameArena
 import gg.scala.cgs.common.information.mode.CgsGameMode
+import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -87,6 +88,10 @@ sealed interface EventType
             gameModes = listOf(mode)
         ).apply {
             this.configureSpectatorChat = false
+            this.customDeathMessage = true
+            this.customDeathMessageService = { player ->
+                "${CC.D_RED}✘ ${CC.WHITE}${player.name}${CC.RED} was eliminated from the event."
+            }
         }
     }
 
