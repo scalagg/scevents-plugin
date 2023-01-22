@@ -16,6 +16,7 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
+import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -94,9 +95,9 @@ object SumoModule : EventModule
                 CgsGameState.STARTING ->
                 {
                     lines += "${CC.WHITE}Event starting soon..."
-                    lines += "${CC.GOLD}${Players.all().size}/30"
+                    lines += "${CC.PRI}${Players.all().size}/30"
                     lines += ""
-                    lines += "${CC.WHITE}Starts in: ${CC.GOLD}${
+                    lines += "${CC.WHITE}Starts in: ${CC.PRI}${
                         TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
                     }"
                 }
@@ -107,7 +108,7 @@ object SumoModule : EventModule
 
                     if (currentlyPlaying == null)
                     {
-                        lines += "${CC.GOLD}N/A"
+                        lines += "${CC.PRI}N/A"
                     } else
                     {
                         val first = Bukkit
@@ -124,10 +125,10 @@ object SumoModule : EventModule
                         {
                             if (player == null)
                             {
-                                return "${CC.GOLD}N/A ${CC.GRAY}(0ms)"
+                                return "${CC.PRI}N/A ${CC.GRAY}(0ms)"
                             }
 
-                            return "${CC.GOLD}${player.name} ${CC.GRAY}(${MinecraftReflection.getPing(player)}ms)"
+                            return "${CC.PRI}${player.name} ${CC.GRAY}(${MinecraftReflection.getPing(player)}ms)"
                         }
 
                         lines += formatIntoLine(first)
@@ -136,21 +137,21 @@ object SumoModule : EventModule
                     }
 
                     lines += ""
-                    lines += "${CC.WHITE}Players: ${CC.GOLD}${Players.all().size}/30"
+                    lines += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}/30"
                 }
                 CgsGameState.ENDED ->
                 {
                     lines += "Thanks for playing!"
-                    lines += "${CC.GOLD}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
+                    lines += "${CC.PRI}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
                 }
                 CgsGameState.WAITING -> {
                     lines += "${CC.WHITE}Waiting for players..."
-                    lines += "${CC.GOLD}${Players.all().size}/30"
+                    lines += "${CC.PRI}${Players.all().size}/30"
                 }
             }
 
             lines += ""
-            lines += "${CC.GOLD}tropic.gg"
+            lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
         }
     }
