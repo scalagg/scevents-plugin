@@ -9,6 +9,8 @@ import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
 import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.lemon.redirection.PlayerRedirectSystem
+import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 

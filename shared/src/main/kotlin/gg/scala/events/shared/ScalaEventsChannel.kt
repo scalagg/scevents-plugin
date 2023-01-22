@@ -72,7 +72,10 @@ object ScalaEventsChannel
     }
 
     private val connection by lazy {
-        aware.internal().connect()
+        val connection = aware.internal().connect()
+
+        connection.sync().del("events:status")
+        connection!!
     }
 
     fun kv() = connection

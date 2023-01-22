@@ -28,7 +28,7 @@ sealed interface EventType
     object Sumo : EventType
     {
         override val icon = ItemBuilder
-            .of(XMaterial.LEAD)
+            .of(XMaterial.SLIME_BALL)
             .build()
 
         override val description =
@@ -95,8 +95,78 @@ sealed interface EventType
         }
     }
 
+    object WoolShuffle : EventType
+    {
+        override val icon = ItemBuilder
+            .of(XMaterial.RED_WOOL)
+            .build()
+
+        override val description =
+            "Test your skills and be the first to survive multiple rounds of wool changes."
+
+        override val mode = object : CgsGameMode
+        {
+            override fun getArenas() = listOf(
+                object : CgsGameArena
+                {
+                    override fun getBukkitWorldName() = "world"
+                    override fun getDescription() = ""
+
+                    override fun getDirectory(): Path? = null
+                    override fun getId() = "world"
+
+                    override fun getMaterial() = Material.ARROW to 1
+                    override fun getName() = "wool_shuffle"
+
+                    override fun getPreLobbyLocation() = Location(
+                        Bukkit.getWorld("world"),
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                    )
+
+                    override fun getSpectatorLocation() = Location(
+                        Bukkit.getWorld("world"),
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                    )
+                }
+            )
+            override fun getDescription() = ""
+
+            override fun getId() = "wool_shuffle"
+
+            override fun getMaterial() = Material.WOOL to 1
+
+            override fun getMaxTeams() = 30
+            override fun getTeamSize() = 1
+
+            override fun getName() = "Wool Shuffle"
+        }
+
+        override val info = CgsGameGeneralInfo(
+            fancyNameRender = "Wool Shuffle",
+            gameVersion = 1.0F,
+            minimumPlayers = 2,
+            startingCountdownSec = 61,
+            awards = CgsGameAwardInfo(
+                false, 0..100, 0..100
+            ),
+            preStartVoting = false,
+            disqualifyOnLogout = true,
+            spectateOnDeath = true,
+            showTabHearts = false,
+            showNameHearts = false,
+            usesCustomArenaWorld = true,
+            gameModes = listOf(mode)
+        ).apply {
+            this.configureSpectatorChat = false
+            this.customDeathMessage = true
+            this.customDeathMessageService = { player ->
+                "${CC.D_RED}✘ ${CC.WHITE}${player.name}${CC.RED} was eliminated from the event."
+            }
+        }
+    }
+
     companion object
     {
-        val TYPES = mutableListOf(Sumo)
+        val TYPES = mutableListOf(Sumo, WoolShuffle)
     }
 }
