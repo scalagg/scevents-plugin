@@ -190,12 +190,12 @@ sealed interface EventType
 
                     override fun getPreLobbyLocation() = Location(
                         Bukkit.getWorld("world"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                        0.500, 60.000, 0.500
                     )
 
                     override fun getSpectatorLocation() = Location(
                         Bukkit.getWorld("world"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                        500.500, 60.000, 500.500
                     )
                 }
             )
