@@ -2,6 +2,7 @@ package gg.scala.events.plugin.game.module.shuffle
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
+import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
@@ -24,22 +25,26 @@ import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
-import net.evilblock.cubed.util.nms.MinecraftReflection
+import net.evilblock.cubed.util.bukkit.Tasks
+import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
-import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -60,6 +65,7 @@ object WoolShuffleModule : EventModule
     lateinit var plugin: ScalaEventsGamePlugin
 
     private var winner: String? = null
+    private var color: ChatColor? = null
 
     private fun findAliveParticipants() = Players.all()
         .filter {
@@ -92,18 +98,21 @@ object WoolShuffleModule : EventModule
                 CgsGameState.STARTED ->
                 {
                     lines += "${CC.WHITE}Current color:"
-                    lines += "${CC.RED}Selecting..."
-                    lines += ""
-                    lines += "${CC.WHITE}Time left: ${CC.GREEN}5s"
+                    lines += "${
+                        if (color != null) "$color${color?.better()}" else "${CC.RED}Selecting..."
+                    }"
                     lines += ""
                     lines += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}/30"
                 }
+
                 CgsGameState.ENDED ->
                 {
                     lines += "Thanks for playing!"
                     lines += "${CC.PRI}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
                 }
-                CgsGameState.WAITING -> {
+
+                CgsGameState.WAITING ->
+                {
                     lines += "${CC.WHITE}Waiting for players..."
                     lines += "${CC.PRI}${Players.all().size}/30"
                 }
@@ -145,12 +154,40 @@ object WoolShuffleModule : EventModule
     override val scoreboardFormatter = ScoreboardRenderer
     override val visibilityAdapter = VisibilityAdapter
 
+    val middleOfArena = Location(
+        Bukkit.getWorld("world"),
+        294116.500, 73.000, 49050.500
+    )
+
     override fun configure()
     {
         val lobby = Location(
             Bukkit.getWorld("world"),
             294143.5, 75.000, 49050.5, 90.0F, 0.0F
         )
+
+        val platform = Cuboid(
+            Location(
+                Bukkit.getWorld("world"),
+                294104.000, 72.000, 49039.000
+            ),
+            Location(
+                Bukkit.getWorld("world"),
+                294129.000, 72.000, 49060.000
+            )
+        )
+
+        fun resetPlatform()
+        {
+            Tasks.sync {
+                platform.forEach { block ->
+                    block.data = 0
+                    block.type = Material.WOOL
+                }
+            }
+        }
+
+        resetPlatform()
 
         Events
             .subscribe(PlayerJoinEvent::class.java)
@@ -169,10 +206,82 @@ object WoolShuffleModule : EventModule
         Events
             .subscribe(EntityDamageByEntityEvent::class.java)
             .handler {
-                it.isCancelled = true
+                if (!findAliveParticipants().contains(it.entity))
+                {
+                    it.isCancelled = true
+                    return@handler
+                }
+
+                if (color == null)
+                {
+                    it.isCancelled = true
+                }
             }
 
         var currentRound = 1
+
+        fun randomizePlatform()
+        {
+            platform
+                .forEach {
+                    it.type = Material.WOOL
+                    it.data = WoolShuffleUtilities.randomColor()
+                }
+        }
+
+        /**
+         * Shuffle wool colors for all blocks in the [cuboid].
+         */
+        fun shuffle(
+            color: ChatColor =
+                WoolShuffleUtilities.availableColors.random()
+        )
+        {
+            this.color = color
+
+            val wool = ItemStack(
+                Material.WOOL, 1,
+                WoolShuffleUtilities
+                    .fromChatColor(color)
+                    .toShort()
+            ).apply {
+                val itemMeta = this.itemMeta
+                itemMeta.displayName = "$color${color.better()} Wool"
+                itemMeta.lore = mutableListOf(
+                    "${ChatColor.GRAY}Stand on this block!"
+                )
+
+                this.itemMeta = itemMeta
+            }
+
+            for (player in findAliveParticipants())
+            {
+                for (i in 0..8)
+                {
+                    player.inventory.setItem(i, wool)
+                }
+            }
+        }
+
+        /**
+         * Eliminate players who are not on
+         * a block with the color [color].
+         */
+        fun eliminate()
+        {
+            val woolData = WoolShuffleUtilities
+                .fromChatColor(color!!)
+
+            platform
+                .filter { it.data != woolData }
+                .forEach {
+                    it.type = Material.AIR
+                }
+
+            Bukkit.broadcastMessage(
+                "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.RED}Players not on $color${color?.better()}${CC.WHITE} were eliminated!"
+            )
+        }
 
         fun startNewRound()
         {
@@ -180,6 +289,7 @@ object WoolShuffleModule : EventModule
 
             if (active.size <= 1)
             {
+                color = null
                 winner = active.firstOrNull()?.name
                 return
             }
@@ -187,6 +297,16 @@ object WoolShuffleModule : EventModule
             Bukkit.broadcastMessage(
                 "${CC.B_GOLD}✮ ${CC.YELLOW}Round #${currentRound++}: ${CC.GREEN}Selecting color..."
             )
+
+            color = null
+
+            randomizePlatform()
+
+            findAliveParticipants()
+                .forEach {
+                    it.teleport(middleOfArena)
+                    it.inventory.clear()
+                }
 
             object : DiminutionRunnable(6)
             {
@@ -198,14 +318,52 @@ object WoolShuffleModule : EventModule
 
                 override fun onEnd()
                 {
+                    shuffle()
+
                     Bukkit.broadcastMessage(
-                        "${CC.B_GOLD}✮ ${CC.YELLOW}Round #${currentRound++}: ${CC.WHITE}The color ${CC.PINK}Light Purple${CC.WHITE} was selected!"
+                        "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.WHITE}The color $color${color?.better()}${CC.WHITE} was selected!"
                     )
+
+                    findAliveParticipants().forEach {
+                        it.playSound(it.location, Sound.NOTE_PLING, 1.0F, 1.0f)
+                    }
+
+                    object : DiminutionRunnable(4)
+                    {
+                        override fun getSeconds() = listOf(
+                            18000, 14400, 10800, 7200, 3600, 2700, 1800,
+                            900, 600, 300, 240, 180, 120, 60, 50, 40, 30,
+                            15, 10, 5, 4, 3, 2, 1
+                        )
+
+                        override fun onEnd()
+                        {
+                            eliminate()
+
+                            Schedulers.sync()
+                                .runLater({
+                                          startNewRound()
+                                }, 40L)
+                        }
+
+                        override fun onRun()
+                        {
+                            Bukkit.broadcastMessage(
+                                "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.RED}Players will be eliminated in ${CC.BOLD}${seconds}s${CC.RED}!"
+                            )
+                        }
+                    }.runTaskTimer(plugin, 10L, 20L)
                 }
 
                 override fun onRun()
                 {
+                    Bukkit.broadcastMessage(
+                        "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.GREEN}Color will be selected in ${CC.GOLD}${seconds}s${CC.GREEN}..."
+                    )
 
+                    findAliveParticipants().forEach {
+                        it.playSound(it.location, Sound.NOTE_STICKS, 1.0F, 1.0f)
+                    }
                 }
             }.runTaskTimer(plugin, 0L, 20L)
         }
@@ -219,13 +377,37 @@ object WoolShuffleModule : EventModule
                 }, 3L, TimeUnit.SECONDS)
         }
 
-        listOf(BlockBreakEvent::class.java, BlockPlaceEvent::class.java, FoodLevelChangeEvent::class.java)
+        listOf(
+            BlockBreakEvent::class.java,
+            BlockPlaceEvent::class.java,
+            FoodLevelChangeEvent::class.java,
+            PlayerDropItemEvent::class.java
+        )
             .forEach {
                 Events
                     .subscribe(it)
                     .handler { event ->
                         event.isCancelled = true
                     }
+            }
+
+        Events
+            .subscribe(PlayerMoveEvent::class.java)
+            .filter(EventUtils::hasPlayerMoved)
+            .filter {
+                findAliveParticipants().contains(it.player)
+            }
+            .filter {
+                it.to.block.isLiquid
+            }
+            .handler {
+                it.player.health = 0.0
+                it.player.teleport(lobby)
+                it.player.setMetadata(
+                    "spectator", FixedMetadataValue(plugin, true)
+                )
+
+                playerLoses(it.player)
             }
 
         Events
@@ -236,19 +418,13 @@ object WoolShuffleModule : EventModule
             }
 
         Events
-            .subscribe(PlayerQuitEvent::class.java)
-            .handler {
-                if (Bukkit.getOnlinePlayers().size - 1 > 1)
-                {
-                    playerLoses(it.player)
-                    return@handler
-                }
-            }
-
-        Events
             .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
             .handler {
                 startNewRound()
             }
     }
 }
+
+fun ChatColor.better(): String = name
+    .replace("_", " ")
+    .lowercase().capitalize()

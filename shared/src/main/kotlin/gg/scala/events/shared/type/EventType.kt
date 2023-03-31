@@ -165,8 +165,78 @@ sealed interface EventType
         }
     }
 
+    object Bonkers : EventType
+    {
+        override val icon = ItemBuilder
+            .of(XMaterial.CHEST)
+            .build()
+
+        override val description =
+            "Jay has gone Bonkers."
+
+        override val mode = object : CgsGameMode
+        {
+            override fun getArenas() = listOf(
+                object : CgsGameArena
+                {
+                    override fun getBukkitWorldName() = "world"
+                    override fun getDescription() = ""
+
+                    override fun getDirectory(): Path? = null
+                    override fun getId() = "world"
+
+                    override fun getMaterial() = Material.CHEST to 1
+                    override fun getName() = "bonkers"
+
+                    override fun getPreLobbyLocation() = Location(
+                        Bukkit.getWorld("world"),
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                    )
+
+                    override fun getSpectatorLocation() = Location(
+                        Bukkit.getWorld("world"),
+                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                    )
+                }
+            )
+            override fun getDescription() = ""
+
+            override fun getId() = "bonkers"
+
+            override fun getMaterial() = Material.WOOL to 1
+
+            override fun getMaxTeams() = 4
+            override fun getTeamSize() = 5
+
+            override fun getName() = "Bonkers"
+        }
+
+        override val info = CgsGameGeneralInfo(
+            fancyNameRender = "Bonkers",
+            gameVersion = 1.0F,
+            minimumPlayers = 4,
+            startingCountdownSec = 6,
+            awards = CgsGameAwardInfo(
+                false, 0..100, 0..100
+            ),
+            preStartVoting = false,
+            disqualifyOnLogout = true,
+            spectateOnDeath = true,
+            showTabHearts = false,
+            showNameHearts = false,
+            usesCustomArenaWorld = true,
+            gameModes = listOf(mode)
+        ).apply {
+            this.configureSpectatorChat = true
+            this.customDeathMessage = true
+            this.customDeathMessageService = { player ->
+                "${CC.D_RED}✘ ${CC.WHITE}${player.name}${CC.RED} was eliminated from the event."
+            }
+        }
+    }
+
     companion object
     {
-        val TYPES = mutableListOf(Sumo, WoolShuffle)
+        val TYPES = mutableListOf(Sumo, WoolShuffle, Bonkers)
     }
 }
