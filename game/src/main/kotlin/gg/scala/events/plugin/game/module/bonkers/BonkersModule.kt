@@ -26,6 +26,7 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
@@ -136,6 +137,21 @@ object BonkersModule : EventModule
                 }
             }
 
+            lines += "Balance: ${
+                Numbers.format(
+                    playerAccounts[player.uniqueId]?.balance ?: 0
+                )
+            }"
+
+            val teamData = player.team()?.data()
+            lines += "Points: ${
+                teamData?.second?.color ?: ChatColor.WHITE
+            }${
+                Numbers.format(
+                    teamData?.second?.points ?: 0
+                )
+            }"
+
             lines += ""
             lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
             lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
@@ -196,7 +212,7 @@ object BonkersModule : EventModule
         seconds: Int,
         end: () -> Unit,
         update: (Int) -> Unit
-    ) = object : DiminutionRunnable(seconds)
+    ) = object : DiminutionRunnable(seconds + 1)
     {
         override fun getSeconds() = listOf(
             18000, 14400, 10800, 7200, 3600, 2700, 1800,
@@ -363,6 +379,9 @@ object BonkersModule : EventModule
 
     var gracePeriodCompleted = false
 
+    fun Player.team() = CgsGameTeamService.getTeamOf(this)
+    fun CgsGameTeam.data() = mappings[this.id]
+
     override fun configure()
     {
         val claims = mutableMapOf<String, Cuboid>()
@@ -403,9 +422,6 @@ object BonkersModule : EventModule
                     SelectTeamMenu().openMenu(it.player)
                 }
             }
-
-        fun Player.team() = CgsGameTeamService.getTeamOf(this)
-        fun CgsGameTeam.data() = mappings[this.id]
 
         Events
             .subscribe(PlayerQuitEvent::class.java)
@@ -521,6 +537,14 @@ object BonkersModule : EventModule
                             }
                         }
                 }
+
+                Schedulers.async()
+                    .runRepeating({ _ ->
+                        playerAccounts
+                            .forEach { (_, account) ->
+                                account.balance += 3
+                            }
+                    }, 0L, 60L)
             }
 
         Commands
