@@ -34,9 +34,9 @@ class SelectTeamMenu : Menu("Select your team")
                 buttons[it.key - 1] = ItemBuilder
                     .of(Material.WOOL)
                     .data(
-                        WoolShuffleUtilities.fromChatColor(mapping.second).toShort()
+                        WoolShuffleUtilities.fromChatColor(mapping.second.color).toShort()
                     )
-                    .name("${mapping.second}${CC.BOLD}${mapping.first}")
+                    .name("${mapping.second.color}${CC.BOLD}${mapping.first}")
                     .apply {
                         it.value.participants
                             .forEach { player ->
@@ -66,7 +66,7 @@ class SelectTeamMenu : Menu("Select your team")
                             ?.participants?.remove(player.uniqueId)
 
                         it.value.participants.add(player.uniqueId)
-                        player.sendMessage("${CC.GREEN}You joined team ${mapping.second}${CC.BOLD}${mapping.first}${CC.GREEN}.")
+                        player.sendMessage("${CC.GREEN}You joined team ${mapping.second.color}${CC.BOLD}${mapping.first}${CC.GREEN}.")
 
                         openMenu(player)
                     }
