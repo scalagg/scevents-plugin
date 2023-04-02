@@ -214,7 +214,7 @@ sealed interface EventType
         override val info = CgsGameGeneralInfo(
             fancyNameRender = "Bonkers",
             gameVersion = 1.0F,
-            minimumPlayers = 4,
+            minimumPlayers = 2,
             startingCountdownSec = 6,
             awards = CgsGameAwardInfo(
                 false, 0..100, 0..100
