@@ -4,6 +4,7 @@ import gg.scala.aware.AwareBuilder
 import gg.scala.aware.codec.codecs.interpretation.AwareMessageCodec
 import gg.scala.aware.message.AwareMessage
 import me.lucko.helper.utils.Players
+import net.evilblock.cubed.ScalaCommonsSpigot
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.FancyMessage
@@ -72,7 +73,7 @@ object ScalaEventsChannel
     }
 
     private val connection by lazy {
-        val connection = aware.internal().connect()
+        val connection = ScalaCommonsSpigot.instance.kvConnection
 
         connection.sync().del("events:status")
         connection!!
