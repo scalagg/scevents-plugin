@@ -394,6 +394,7 @@ object BonkersModule : EventModule
             .handler {
                 createGracePeriodRunner()
                 createSpawnCampInvincibilityRunner()
+                createCentralKothCreationRunner()
 
                 CgsGameTeamService.teams
                     .forEach { (_, team) ->
