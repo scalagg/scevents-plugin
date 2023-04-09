@@ -151,7 +151,7 @@ object BonkersModule : EventModule
 
     private fun createCentralKothCreationRunner() =
         createRunner(
-            seconds = 15,
+            seconds = 60 * 12,
             end = {
                 ConquestKothMix(
                     Cuboid(
