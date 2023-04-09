@@ -337,11 +337,13 @@ object BonkersModule : EventModule
             if (claim == null && oldClaim != null)
             {
                 it.player.sendMessage("${CC.GOLD}Fuck you bestie. Why u leaving. ${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key}")
+                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.WHITE}Warzone")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
             }
 
             if (claim != null && oldClaim == null)
             {
+                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.WHITE}Warzone")
                 it.player.sendMessage("${CC.PINK}Welcome bestie. ${CC.YELLOW}You entered: ${CC.GREEN}${claim.key}")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
             }
