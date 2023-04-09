@@ -220,7 +220,7 @@ data class ConquestKothMix(
             }
 
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${special()}Koth ${region.lowerNE} in 5 seconds!"
+                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${special()}Koth ${region.lowerNE.stringify()} in 5 seconds!"
             )
 
             Schedulers
