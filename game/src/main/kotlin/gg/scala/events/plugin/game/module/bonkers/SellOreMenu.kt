@@ -4,6 +4,7 @@ import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
+import org.apache.commons.lang3.text.WordUtils
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -33,9 +34,12 @@ class SellOreMenu : Menu("Sell your ores")
 
         for (mapping in mappings)
         {
-            val materialName = mapping.key.first.name
-                .replace("_", " ")
-                .lowercase().capitalize()
+            val materialName = WordUtils
+                .capitalizeFully(
+                    mapping.key.first.name
+                        .replace("_", " ")
+                        .lowercase()
+                )
 
             buttons[index] = ItemBuilder
                 .of(mapping.key.first)
