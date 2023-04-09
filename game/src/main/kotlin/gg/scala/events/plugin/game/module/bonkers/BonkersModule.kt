@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
@@ -23,6 +24,7 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -46,12 +48,6 @@ object BonkersModule : EventModule
         )
 
     val mappings = mutableListOf(
-        "" to TeamData(
-            -1,
-            ChatColor.WHITE,
-            loc(500.500, 53.0, 678.500),
-            Cuboid(loc(500.500, 53.0, 678.500))
-        ),
         "Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
@@ -124,10 +120,11 @@ object BonkersModule : EventModule
     }
 
     private var gracePeriodCompleted = false
+    private var spawnCampInvincibility = false
 
     private fun createGracePeriodRunner() =
         createRunner(
-            seconds = 60 * 15,
+            seconds = 60 * 1,
             end = {
                 gracePeriodCompleted = true
                 Bukkit.broadcastMessage("${CC.GREEN}Grace period has ended! You can now capture koths!")
@@ -140,6 +137,18 @@ object BonkersModule : EventModule
                         DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
                     }..."
                 )
+            }
+        )
+
+    private fun createSpawnCampInvincibilityRunner() =
+        createRunner(
+            seconds = 15,
+            end = {
+                spawnCampInvincibility = true
+                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage.")
+            },
+            update = {
+
             }
         )
 
@@ -165,6 +174,15 @@ object BonkersModule : EventModule
                 delayed(1L) {
                     SelectTeamMenu().openMenu(it.player)
                 }
+            }
+
+        Events
+            .subscribe(EntityDamageEvent::class.java)
+            .filter {
+                !spawnCampInvincibility
+            }
+            .handler {
+                it.isCancelled = true
             }
 
         Events
@@ -240,6 +258,7 @@ object BonkersModule : EventModule
 
                 if (it.player.team()?.id != mapping.second.teamId)
                 {
+                    it.player.sendMessage("${CC.RED}You cannot interact with this base! ${it.player.team()?.id} & ${mapping.second.teamId}")
                     it.isCancelled = true
                     return@handler
                 }
@@ -251,6 +270,7 @@ object BonkersModule : EventModule
             .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
             .handler {
                 createGracePeriodRunner()
+                createSpawnCampInvincibilityRunner()
 
                 this.mappings.forEach {
                     CgsGameTeamService.teams[it.second.teamId]
@@ -278,6 +298,12 @@ object BonkersModule : EventModule
             .create()
             .assertPlayer()
             .handler {
+                if (CgsGameEngine.INSTANCE.gameState.isAfter(CgsGameState.STARTED))
+                {
+                    it.sender().sendMessage("${CC.RED}You cannot switch teams right now!")
+                    return@handler
+                }
+
                 SelectTeamMenu().openMenu(it.sender())
             }
             .register("selectteam")

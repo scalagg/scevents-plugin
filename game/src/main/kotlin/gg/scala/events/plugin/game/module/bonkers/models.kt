@@ -239,6 +239,8 @@ data class ConquestKothMix(
 
     fun configure()
     {
+        Bukkit.broadcastMessage("${CC.GREEN}Koth has started at ${region.lowerNE}!")
+
         Schedulers
             .async()
             .runRepeating({ _ ->
@@ -254,7 +256,7 @@ data class ConquestKothMix(
                     val bukkitPlayer = Bukkit.getPlayer(newHolder)
                         ?: return@runRepeating
 
-                    currentHolder = futureHolders.pop()
+                    currentHolder = newHolder
                     bukkitPlayer.sendMessage(
                         "${CC.GREEN}You are now the new capper of Koth!"
                     )
@@ -283,6 +285,7 @@ data class ConquestKothMix(
                 {
                     if (currentHolder != it.player.uniqueId)
                     {
+                        println(futureHolders)
                         if (!futureHolders.contains(it.player.uniqueId))
                         {
                             futureHolders.push(it.player.uniqueId)

@@ -18,7 +18,7 @@ object ScalaEventsCustomGameMode : CgsGameMode
     override fun getMaterial() =
         Material.WOOL to 1
 
-    override fun getMaxTeams() = 6
+    override fun getMaxTeams() = 4
     override fun getTeamSize() = 2
 
     override fun getName() = "custom"
