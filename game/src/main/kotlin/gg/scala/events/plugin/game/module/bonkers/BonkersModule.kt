@@ -290,8 +290,11 @@ object BonkersModule : EventModule
                         .build()
                 )
 
+                it.player.sendMessage("${ChatColor.LIGHT_PURPLE}YAS QUEEN! U SLAYED. GO GET UR ${original.name} BESTIEEEE")
+
                 delayed(6 * 20L) {
                     it.block.type = original
+                    it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
                 }
             }
 
