@@ -13,6 +13,7 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
+import net.evilblock.cubed.entity.EntityHandler
 import net.evilblock.cubed.entity.villager.VillagerEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
@@ -130,13 +131,13 @@ object BonkersModule : EventModule
             seconds = 60 * 1,
             end = {
                 gracePeriodCompleted = true
-                Bukkit.broadcastMessage("${CC.GREEN}Grace period has ended! You can now capture koths!")
+                Bukkit.broadcastMessage("$PREFIX_GRACE_PERIOD${CC.GREEN}Grace period has ended! You can now capture koths!")
 
                 startNewConquestEvent(conquests.random())
             },
             update = {
                 Bukkit.broadcastMessage(
-                    "${CC.RED}Grace period ends in ${
+                    "$PREFIX_GRACE_PERIOD${CC.RED}Grace period ends in ${
                         DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
                     }..."
                 )
@@ -301,7 +302,7 @@ object BonkersModule : EventModule
                 createSpawnCampInvincibilityRunner()
 
                 CgsGameTeamService.teams
-                    .forEach { (t, team) ->
+                    .forEach { (_, team) ->
                         val it = this.mappings.entries
                             .firstOrNull {
                                 it.value.teamId == team.id
@@ -321,6 +322,7 @@ object BonkersModule : EventModule
                         }
 
                         entity.initializeData()
+                        EntityHandler.trackEntity(entity)
 
                         team.participants.forEach { player ->
                             val bukkitPlayer = Bukkit.getPlayer(player)

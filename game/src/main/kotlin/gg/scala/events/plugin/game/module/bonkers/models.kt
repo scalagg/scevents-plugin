@@ -200,23 +200,23 @@ data class ConquestKothMix(
         seconds = this.seconds,
         end = {
             Bukkit.broadcastMessage(
-                "${CC.B_GREEN}Koth ${region.lowerNE.stringify()} was completed!"
+                "$PREFIX_KOTH${CC.B_GREEN}Koth ${region.lowerNE.stringify()} was completed!"
             )
 
             if (currentHolder == null)
             {
-                Bukkit.broadcastMessage("${CC.GRAY} - No one capped.")
+                Bukkit.broadcastMessage("$PREFIX_KOTH${CC.WHITE}No one captured.")
             } else
             {
                 Bukkit.broadcastMessage(
-                    "${CC.GRAY} - ${
+                    "$PREFIX_KOTH${CC.WHITE}${
                         Bukkit.getPlayer(currentHolder)?.name
-                    } captured koth!"
+                    }${CC.GRAY} captured koth!"
                 )
             }
 
             Bukkit.broadcastMessage(
-                "${CC.GOLD}Loot is dropping at the center of Koth ${region.lowerNE} in 5 seconds!"
+                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of Koth ${region.lowerNE} in 5 seconds!"
             )
 
             Schedulers
@@ -234,7 +234,7 @@ data class ConquestKothMix(
         },
         update = {
             Bukkit.broadcastMessage(
-                "${CC.GREEN}Koth ${region.lowerNE.stringify()} will capture in ${
+                "$PREFIX_KOTH${CC.GREEN}Koth ${region.lowerNE.stringify()} will capture in ${
                     DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
                 }"
             )
@@ -246,7 +246,7 @@ data class ConquestKothMix(
 
     fun configure()
     {
-        Bukkit.broadcastMessage("${CC.GREEN}Koth has started at ${region.lowerNE.stringify()}!")
+        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.GREEN}Koth has started at ${region.lowerNE.stringify()}!")
 
         Schedulers
             .async()
@@ -271,7 +271,7 @@ data class ConquestKothMix(
                     createNewRunner()
 
                     Bukkit.broadcastMessage(
-                        "${CC.GREEN}${bukkitPlayer.name} is now capping Koth!"
+                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.name}${CC.GREEN} is now capping Koth!"
                     )
                 }
             }, 0L, 10L)
@@ -317,7 +317,7 @@ data class ConquestKothMix(
                         )
 
                         Bukkit.broadcastMessage(
-                            "${CC.RED}${it.player.name} is no longer capping Koth!"
+                            "$PREFIX_KOTH${CC.RED}${it.player.name} is no longer capping Koth!"
                         )
                     }
 
