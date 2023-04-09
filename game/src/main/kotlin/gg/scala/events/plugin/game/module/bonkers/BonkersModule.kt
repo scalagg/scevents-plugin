@@ -23,6 +23,7 @@ import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Effect
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -295,6 +296,7 @@ object BonkersModule : EventModule
                 delayed(6 * 20L) {
                     it.block.type = original
                     it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
+                    it.player.playEffect(it.player.location, Effect.RECORD_PLAY, Material.RECORD_9)
                 }
             }
 
