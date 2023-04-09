@@ -177,6 +177,8 @@ object BonkersModule : EventModule
 
     override fun configure()
     {
+        plugin.logger.info("I've gone bonkers! Send help! (locali9zation/messages parker influneced)")
+
         this.mappings.forEach {
             claims[it.key + "_base"] = it.value.region
             claims[it.key + "_mine"] = it.value.region
@@ -415,27 +417,50 @@ object BonkersModule : EventModule
                             }
                             ?: return@forEach
 
-                        val entity = object : NpcEntity(
-                            lines = listOf(
-                                "${CC.GREEN}Sell your items",
-                                "${CC.GRAY}Click to open menu!"
-                            ),
-                            location = it.value.spawnLocation
+                        fun buildActionEntity(
+                            action: String,
+                            location: Location,
+                            actionLambda: (Player) -> Unit
                         )
                         {
-                            override fun onRightClick(player: Player)
+                            val entity = object : NpcEntity(
+                                lines = listOf(
+                                    "${CC.GREEN}$action",
+                                    "${CC.GRAY}Click to open menu!"
+                                ),
+                                location = location
+                            )
                             {
-                                if (player.hasMetadata("spectator"))
+                                override fun onRightClick(player: Player)
                                 {
-                                    return
-                                }
+                                    if (player.hasMetadata("spectator"))
+                                    {
+                                        return
+                                    }
 
-                                SellOreMenu().openMenu(player)
+                                    actionLambda(player)
+                                }
                             }
+
+                            entity.initializeData()
+                            EntityHandler.trackEntity(entity)
                         }
 
-                        entity.initializeData()
-                        EntityHandler.trackEntity(entity)
+                        buildActionEntity(
+                            action = "Sell your ore",
+                            location = it.value.spawnLocation
+                        ) {
+                            SellOreMenu().openMenu(it)
+                        }
+
+                        buildActionEntity(
+                            action = "Shop",
+                            location = it.value.spawnLocation
+                                .clone()
+                                .subtract(1.0, 0.0, 1.0)
+                        ) {
+                            ShopMenu().openMenu(it)
+                        }
 
                         team.participants.forEach { player ->
                             val bukkitPlayer = Bukkit.getPlayer(player)

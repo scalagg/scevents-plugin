@@ -66,6 +66,12 @@ class SelectTeamMenu : Menu("Select your team")
                             return@toButton
                         }
 
+                        if (it.value.participants.size >= 4)
+                        {
+                            player.sendMessage("${CC.RED}This team is full, sorry!")
+                            return@toButton
+                        }
+
                         CgsGameTeamService.getTeamOf(player)
                             ?.participants?.remove(player.uniqueId)
 

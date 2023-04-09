@@ -2,9 +2,11 @@ package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
+import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
+import gg.scala.cgs.common.runnable.state.StartingStateRunnable
 import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
@@ -23,6 +25,7 @@ import net.evilblock.cubed.util.bukkit.Rainbow
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.math.Numbers
+import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
@@ -33,6 +36,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -89,31 +93,78 @@ data class GenericMovementEvent(
 
 object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
-    override fun getTitle() = "${
-        Rainbow.currentColor
-    }${CC.BOLD}Bonkers"
+    private val format = SimpleDateFormat()
+
+    override fun getTitle() = "${CC.B_GOLD}Bunkers"
 
     override fun render(
         lines: LinkedList<String>,
         player: Player, state: CgsGameState
     )
     {
-        lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
-        lines += "Balance: ${CC.GREEN}${
-            Numbers.format(
-                BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
-            )
-        }"
+        lines += ""
 
-        player.team()?.data()
-            ?.apply {
-                lines += "DTR: ${CC.GOLD}${dtr}"
-                lines += "Team: ${colored()}"
-            }
+        if (state == CgsGameState.STARTING)
+        {
+            lines += "${CC.GOLD}Game starts in:"
+            lines += "${
+                StartingStateRunnable.PRE_START_TIME 
+            } seconds"
+            lines += ""
+            lines += "${CC.WHITE}Selected team: ${
+                player.team()?.data()?.colored()
+            }"
+            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+                Bukkit.getOnlinePlayers().size
+            }/${
+                Bukkit.getMaxPlayers()
+            }"
+        } else if (state.isAfter(CgsGameState.STARTED))
+        {
+            lines += "Game Time: ${CC.GOLD}${
+                TimeUtil.formatIntoMMSS(
+                    ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
+                )
+            }"
+            lines += "Balance: ${CC.GOLD}${
+                Numbers.format(
+                    BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
+                )
+            }"
+
+            player.team()?.data()
+                ?.apply {
+                    lines += ""
+                    lines += "DTR: ${CC.GREEN}${dtr}"
+                    lines += "Team: ${colored()}"
+                }
+
+            lines += "Kills: ${CC.GOLD}${
+                runCatching {
+                    CgsGameEngine.INSTANCE
+                        .getStatistics(CgsPlayerHandler.find(player)!!)
+                        .gameKills.value
+                }.getOrNull() ?: 0
+            }"
+        } else if (state == CgsGameState.WAITING)
+        {
+            lines += "${CC.GOLD}Waiting:"
+            lines += "${
+                Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
+            } more players."
+            lines += ""
+            lines += "${CC.WHITE}Selected team: ${
+                player.team()?.data()?.colored()
+            }"
+            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+                Bukkit.getOnlinePlayers().size
+            }/${
+                Bukkit.getMaxPlayers()
+            }"
+        }
 
         lines += ""
-        lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
-        lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
+        lines += "${CC.GRAY}www.tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
     }
 }
 
@@ -132,7 +183,7 @@ object NametagAdapter : CgsGameNametagAdapter
         target: CgsGamePlayer
     ): NametagInfo?
     {
-        val thing = Bukkit.getPlayer(target.uniqueId)
+        val thing = Bukkit.getPlayer(viewer.uniqueId)
             ?: return null
 
         return NametagProvider.createNametag(
