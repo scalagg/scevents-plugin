@@ -73,6 +73,11 @@ fun createRunner(
     runTaskTimer(BonkersModule.plugin, 0L, 20L)
 }
 
+data class GenericMovementEvent(
+    val player: Player,
+    val to: Location
+)
+
 object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
     override fun getTitle() = "${CC.B_PRI}Events ${CC.GRAY}(BETA)"
@@ -285,10 +290,7 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        data class GenericMovementEvent(
-            val player: Player,
-            val to: Location
-        )
+        fun name() = "${CC.GOLD}Koth ${CC.GRAY}(${region.lowerNE.stringify()})"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
@@ -299,7 +301,7 @@ data class ConquestKothMix(
                     if (!futureHolders.contains(it.player.uniqueId))
                     {
                         futureHolders.push(it.player.uniqueId)
-                        it.player.sendMessage("${CC.GRAY}You entered koth.")
+                        it.player.sendMessage("${CC.YELLOW}You entered: ${name()}")
 
                         if (currentHolder != null)
                         {
@@ -316,6 +318,7 @@ data class ConquestKothMix(
                     runner?.cancel()
                     runner = null
 
+                    it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
                     it.player.sendMessage(
                         "${CC.RED}You are no longer capping!"
                     )
@@ -328,7 +331,7 @@ data class ConquestKothMix(
                 if (futureHolders.contains(it.player.uniqueId))
                 {
                     futureHolders.remove(it.player.uniqueId)
-                    it.player.sendMessage("${CC.GRAY}You left koth.")
+                    it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
                 }
             }
         }
