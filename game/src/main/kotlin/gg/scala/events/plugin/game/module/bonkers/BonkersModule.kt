@@ -147,7 +147,7 @@ object BonkersModule : EventModule
             seconds = 15,
             end = {
                 spawnCampInvincibility = true
-                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage.")
+                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage. SLAY QUEEN")
             },
             update = {
 

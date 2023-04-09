@@ -394,7 +394,7 @@ data class ConquestKothMix(
                     if (!futureHolders.contains(it.player.uniqueId))
                     {
                         futureHolders.push(it.player.uniqueId)
-                        it.player.sendMessage("${CC.YELLOW}You entered: ${name()}")
+                        it.player.sendMessage("${CC.AQUA}HEYY GIRLBOSS. ${CC.YELLOW}You entered: ${name()}")
 
                         if (currentHolder != null)
                         {
@@ -432,18 +432,18 @@ data class ConquestKothMix(
                         runner = null
                     }
 
-                    it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
+                    it.player.sendMessage("${CC.BLACK}bestie why u leaving :(, it's giving.... DIVORCE. ${CC.YELLOW}You exited: ${name()}")
                     it.player.sendMessage(
                         "${CC.RED}You are no longer capping for your team!"
                     )
 
                     if (nextCaptureSameTeam)
                     {
-                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though.")
+                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though SLAY.")
                     }
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}${
+                        "$PREFIX_KOTH${CC.RED}HELLO???? ${
                             it.player.team()?.data()?.colored()
                         }${CC.RED} is no longer controling ${special()}Koth!"
                     )

@@ -42,7 +42,7 @@ class ShopMenu : Menu("Shop")
 
             if (balance < amount)
             {
-                player.sendMessage("${CC.RED}You don't have enough money!")
+                player.sendMessage("${CC.RED}You don't have enough money bestie!")
                 return@toButton
             }
 
