@@ -14,10 +14,9 @@ import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.entity.EntityHandler
-import net.evilblock.cubed.entity.villager.VillagerEntity
+import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
-import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.apache.commons.lang.time.DurationFormatUtils
@@ -309,7 +308,7 @@ object BonkersModule : EventModule
                             }
                             ?: return@forEach
 
-                        val entity = object : VillagerEntity(
+                        val entity = object : NpcEntity(
                             lines = listOf(
                                 "${CC.GREEN}Sell your items",
                                 "${CC.GRAY}Click to open menu!"
