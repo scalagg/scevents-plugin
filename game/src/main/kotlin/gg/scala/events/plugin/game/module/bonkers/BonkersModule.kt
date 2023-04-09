@@ -227,7 +227,7 @@ object BonkersModule : EventModule
                     }
                 }
 
-                if (mappings[it.block.type] != null)
+                if (mappings[it.block.type] == null)
                 {
                     it.isCancelled = true
                     return@handler
