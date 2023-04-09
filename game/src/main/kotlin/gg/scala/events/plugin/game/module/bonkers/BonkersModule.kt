@@ -312,7 +312,7 @@ object BonkersModule : EventModule
                                 ?: return@forEach
 
                             bukkitPlayer
-                                .teleport(it.spawnLocation)
+                                .teleport(it.value.spawnLocation)
 
                             bukkitPlayer.inventory
                                 .addItem(
