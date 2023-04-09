@@ -56,8 +56,8 @@ object BonkersModule : EventModule
             color = ChatColor.BLUE,
             spawnLocation = loc(500.500, 53.0, 322.500),
             region = Cuboid(
-                loc(546.500, 0.0, 649.500),
-                loc(454.500, 144.0, 699.500)
+                loc(454.500, 0.0, 301.500),
+                loc(546.500, 144.0, 351.500)
             )
         ),
         "Red" to TeamData(
@@ -65,8 +65,8 @@ object BonkersModule : EventModule
             color = ChatColor.RED,
             spawnLocation = loc(500.500, 53.0, 678.500),
             region = Cuboid(
-                loc(454.500, 0.0, 301.500),
-                loc(546.500, 144.0, 351.500)
+                loc(546.500, 0.0, 649.500),
+                loc(454.500, 144.0, 699.500)
             )
         ),
         "Green" to TeamData(
@@ -74,19 +74,17 @@ object BonkersModule : EventModule
             color = ChatColor.GREEN,
             spawnLocation = loc(678.500, 53.0, 500.500),
             region = Cuboid(
-                loc(301.500, 0.0, 546.500),
-                loc(351.500, 144.0, 454.500)
+                loc(699.500, 0.0, 454.500),
+                loc(649.500, 144.0, 546.500)
             )
-
         ),
         "Yellow" to TeamData(
             teamId = 4,
             color = ChatColor.YELLOW,
             spawnLocation = loc(322.500, 53.0, 500.500),
             region = Cuboid(
-                loc(699.500, 0.0, 454.500),
-                loc(649.500, 144.0, 546.500)
-
+                loc(301.500, 0.0, 546.500),
+                loc(351.500, 144.0, 454.500)
             )
         )
     )
@@ -314,7 +312,7 @@ object BonkersModule : EventModule
                                 ?: return@forEach
 
                             bukkitPlayer
-                                .teleport(it.value.spawnLocation)
+                                .teleport(it.spawnLocation)
 
                             bukkitPlayer.inventory
                                 .addItem(
