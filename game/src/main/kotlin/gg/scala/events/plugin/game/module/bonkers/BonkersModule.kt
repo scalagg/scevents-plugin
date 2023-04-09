@@ -25,6 +25,7 @@ import org.bukkit.Material
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -55,7 +56,6 @@ object BonkersModule : EventModule
             region = Cuboid(
                 loc(546.500, 0.0, 649.500),
                 loc(454.500, 144.0, 699.500)
-
             )
         ),
         "Red" to TeamData(
@@ -270,6 +270,16 @@ object BonkersModule : EventModule
                 }
 
                 it.isCancelled = false
+            }
+
+        Events
+            .subscribe(PlayerDeathEvent::class.java)
+            .handler {
+                // TODO: spec on dtr loss
+                it.entity.team()?.data()?.second?.spawnLocation
+                    .apply {
+                        it.entity.teleport(this)
+                    }
             }
 
         Events
