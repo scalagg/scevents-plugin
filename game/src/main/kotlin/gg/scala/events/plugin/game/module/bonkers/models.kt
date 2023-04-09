@@ -194,7 +194,7 @@ data class ConquestKothMix(
     val terminable = CompositeTerminable.create()
     var runner: DiminutionRunnable? = null
 
-    fun Location.stringify() = "$x, $y, $z"
+    fun Location.stringify() = "($x, $y, $z)"
 
     fun createNewRunner() = createRunner(
         seconds = this.seconds,

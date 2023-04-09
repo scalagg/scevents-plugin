@@ -272,7 +272,7 @@ object BonkersModule : EventModule
 
                 if (it.player.team()?.id != mapping.teamId)
                 {
-                    it.player.sendMessage("${CC.RED}You cannot interact with this base! ${it.player.team()?.id} & ${mapping.teamId}")
+                    it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                     it.isCancelled = true
                     return@handler
                 }
@@ -286,7 +286,6 @@ object BonkersModule : EventModule
                 // TODO: spec on dtr loss
                 it.entity.team()?.data()?.spawnLocation
                     .apply {
-                        Bukkit.broadcastMessage("this is excuting")
                         delayed(1L) {
                             it.entity.teleport(this)
                         }
