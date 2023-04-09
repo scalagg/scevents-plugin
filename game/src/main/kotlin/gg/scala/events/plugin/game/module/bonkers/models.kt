@@ -159,7 +159,7 @@ object GameSnapshot : CgsGameSnapshot
 }
 
 fun Player.team() = CgsGameTeamService.getTeamOf(this)
-fun CgsGameTeam.data() = BonkersModule.mappings[this.id]
+fun CgsGameTeam.data() = BonkersModule.mappings[this.id - 1]
 
 fun Player.findClaim() = BonkersModule.claims.values
     .firstOrNull {

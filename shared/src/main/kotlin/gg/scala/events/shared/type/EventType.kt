@@ -220,18 +220,14 @@ sealed interface EventType
                 false, 0..100, 0..100
             ),
             preStartVoting = false,
-            disqualifyOnLogout = true,
-            spectateOnDeath = true,
+            disqualifyOnLogout = false,
+            spectateOnDeath = false,
             showTabHearts = false,
-            showNameHearts = false,
+            showNameHearts = true,
             usesCustomArenaWorld = true,
             gameModes = listOf(mode)
         ).apply {
             this.configureSpectatorChat = true
-            this.customDeathMessage = true
-            this.customDeathMessageService = { player ->
-                "${CC.D_RED}✘ ${CC.WHITE}${player.name}${CC.RED} was eliminated from the event."
-            }
         }
     }
 

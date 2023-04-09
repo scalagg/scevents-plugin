@@ -278,18 +278,22 @@ object BonkersModule : EventModule
                 createGracePeriodRunner()
                 createSpawnCampInvincibilityRunner()
 
-                this.mappings.forEach {
-                    CgsGameTeamService.teams[it.second.teamId]
-                        ?.apply {
-                            participants.forEach { player ->
-                                val bukkitPlayer = Bukkit.getPlayer(player)
-                                    ?: return@apply
-
-                                bukkitPlayer
-                                    .teleport(it.second.spawnLocation)
+                CgsGameTeamService.teams
+                    .forEach { t, team ->
+                        val it = this.mappings
+                            .firstOrNull {
+                                it.second.teamId == team.id
                             }
+                            ?: return@forEach
+
+                        team.participants.forEach { player ->
+                            val bukkitPlayer = Bukkit.getPlayer(player)
+                                ?: return@forEach
+
+                            bukkitPlayer
+                                .teleport(it.second.spawnLocation)
                         }
-                }
+                    }
 
                 Schedulers.async()
                     .runRepeating({ _ ->

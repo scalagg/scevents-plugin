@@ -28,7 +28,7 @@ class SelectTeamMenu : Menu("Select your team")
         CgsGameTeamService.teams
             .forEach {
                 val mapping = BonkersModule
-                    .mappings.getOrNull(it.value.id)
+                    .mappings.getOrNull(it.value.id - 1)
                     ?: return@forEach
 
                 buttons[it.key - 1] = ItemBuilder
