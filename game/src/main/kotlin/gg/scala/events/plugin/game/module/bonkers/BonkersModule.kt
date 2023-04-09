@@ -54,20 +54,19 @@ object BonkersModule : EventModule
         "Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
-            spawnLocation = loc(500.500, 53.0, 678.500),
-            region = Cuboid(
-                loc(454.500, 0.0, 301.500),
-                loc(546.500, 144.0, 351.500)
-            )
-
-        ),
-        "Red" to TeamData(
-            teamId = 2,
-            color = ChatColor.RED,
             spawnLocation = loc(500.500, 53.0, 322.500),
             region = Cuboid(
                 loc(546.500, 0.0, 649.500),
                 loc(454.500, 144.0, 699.500)
+            )
+        ),
+        "Red" to TeamData(
+            teamId = 2,
+            color = ChatColor.RED,
+            spawnLocation = loc(500.500, 53.0, 678.500),
+            region = Cuboid(
+                loc(454.500, 0.0, 301.500),
+                loc(546.500, 144.0, 351.500)
             )
         ),
         "Green" to TeamData(
