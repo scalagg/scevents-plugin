@@ -412,8 +412,15 @@ object BonkersModule : EventModule
                             location = it.value.spawnLocation
                         )
                         {
-                            override fun onRightClick(player: Player) =
+                            override fun onRightClick(player: Player)
+                            {
+                                if (player.hasMetadata("spectator"))
+                                {
+                                    return
+                                }
+
                                 SellOreMenu().openMenu(player)
+                            }
                         }
 
                         entity.initializeData()

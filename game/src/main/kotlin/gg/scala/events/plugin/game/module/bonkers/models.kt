@@ -281,6 +281,11 @@ data class ConquestKothMix(
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
+            if (it.player.hasMetadata("spectator"))
+            {
+                return
+            }
+
             if (region.contains(it.to))
             {
                 if (currentHolder != it.player.uniqueId)
