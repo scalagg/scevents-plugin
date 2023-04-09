@@ -232,7 +232,7 @@ object BonkersModule : EventModule
                 !it.player.hasMetadata("spectator")
             }
             .handler {
-                val claim = it.player.findClaim()
+                val claim = it.block.findClaim()
 
                 if (claim == null)
                 {
@@ -326,7 +326,7 @@ object BonkersModule : EventModule
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
-            val claim = it.player.findClaimWithName()
+            val claim = it.to.block.findClaim()
             val oldClaim = it.from.block.findClaim()
 
             if (oldClaim == null && claim == null)
