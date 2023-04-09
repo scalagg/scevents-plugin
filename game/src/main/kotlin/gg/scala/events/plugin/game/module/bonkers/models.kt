@@ -17,6 +17,7 @@ import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
+import net.evilblock.cubed.util.bukkit.Rainbow
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.visibility.VisibilityAction
@@ -41,12 +42,14 @@ data class Account(
 
 data class TeamData(
     val teamId: Int,
+    val teamName: String,
     val color: ChatColor,
     val spawnLocation: Location,
     val region: Cuboid,
     var dtr: Double = 5.0
 )
 {
+    fun colored() = "$color$teamName"
     fun raidable() = dtr <= 0.0
 }
 
@@ -83,7 +86,9 @@ data class GenericMovementEvent(
 
 object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
-    override fun getTitle() = "${CC.B_PRI}Events ${CC.GRAY}(BETA)"
+    override fun getTitle() = "${
+        Rainbow.currentColor
+    }${CC.BOLD}Bonkers"
 
     override fun render(
         lines: LinkedList<String>,
@@ -178,6 +183,8 @@ data class ConquestKothMix(
 )
 {
     var currentHolder: UUID? = null
+    var previousHolderTeamId: Int? = null
+
     var futureHolders = LinkedList<UUID>()
 
     val terminable = CompositeTerminable.create()
@@ -198,10 +205,17 @@ data class ConquestKothMix(
                 Bukkit.broadcastMessage("$PREFIX_KOTH${CC.WHITE}No one captured.")
             } else
             {
+                val holder = Bukkit.getPlayer(currentHolder)
+                val holderTeam = holder?.team()?.data()
+
                 Bukkit.broadcastMessage(
                     "$PREFIX_KOTH${CC.WHITE}${
                         Bukkit.getPlayer(currentHolder)?.colorfulName()
-                    }${CC.GRAY} captured koth!"
+                    }${CC.GRAY} captured koth for ${
+                        holderTeam?.color
+                    }${
+                        holderTeam?.teamName
+                    }${CC.GRAY}!"
                 )
             }
 
@@ -258,14 +272,26 @@ data class ConquestKothMix(
 
                     currentHolder = newHolder
                     bukkitPlayer.sendMessage(
-                        "${CC.GREEN}You are now the new capper of ${special()}Koth!"
+                        "${CC.GREEN}You are now capping ${special()}Koth for ${
+                            bukkitPlayer.team()?.data()?.colored()
+                        }${CC.GREEN}!"
                     )
-
-                    createNewRunner()
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping ${special()}Koth!"
+                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping ${special()}Koth for ${
+                            bukkitPlayer.team()?.data()?.colored()
+                        }${CC.GREEN}!"
                     )
+
+                    if (runner == null)
+                    {
+                        createNewRunner()
+                    } else
+                    {
+                        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.YELLOW}Koth is continuing under ${
+                            bukkitPlayer.team()?.data()?.colored()
+                        }'s${CC.YELLOW} capture!")
+                    }
                 }
             }, 0L, 10L)
             .bindWith(terminable)
@@ -274,6 +300,8 @@ data class ConquestKothMix(
             .subscribe(PlayerQuitEvent::class.java)
             .handler {
                 currentHolder = null
+                previousHolderTeamId = it
+                    .player?.team()?.data()?.teamId
                 futureHolders.remove(it.player.uniqueId)
             }
 
@@ -297,7 +325,7 @@ data class ConquestKothMix(
 
                         if (currentHolder != null)
                         {
-                            it.player.sendMessage("${CC.WHITE}You're queued up to become the capper if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves.")
+                            it.player.sendMessage("${CC.WHITE}You're queued up to capture if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves. (#${futureHolders.size})")
                         }
                     }
                 }
@@ -306,17 +334,45 @@ data class ConquestKothMix(
                 if (currentHolder == it.player.uniqueId)
                 {
                     currentHolder = null
+                    previousHolderTeamId = it.player.team()?.data()?.teamId
 
-                    runner?.cancel()
-                    runner = null
+                    val nextPotentialCapture = futureHolders.peekFirst()
+                    var nextCaptureSameTeam = false
+
+                    if (nextPotentialCapture != null)
+                    {
+                        val nextPotentialPlayer = Bukkit
+                            .getPlayer(nextPotentialCapture)
+                            ?.team()?.data()?.teamId
+
+                        if (nextPotentialPlayer == previousHolderTeamId)
+                        {
+                            nextCaptureSameTeam = true
+                        } else
+                        {
+                            runner?.cancel()
+                            runner = null
+                        }
+                    } else
+                    {
+                        runner?.cancel()
+                        runner = null
+                    }
 
                     it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
                     it.player.sendMessage(
-                        "${CC.RED}You are no longer capping!"
+                        "${CC.RED}You are no longer capping for your team!"
                     )
 
+                    if (nextCaptureSameTeam)
+                    {
+                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though.")
+                    }
+
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping ${special()}Koth!"
+                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping ${special()}Koth for ${
+                            it.player.team()?.data()?.colored()
+                        }${CC.RED}!"
                     )
                 }
 
