@@ -18,6 +18,7 @@ class SellOreMenu : Menu("Sell your ores")
     init
     {
         placeholder = true
+        updateAfterClick = true
     }
 
     private val mappings = mutableMapOf(
