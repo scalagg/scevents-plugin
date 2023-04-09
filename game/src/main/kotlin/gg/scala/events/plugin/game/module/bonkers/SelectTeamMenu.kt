@@ -4,6 +4,7 @@ import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.module.shuffle.WoolShuffleUtilities
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
+import net.evilblock.cubed.nametag.NametagHandler
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Bukkit
@@ -70,6 +71,8 @@ class SelectTeamMenu : Menu("Select your team")
 
                         it.value.participants.add(player.uniqueId)
                         player.sendMessage("${CC.GREEN}You joined team ${mapping.value.color}${CC.BOLD}${mapping.key}${CC.GREEN}.")
+
+                        NametagHandler.reloadPlayer(player)
 
                         openMenu(player)
                     }

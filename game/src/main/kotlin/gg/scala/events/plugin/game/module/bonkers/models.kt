@@ -16,6 +16,7 @@ import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.nametag.NametagInfo
+import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Rainbow
@@ -131,7 +132,13 @@ object NametagAdapter : CgsGameNametagAdapter
         target: CgsGamePlayer
     ): NametagInfo?
     {
-        return null
+        val thing = Bukkit.getPlayer(target.uniqueId)
+            ?: return null
+
+        return NametagProvider.createNametag(
+            thing.team()?.data()?.color?.toString() ?: CC.GRAY,
+            ""
+        )
     }
 }
 
