@@ -91,31 +91,17 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
     )
     {
         lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
-
-        when (state)
-        {
-            CgsGameState.STARTING ->
-            {
-            }
-
-            CgsGameState.STARTED ->
-            {
-            }
-
-            CgsGameState.ENDED ->
-            {
-            }
-
-            CgsGameState.WAITING ->
-            {
-            }
-        }
-
-        lines += "Balance: ${CC.GOLD}${
+        lines += "Balance: ${CC.GREEN}${
             Numbers.format(
                 BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
             )
         }"
+
+        player.team()?.data()
+            ?.apply {
+                lines += "DTR: ${CC.GOLD}${dtr}"
+                lines += "Team: ${color}${color.name}"
+            }
 
         lines += ""
         lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
