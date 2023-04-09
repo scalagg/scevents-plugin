@@ -1,5 +1,6 @@
 package gg.scala.events.plugin.game.module.bonkers
 
+import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
@@ -18,6 +19,7 @@ import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Rainbow
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.visibility.VisibilityAction
@@ -235,6 +237,14 @@ data class ConquestKothMix(
                     .runLater({
                         BonkersModule.startNewConquestEvent(BonkersModule.conquests.random())
                     }, 30 * 20)
+            }
+
+            if (specialCentral)
+            {
+                Tasks.sync {
+                    CgsGameEngine.INSTANCE.winningTeam = Bukkit.getPlayer(currentHolder)?.team()!!
+                    CgsGameEngine.INSTANCE.gameState = CgsGameState.ENDED
+                }
             }
 
             terminable.closeAndReportException()
