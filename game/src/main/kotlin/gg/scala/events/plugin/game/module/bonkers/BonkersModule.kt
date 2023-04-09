@@ -200,6 +200,17 @@ object BonkersModule : EventModule
         )
 
         Events
+            .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
+            .handler {
+                val claim = it.player.findClaim()
+
+                if (claim == null)
+                {
+                    it.isCancelled = true
+                }
+            }
+
+        Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
             .filter {
                 it.player.location.y < 42
