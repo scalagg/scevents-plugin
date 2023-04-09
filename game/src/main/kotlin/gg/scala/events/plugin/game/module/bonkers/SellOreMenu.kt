@@ -21,10 +21,10 @@ class SellOreMenu : Menu("Sell your ores")
     }
 
     private val mappings = mutableMapOf(
-        Material.GOLD_INGOT to 40 to 3,
-        Material.DIAMOND to 50 to 3,
-        Material.COAL to 10 to 3,
-        Material.IRON_INGOT to 20 to 25
+        Material.GOLD_INGOT to 40,
+        Material.DIAMOND to 50,
+        Material.COAL to 10,
+        Material.IRON_INGOT to 20
     )
 
     override fun getButtons(player: Player): Map<Int, Button>
@@ -36,42 +36,42 @@ class SellOreMenu : Menu("Sell your ores")
         {
             val materialName = WordUtils
                 .capitalizeFully(
-                    mapping.key.first.name
+                    mapping.key.name
                         .replace("_", " ")
                         .lowercase()
                 )
 
+            val totalAmount = player.inventory
+                .filter { it != null && it.type == mapping.key }
+                .sumOf { it.amount }
+
             buttons[index] = ItemBuilder
-                .of(mapping.key.first)
+                .of(mapping.key)
                 .name(
                     "${CC.GREEN}Sell $materialName"
                 )
                 .addToLore(
                     "${CC.B_GRAY}Left-click:",
-                    " ${CC.GRAY}Sell 1 for ${CC.WHITE}$${mapping.key.second}",
+                    " ${CC.GRAY}Sell 1 for ${CC.WHITE}$${mapping.value}",
                     "",
                     "${CC.B_GRAY}Right-click:",
-                    " ${CC.GRAY}Sell ${mapping.value} for ${CC.WHITE}$${
-                        mapping.key.second * mapping.value
+                    " ${CC.GRAY}Sell $totalAmount for ${CC.WHITE}$${
+                        mapping.value * totalAmount
                     }"
                 )
                 .toButton { _, type ->
-                    val totalAmount = player.inventory
-                        .filter { it != null && it.type == mapping.key.first }
-                        .sumOf { it.amount }
-
                     if (type!!.isRightClick)
                     {
-                        if (totalAmount < mapping.value)
+                        if (totalAmount <= 0)
                         {
                             player.sendMessage("${CC.RED}You do not have enough of this material to bulk deposit!")
                             return@toButton
                         }
 
-                        player.inventory.removeAmount(mapping.key.first, mapping.value)
-                        player.account().balance += mapping.key.second * mapping.value
+                        player.inventory.removeAmount(mapping.key, totalAmount)
+                        player.account().balance += mapping.value * totalAmount
 
-                        player.sendMessage("${CC.GREEN}You deposited ${mapping.value} ${materialName}s and gained $${mapping.key.second * mapping.value}!")
+                        player.sendMessage("${CC.GREEN}You deposited all of your ${materialName}s and gained $${mapping.value * totalAmount}!")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     } else if (type.isLeftClick)
                     {
@@ -81,10 +81,10 @@ class SellOreMenu : Menu("Sell your ores")
                             return@toButton
                         }
 
-                        player.inventory.removeAmount(mapping.key.first, 1)
-                        player.account().balance += mapping.key.second
+                        player.inventory.removeAmount(mapping.key, 1)
+                        player.account().balance += mapping.value
 
-                        player.sendMessage("${CC.GREEN}You deposited one $materialName and gained $${mapping.key.second}!")
+                        player.sendMessage("${CC.GREEN}You deposited one $materialName and gained $${mapping.value}!")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     }
                 }
