@@ -28,15 +28,18 @@ class SelectTeamMenu : Menu("Select your team")
         CgsGameTeamService.teams
             .forEach {
                 val mapping = BonkersModule
-                    .mappings.getOrNull(it.value.id - 1)
+                    .mappings.entries
+                    .firstOrNull { t ->
+                        t.value.teamId == it.key
+                    }
                     ?: return@forEach
 
                 buttons[it.key - 1] = ItemBuilder
                     .of(Material.WOOL)
                     .data(
-                        WoolShuffleUtilities.fromChatColor(mapping.second.color).toShort()
+                        WoolShuffleUtilities.fromChatColor(mapping.value.color).toShort()
                     )
-                    .name("${mapping.second.color}${CC.BOLD}${mapping.first}")
+                    .name("${mapping.value.color}${CC.BOLD}${mapping.key}")
                     .apply {
                         it.value.participants
                             .forEach { player ->
@@ -66,7 +69,7 @@ class SelectTeamMenu : Menu("Select your team")
                             ?.participants?.remove(player.uniqueId)
 
                         it.value.participants.add(player.uniqueId)
-                        player.sendMessage("${CC.GREEN}You joined team ${mapping.second.color}${CC.BOLD}${mapping.first}${CC.GREEN}.")
+                        player.sendMessage("${CC.GREEN}You joined team ${mapping.value.color}${CC.BOLD}${mapping.key}${CC.GREEN}.")
 
                         openMenu(player)
                     }

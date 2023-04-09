@@ -110,20 +110,20 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
         val teamData = player.team()?.data()
         lines += "Your Team: ${
-            teamData?.second?.color ?: ChatColor.WHITE
+            teamData?.color ?: ChatColor.WHITE
         }${
             Numbers.format(
-                teamData?.second?.points ?: 0
+                teamData?.points ?: 0
             )
         }"
 
         lines += ""
 
         BonkersModule.mappings.forEach {
-            CgsGameTeamService.teams[it.second.teamId]
+            CgsGameTeamService.teams[it.value.teamId]
                 ?.apply {
-                    lines += " ${it.second.color}${it.first}: ${CC.WHITE}${
-                        Numbers.format(it.second.points)
+                    lines += " ${it.value.color}${it.key}: ${CC.WHITE}${
+                        Numbers.format(it.value.points)
                     }"
                 }
         }
@@ -159,7 +159,11 @@ object GameSnapshot : CgsGameSnapshot
 }
 
 fun Player.team() = CgsGameTeamService.getTeamOf(this)
-fun CgsGameTeam.data() = BonkersModule.mappings[this.id - 1]
+fun CgsGameTeam.data() = BonkersModule.mappings.entries
+    .firstOrNull {
+        it.value.teamId == this.id
+    }
+    ?.value
 
 fun Player.findClaim() = BonkersModule.claims.values
     .firstOrNull {

@@ -48,7 +48,7 @@ object BonkersModule : EventModule
             Bukkit.getWorld("world"), x, y, z
         )
 
-    val mappings = mutableListOf(
+    val mappings = mutableMapOf(
         "Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
@@ -157,8 +157,8 @@ object BonkersModule : EventModule
     override fun configure()
     {
         this.mappings.forEach {
-            claims[it.first.lowercase() + "_base"] = it.second.region
-            claims[it.first.lowercase() + "_mine"] = it.second.region
+            claims[it.key.lowercase() + "_base"] = it.value.region
+            claims[it.key.lowercase() + "_mine"] = it.value.region
         }
 
         claims["central_mine"] = Cuboid(
@@ -202,7 +202,7 @@ object BonkersModule : EventModule
         Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
             .filter {
-                it.block.type in mappings.keys && it.player.location.y < 42
+                it.player.location.y < 42
             }
             .handler {
                 val claim = it.block.findClaimContextual("mine")
@@ -213,19 +213,18 @@ object BonkersModule : EventModule
                     return@handler
                 }
 
-                val mapping = this.mappings
-                    .firstOrNull { data ->
-                        data.first.lowercase() == claim.key.split("_")[0]
-                    }
+                val mapping = this.mappings[claim.key.split("_")[0]]
 
                 if (mapping != null)
                 {
-                    if (it.player.team()?.id != mapping.second.teamId)
+                    if (it.player.team()?.id != mapping.teamId)
                     {
                         it.isCancelled = true
                         return@handler
                     }
                 }
+
+                println(mappings[it.block.type])
 
                 if (mappings[it.block.type] == null)
                 {
@@ -256,15 +255,12 @@ object BonkersModule : EventModule
                     .findClaimContextual("base")
                     ?: return@handler
 
-                val mapping = this.mappings
-                    .firstOrNull { data ->
-                        data.first.lowercase() == claim.key.split("_")[0]
-                    }
+                val mapping = this.mappings[claim.key.split("_")[0]]
                     ?: return@handler
 
-                if (it.player.team()?.id != mapping.second.teamId)
+                if (it.player.team()?.id != mapping.teamId)
                 {
-                    it.player.sendMessage("${CC.RED}You cannot interact with this base! ${it.player.team()?.id} & ${mapping.second.teamId}")
+                    it.player.sendMessage("${CC.RED}You cannot interact with this base! ${it.player.team()?.id} & ${mapping.teamId}")
                     it.isCancelled = true
                     return@handler
                 }
@@ -276,7 +272,7 @@ object BonkersModule : EventModule
             .subscribe(PlayerDeathEvent::class.java)
             .handler {
                 // TODO: spec on dtr loss
-                it.entity.team()?.data()?.second?.spawnLocation
+                it.entity.team()?.data()?.spawnLocation
                     .apply {
                         it.entity.teleport(this)
                     }
@@ -290,9 +286,9 @@ object BonkersModule : EventModule
 
                 CgsGameTeamService.teams
                     .forEach { t, team ->
-                        val it = this.mappings
+                        val it = this.mappings.entries
                             .firstOrNull {
-                                it.second.teamId == team.id
+                                it.value.teamId == team.id
                             }
                             ?: return@forEach
 
@@ -301,7 +297,7 @@ object BonkersModule : EventModule
                                 ?: return@forEach
 
                             bukkitPlayer
-                                .teleport(it.second.spawnLocation)
+                                .teleport(it.value.spawnLocation)
                         }
                     }
 
