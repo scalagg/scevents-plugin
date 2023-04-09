@@ -9,6 +9,7 @@ import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.lemon.LemonConstants
+import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -189,11 +190,13 @@ data class ConquestKothMix(
     val terminable = CompositeTerminable.create()
     var runner: DiminutionRunnable? = null
 
+    fun Location.stringify() = "$x, $y, $z"
+
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
         end = {
             Bukkit.broadcastMessage(
-                "${CC.B_GREEN}Koth ${region.lowerNE} was completed!"
+                "${CC.B_GREEN}Koth ${region.lowerNE.stringify()} was completed!"
             )
 
             if (currentHolder == null)
@@ -227,7 +230,7 @@ data class ConquestKothMix(
         },
         update = {
             Bukkit.broadcastMessage(
-                "${CC.GREEN}Koth ${region.lowerNE} will capture in ${
+                "${CC.GREEN}Koth ${region.lowerNE.stringify()} will capture in ${
                     DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
                 }"
             )
@@ -239,7 +242,7 @@ data class ConquestKothMix(
 
     fun configure()
     {
-        Bukkit.broadcastMessage("${CC.GREEN}Koth has started at ${region.lowerNE}!")
+        Bukkit.broadcastMessage("${CC.GREEN}Koth has started at ${region.lowerNE.stringify()}!")
 
         Schedulers
             .async()
@@ -285,11 +288,15 @@ data class ConquestKothMix(
                 {
                     if (currentHolder != it.player.uniqueId)
                     {
-                        println(futureHolders)
                         if (!futureHolders.contains(it.player.uniqueId))
                         {
                             futureHolders.push(it.player.uniqueId)
                             it.player.sendMessage("${CC.GRAY}You entered koth.")
+
+                            if (currentHolder != null)
+                            {
+                                it.player.sendMessage("${CC.WHITE}You're queued up to become the capper if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves.")
+                            }
                         }
                     }
                 } else
