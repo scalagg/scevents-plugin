@@ -200,6 +200,8 @@ fun Block.findClaimContextual(context: String) = BonkersModule.claims.entries
         it.value.contains(this)
     }
 
+fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$name"
+
 data class ConquestKothMix(
     val region: Cuboid,
     val seconds: Int,
@@ -228,7 +230,7 @@ data class ConquestKothMix(
             {
                 Bukkit.broadcastMessage(
                     "$PREFIX_KOTH${CC.WHITE}${
-                        Bukkit.getPlayer(currentHolder)?.name
+                        Bukkit.getPlayer(currentHolder)?.colorfulName()
                     }${CC.GRAY} captured koth!"
                 )
             }
@@ -289,7 +291,7 @@ data class ConquestKothMix(
                     createNewRunner()
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.name}${CC.GREEN} is now capping Koth!"
+                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping Koth!"
                     )
                 }
             }, 0L, 10L)
@@ -336,7 +338,7 @@ data class ConquestKothMix(
                     )
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}${it.player.name} is no longer capping Koth!"
+                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping Koth!"
                     )
                 }
 

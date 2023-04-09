@@ -339,15 +339,22 @@ object BonkersModule : EventModule
             }
 
         Events
-            .subscribe(PlayerDeathEvent::class.java)
+            .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
             .handler {
                 // TODO: spec on dtr loss
-                it.entity.team()?.data()?.spawnLocation
+                it.participant.team()?.data()?.spawnLocation
                     .apply {
                         delayed(1L) {
-                            it.entity.teleport(this)
+                            it.participant.teleport(this)
                         }
                     }
+
+                it.killer?.apply {
+                    account().balance += 250
+                    sendMessage(
+                        "${CC.GOLD}You earned $250 for killing ${it.participant.colorfulName()}${CC.GOLD}!"
+                    )
+                }
             }
 
         Events
