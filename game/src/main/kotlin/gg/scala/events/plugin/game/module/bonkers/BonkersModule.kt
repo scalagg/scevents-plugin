@@ -187,8 +187,11 @@ object BonkersModule : EventModule
             .handler {
                 playerAccounts[it.player.uniqueId] = Account()
 
-                delayed(1L) {
-                    SelectTeamMenu().openMenu(it.player)
+                if (CgsGameEngine.INSTANCE.gameState != CgsGameState.STARTED)
+                {
+                    delayed(1L) {
+                        SelectTeamMenu().openMenu(it.player)
+                    }
                 }
             }
 
@@ -217,6 +220,9 @@ object BonkersModule : EventModule
 
         Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
+            .filter {
+                !it.player.hasMetadata("spectator")
+            }
             .handler {
                 val claim = it.player.findClaim()
 
@@ -239,7 +245,7 @@ object BonkersModule : EventModule
         Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
             .filter {
-                it.player.location.y < 42
+                it.player.location.y < 42 && !it.player.hasMetadata("spectator")
             }
             .handler {
                 val claim = it.block.findClaimContextual("mine")
@@ -284,7 +290,7 @@ object BonkersModule : EventModule
 
         Events
             .subscribe(PlayerInteractEvent::class.java, EventPriority.HIGHEST)
-            .filter { it.clickedBlock != null }
+            .filter { it.clickedBlock != null && !it.player.hasMetadata("spectator") }
             .handler {
                 val claim = it.clickedBlock
                     .findClaimContextual("base")
