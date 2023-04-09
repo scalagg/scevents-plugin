@@ -227,6 +227,12 @@ object BonkersModule : EventModule
                     }
                 }
 
+                if (mappings[it.block.type] != null)
+                {
+                    it.isCancelled = true
+                    return@handler
+                }
+
                 val original = it.block.type
                 it.isCancelled = true
                 it.block.type = Material.COBBLESTONE
