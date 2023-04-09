@@ -133,7 +133,8 @@ object BonkersModule : EventModule
 
     private fun createGracePeriodRunner() =
         createRunner(
-            seconds = 60 * 4,
+            // TODO: change back to 60
+            seconds = 5 * 4,
             end = {
                 startNewConquestEvent(conquests.random())
             },

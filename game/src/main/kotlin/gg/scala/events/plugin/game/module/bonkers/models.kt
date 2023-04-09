@@ -105,7 +105,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         player.team()?.data()
             ?.apply {
                 lines += "DTR: ${CC.GOLD}${dtr}"
-                lines += "Team: ${color}${color.name}"
+                lines += "Team: ${colored()}"
             }
 
         lines += ""
@@ -278,9 +278,9 @@ data class ConquestKothMix(
                     )
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping ${special()}Koth for ${
+                        "$PREFIX_KOTH${CC.WHITE}${
                             bukkitPlayer.team()?.data()?.colored()
-                        }${CC.GREEN}!"
+                        }${CC.GREEN} is now capping ${special()}Koth!"
                     )
 
                     if (runner == null)
@@ -370,9 +370,9 @@ data class ConquestKothMix(
                     }
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping ${special()}Koth for ${
+                        "$PREFIX_KOTH${CC.RED}${
                             it.player.team()?.data()?.colored()
-                        }${CC.RED}!"
+                        }${CC.RED} is no longer controling ${special()}Koth!"
                     )
                 }
 
