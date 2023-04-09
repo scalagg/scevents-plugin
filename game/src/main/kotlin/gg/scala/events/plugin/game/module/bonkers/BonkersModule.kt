@@ -260,7 +260,7 @@ object BonkersModule : EventModule
 
                 if (mapping != null)
                 {
-                    if (it.player.team()?.id != mapping.teamId)
+                    if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
                     {
                         it.isCancelled = true
                         return@handler
@@ -302,7 +302,7 @@ object BonkersModule : EventModule
                         it.player.sendMessage("${CC.RED}You cannot do this in ${claim.key.split("_")[0]} territory!")
                     }
 
-                if (it.player.team()?.id != mapping.teamId)
+                if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
                 {
                     it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                     it.isCancelled = true
