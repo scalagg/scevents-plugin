@@ -54,6 +54,8 @@ class ShopMenu : Menu("Shop")
                 grant(player)
             }
 
+            player!!.account().balance -= amount
+
             player.updateInventory()
             player.sendMessage(
                 "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$amount${CC.GREEN} bestie!"
