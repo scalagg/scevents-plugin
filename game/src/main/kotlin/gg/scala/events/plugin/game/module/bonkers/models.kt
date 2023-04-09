@@ -288,9 +288,14 @@ data class ConquestKothMix(
                         createNewRunner()
                     } else
                     {
+                        runner?.cancel()
+                        runner = null
+
                         Bukkit.broadcastMessage("$PREFIX_KOTH${CC.YELLOW}Koth is continuing under ${
                             bukkitPlayer.team()?.data()?.colored()
                         }'s${CC.YELLOW} capture!")
+
+                        createNewRunner()
                     }
                 }
             }, 0L, 10L)
