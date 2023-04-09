@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -10,7 +11,6 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
-import gg.scala.lemon.util.QuickAccess.username
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -21,7 +21,6 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
@@ -31,7 +30,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -127,24 +125,15 @@ object BonkersModule : EventModule
         ConquestKothMix(region, 60 * 5).configure()
     }
 
-    private var gracePeriodCompleted = false
     private var spawnCampInvincibility = false
 
     private fun createGracePeriodRunner() =
         createRunner(
-            seconds = 60 * 1,
+            seconds = 60 * 4,
             end = {
-                gracePeriodCompleted = true
-                Bukkit.broadcastMessage("$PREFIX_GRACE_PERIOD${CC.GREEN}Grace period has ended! You can now capture koths!")
-
                 startNewConquestEvent(conquests.random())
             },
             update = {
-                Bukkit.broadcastMessage(
-                    "$PREFIX_GRACE_PERIOD${CC.RED}Grace period ends in ${
-                        DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
-                    }..."
-                )
             }
         )
 
@@ -341,11 +330,35 @@ object BonkersModule : EventModule
         Events
             .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
             .handler {
-                // TODO: spec on dtr loss
-                it.participant.team()?.data()?.spawnLocation
-                    .apply {
+                it.participant.team()
+                    ?.apply {
+                        val data = this.data()!!
+                        val oldDtr = data.dtr
+
+                        val previouslyRaidable = data.raidable()
+                        data.dtr -= 1.0
+
+                        this.participants.forEach { id ->
+                            Bukkit.getPlayer(id)?.apply {
+                                sendMessage("${CC.RED}Teammate Death: ${CC.WHITE}${it.participant.name}")
+                                sendMessage("${CC.YELLOW}DTR: ${CC.WHITE}$oldDtr -> ${data.dtr}")
+
+                                if (data.raidable() && !previouslyRaidable)
+                                {
+                                    sendMessage("${CC.D_RED}BITCH U GONE RAIDABLE! SAVE YOURSELF!")
+                                    playSound(location, Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f)
+                                }
+                            }
+                        }
+
                         delayed(1L) {
-                            it.participant.teleport(this)
+                            if (data.raidable() && previouslyRaidable)
+                            {
+                                CgsSpectatorHandler.setSpectator(it.participant, true)
+                                return@delayed
+                            }
+
+                            it.participant.teleport(data.spawnLocation)
                         }
                     }
 

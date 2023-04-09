@@ -45,8 +45,11 @@ data class TeamData(
     val spawnLocation: Location,
     val region: Cuboid,
     var points: Int = 0,
-    var raidable: Boolean = false
+    var dtr: Double = 5.0
 )
+{
+    fun raidable() = dtr <= 0.0
+}
 
 fun createRunner(
     seconds: Int,
