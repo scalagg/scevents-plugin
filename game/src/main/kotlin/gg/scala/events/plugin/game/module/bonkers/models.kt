@@ -28,6 +28,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import java.util.*
 
 /**
@@ -284,49 +285,66 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
+        data class GenericMovementEvent(
+            val player: Player,
+            val to: Location
+        )
+
+        fun handleGenericMovementEvent(it: GenericMovementEvent)
+        {
+            if (region.contains(it.to))
+            {
+                if (currentHolder != it.player.uniqueId)
+                {
+                    if (!futureHolders.contains(it.player.uniqueId))
+                    {
+                        futureHolders.push(it.player.uniqueId)
+                        it.player.sendMessage("${CC.GRAY}You entered koth.")
+
+                        if (currentHolder != null)
+                        {
+                            it.player.sendMessage("${CC.WHITE}You're queued up to become the capper if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves.")
+                        }
+                    }
+                }
+            } else
+            {
+                if (currentHolder == it.player.uniqueId)
+                {
+                    currentHolder = null
+
+                    runner?.cancel()
+                    runner = null
+
+                    it.player.sendMessage(
+                        "${CC.RED}You are no longer capping!"
+                    )
+
+                    Bukkit.broadcastMessage(
+                        "$PREFIX_KOTH${CC.RED}${it.player.name} is no longer capping Koth!"
+                    )
+                }
+
+                if (futureHolders.contains(it.player.uniqueId))
+                {
+                    futureHolders.remove(it.player.uniqueId)
+                    it.player.sendMessage("${CC.GRAY}You left koth.")
+                }
+            }
+        }
+
         Events
             .subscribe(PlayerMoveEvent::class.java)
             .filter(EventUtils::hasPlayerMoved)
             .handler {
-                if (region.contains(it.to))
-                {
-                    if (currentHolder != it.player.uniqueId)
-                    {
-                        if (!futureHolders.contains(it.player.uniqueId))
-                        {
-                            futureHolders.push(it.player.uniqueId)
-                            it.player.sendMessage("${CC.GRAY}You entered koth.")
+                handleGenericMovementEvent(GenericMovementEvent(player = it.player, to = it.to))
+            }
+            .bindWith(terminable)
 
-                            if (currentHolder != null)
-                            {
-                                it.player.sendMessage("${CC.WHITE}You're queued up to become the capper if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves.")
-                            }
-                        }
-                    }
-                } else
-                {
-                    if (currentHolder == it.player.uniqueId)
-                    {
-                        currentHolder = null
-
-                        runner?.cancel()
-                        runner = null
-
-                        it.player.sendMessage(
-                            "${CC.RED}You are no longer capping!"
-                        )
-
-                        Bukkit.broadcastMessage(
-                            "$PREFIX_KOTH${CC.RED}${it.player.name} is no longer capping Koth!"
-                        )
-                    }
-
-                    if (futureHolders.contains(it.player.uniqueId))
-                    {
-                        futureHolders.remove(it.player.uniqueId)
-                        it.player.sendMessage("${CC.GRAY}You left koth.")
-                    }
-                }
+        Events
+            .subscribe(PlayerTeleportEvent::class.java)
+            .handler {
+                handleGenericMovementEvent(GenericMovementEvent(player = it.player, to = it.to))
             }
             .bindWith(terminable)
     }
