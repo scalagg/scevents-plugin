@@ -165,8 +165,8 @@ object BonkersModule : EventModule
     override fun configure()
     {
         this.mappings.forEach {
-            claims[it.key.lowercase() + "_base"] = it.value.region
-            claims[it.key.lowercase() + "_mine"] = it.value.region
+            claims[it.key + "_base"] = it.value.region
+            claims[it.key + "_mine"] = it.value.region
         }
 
         claims["central_mine"] = Cuboid(
@@ -213,6 +213,16 @@ object BonkersModule : EventModule
                 val claim = it.player.findClaim()
 
                 if (claim == null)
+                {
+                    it.isCancelled = true
+                    return@handler
+                }
+
+                val central = it.block
+                    .findClaimContextual("central")
+                    ?: return@handler
+
+                if (it.player.location.y > 42)
                 {
                     it.isCancelled = true
                 }
@@ -273,7 +283,10 @@ object BonkersModule : EventModule
                     ?: return@handler
 
                 val mapping = this.mappings[claim.key.split("_")[0]]
-                    ?: return@handler
+                    ?: return@handler run {
+                        it.isCancelled = true
+                        it.player.sendMessage("${CC.RED}You cannot do this in ${claim.key.split("_")[0]} territory!")
+                    }
 
                 if (it.player.team()?.id != mapping.teamId)
                 {

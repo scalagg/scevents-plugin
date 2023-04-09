@@ -302,7 +302,7 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        fun name() = "${CC.GOLD}Koth ${CC.GRAY}(${region.lowerNE.stringify()})"
+        fun name() = "${CC.GOLD}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
