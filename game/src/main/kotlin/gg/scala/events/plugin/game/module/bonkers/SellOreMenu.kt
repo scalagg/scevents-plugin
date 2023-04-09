@@ -21,20 +21,22 @@ class SellOreMenu : Menu("Sell your ores")
     }
 
     private val mappings = mutableMapOf(
+        Material.COAL to 10,
+        Material.IRON_INGOT to 20,
         Material.GOLD_INGOT to 40,
         Material.DIAMOND to 50,
-        Material.COAL to 10,
-        Material.IRON_INGOT to 20
+        Material.NETHER_STAR to 400,
     )
 
     override fun getButtons(player: Player): Map<Int, Button>
     {
-        var index = 1
+        var index = 2
         val buttons = mutableMapOf<Int, Button>()
 
         for (mapping in mappings)
         {
-            val materialName = WordUtils
+            val materialName = if (mapping.key == Material.NETHER_STAR)
+                "Shard" else WordUtils
                 .capitalizeFully(
                     mapping.key.name
                         .replace("_", " ")
@@ -45,7 +47,7 @@ class SellOreMenu : Menu("Sell your ores")
                 .filter { it != null && it.type == mapping.key }
                 .sumOf { it.amount }
 
-            buttons[index] = ItemBuilder
+            buttons[index++] = ItemBuilder
                 .of(mapping.key)
                 .name(
                     "${CC.GREEN}Sell $materialName"
@@ -88,8 +90,6 @@ class SellOreMenu : Menu("Sell your ores")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     }
                 }
-
-            index += 2
         }
 
         return buttons
