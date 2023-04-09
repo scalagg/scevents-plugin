@@ -331,3 +331,5 @@ data class ConquestKothMix(
             .bindWith(terminable)
     }
 }
+
+fun Player.account() = BonkersModule.playerAccounts[this.uniqueId]!!

@@ -13,6 +13,7 @@ import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
+import net.evilblock.cubed.entity.villager.VillagerEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks
@@ -23,6 +24,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -299,12 +301,26 @@ object BonkersModule : EventModule
                 createSpawnCampInvincibilityRunner()
 
                 CgsGameTeamService.teams
-                    .forEach { t, team ->
+                    .forEach { (t, team) ->
                         val it = this.mappings.entries
                             .firstOrNull {
                                 it.value.teamId == team.id
                             }
                             ?: return@forEach
+
+                        val entity = object : VillagerEntity(
+                            lines = listOf(
+                                "${CC.GREEN}Sell your items",
+                                "${CC.GRAY}Click to open menu!"
+                            ),
+                            location = it.value.spawnLocation
+                        )
+                        {
+                            override fun onRightClick(player: Player) =
+                                SellOreMenu().openMenu(player)
+                        }
+
+                        entity.initializeData()
 
                         team.participants.forEach { player ->
                             val bukkitPlayer = Bukkit.getPlayer(player)
