@@ -238,8 +238,6 @@ object BonkersModule : EventModule
                     }
                 }
 
-                println(mappings[it.block.type])
-
                 if (mappings[it.block.type] == null)
                 {
                     it.isCancelled = true
