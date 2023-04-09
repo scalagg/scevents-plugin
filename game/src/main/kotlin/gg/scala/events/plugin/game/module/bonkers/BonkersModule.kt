@@ -10,12 +10,14 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
+import gg.scala.lemon.util.QuickAccess.username
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.entity.EntityHandler
 import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -24,6 +26,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
@@ -31,7 +34,9 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
@@ -278,6 +283,46 @@ object BonkersModule : EventModule
                 }
 
                 it.isCancelled = false
+            }
+
+        fun handleGenericMovementEvent(it: GenericMovementEvent)
+        {
+            val claim = it.player.findClaimWithName()
+            val oldClaim = it.from.block.findClaim()
+
+            if (oldClaim == null && claim == null)
+            {
+                return
+            }
+
+            if (claim == null && oldClaim != null)
+            {
+                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key}")
+                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
+            }
+
+            if (claim != null && oldClaim == null)
+            {
+                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.GREEN}${claim.key}")
+                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
+            }
+        }
+
+        Events
+            .subscribe(PlayerMoveEvent::class.java)
+            .filter(EventUtils::hasPlayerMoved)
+            .handler {
+                handleGenericMovementEvent(
+                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                )
+            }
+
+        Events
+            .subscribe(PlayerTeleportEvent::class.java)
+            .handler {
+                handleGenericMovementEvent(
+                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                )
             }
 
         Events

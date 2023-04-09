@@ -75,7 +75,8 @@ fun createRunner(
 
 data class GenericMovementEvent(
     val player: Player,
-    val to: Location
+    val to: Location,
+    val from: Location
 )
 
 object ScoreboardRenderer : CgsGameScoreboardRenderer
@@ -176,8 +177,19 @@ fun Player.findClaim() = BonkersModule.claims.values
         it.contains(this)
     }
 
+fun Player.findClaimWithName() = BonkersModule.claims.entries
+    .firstOrNull {
+        it.value.contains(this)
+    }
+
 fun Player.findClaimContextual(context: String) = BonkersModule.claims.entries
     .filter { it.key.contains(context) }
+    .firstOrNull {
+        it.value.contains(this)
+    }
+
+
+fun Block.findClaim() = BonkersModule.claims.entries
     .firstOrNull {
         it.value.contains(this)
     }
@@ -340,14 +352,18 @@ data class ConquestKothMix(
             .subscribe(PlayerMoveEvent::class.java)
             .filter(EventUtils::hasPlayerMoved)
             .handler {
-                handleGenericMovementEvent(GenericMovementEvent(player = it.player, to = it.to))
+                handleGenericMovementEvent(
+                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                )
             }
             .bindWith(terminable)
 
         Events
             .subscribe(PlayerTeleportEvent::class.java)
             .handler {
-                handleGenericMovementEvent(GenericMovementEvent(player = it.player, to = it.to))
+                handleGenericMovementEvent(
+                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                )
             }
             .bindWith(terminable)
     }
