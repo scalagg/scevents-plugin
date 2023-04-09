@@ -29,6 +29,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.ItemStack
 import java.util.*
 
 /**
@@ -282,6 +283,7 @@ object BonkersModule : EventModule
         Events
             .subscribe(PlayerDeathEvent::class.java)
             .handler {
+                Bukkit.broadcastMessage("this is excuting")
                 // TODO: spec on dtr loss
                 it.entity.team()?.data()?.spawnLocation
                     .apply {
@@ -309,6 +311,12 @@ object BonkersModule : EventModule
 
                             bukkitPlayer
                                 .teleport(it.value.spawnLocation)
+
+                            bukkitPlayer.inventory
+                                .addItem(
+                                    ItemStack(Material.STONE_PICKAXE),
+                                    ItemStack(Material.STONE_AXE)
+                                )
                         }
                     }
 
