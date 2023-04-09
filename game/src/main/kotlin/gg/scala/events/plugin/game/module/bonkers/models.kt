@@ -44,7 +44,6 @@ data class TeamData(
     val color: ChatColor,
     val spawnLocation: Location,
     val region: Cuboid,
-    var points: Int = 0,
     var dtr: Double = 5.0
 )
 {
@@ -118,26 +117,6 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             )
         }"
 
-        val teamData = player.team()?.data()
-        lines += "Your Team: ${
-            teamData?.color ?: ChatColor.WHITE
-        }${
-            Numbers.format(
-                teamData?.points ?: 0
-            )
-        }"
-
-        lines += ""
-
-        BonkersModule.mappings.forEach {
-            CgsGameTeamService.teams[it.value.teamId]
-                ?.apply {
-                    lines += " ${it.value.color}${it.key}: ${CC.WHITE}${
-                        Numbers.format(it.value.points)
-                    }"
-                }
-        }
-
         lines += ""
         lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
         lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
@@ -208,7 +187,8 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
 data class ConquestKothMix(
     val region: Cuboid,
     val seconds: Int,
-    val startNewOneAfter: Boolean = false
+    val startNewOneAfter: Boolean = false,
+    val specialCentral: Boolean = false
 )
 {
     var currentHolder: UUID? = null
@@ -218,12 +198,13 @@ data class ConquestKothMix(
     var runner: DiminutionRunnable? = null
 
     fun Location.stringify() = "($x, $y, $z)"
+    fun special() = if (specialCentral) "Central " else ""
 
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
         end = {
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.B_GREEN}Koth ${region.lowerNE.stringify()} was completed!"
+                "$PREFIX_KOTH${CC.B_GREEN}${special()}Koth ${region.lowerNE.stringify()} was completed!"
             )
 
             if (currentHolder == null)
@@ -239,7 +220,7 @@ data class ConquestKothMix(
             }
 
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of Koth ${region.lowerNE} in 5 seconds!"
+                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${special()}Koth ${region.lowerNE} in 5 seconds!"
             )
 
             Schedulers
@@ -248,16 +229,19 @@ data class ConquestKothMix(
                     // TODO: drop loot
                 }, 100L)
 
-            Schedulers.sync()
-                .runLater({
-                    BonkersModule.startNewConquestEvent(BonkersModule.conquests.random())
-                }, 30 * 20)
+            if (startNewOneAfter)
+            {
+                Schedulers.sync()
+                    .runLater({
+                        BonkersModule.startNewConquestEvent(BonkersModule.conquests.random())
+                    }, 30 * 20)
+            }
 
             terminable.closeAndReportException()
         },
         update = {
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GREEN}Koth ${region.lowerNE.stringify()} will capture in ${
+                "$PREFIX_KOTH${CC.GREEN}${special()}Koth ${region.lowerNE.stringify()} will capture in ${
                     DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
                 }"
             )
@@ -269,7 +253,7 @@ data class ConquestKothMix(
 
     fun configure()
     {
-        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.GREEN}Koth has started at ${region.lowerNE.stringify()}!")
+        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.GREEN}${special()}Koth has started at ${region.lowerNE.stringify()}!")
 
         Schedulers
             .async()
@@ -288,13 +272,13 @@ data class ConquestKothMix(
 
                     currentHolder = newHolder
                     bukkitPlayer.sendMessage(
-                        "${CC.GREEN}You are now the new capper of Koth!"
+                        "${CC.GREEN}You are now the new capper of ${special()}Koth!"
                     )
 
                     createNewRunner()
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping Koth!"
+                        "$PREFIX_KOTH${CC.WHITE}${bukkitPlayer.colorfulName()}${CC.GREEN} is now capping ${special()}Koth!"
                     )
                 }
             }, 0L, 10L)
@@ -307,7 +291,7 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        fun name() = "${CC.GOLD}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
+        fun name() = "${CC.GOLD}${special()}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
@@ -341,7 +325,7 @@ data class ConquestKothMix(
                     )
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping Koth!"
+                        "$PREFIX_KOTH${CC.RED}${it.player.colorfulName()}${CC.RED} is no longer capping ${special()}Koth!"
                     )
                 }
 

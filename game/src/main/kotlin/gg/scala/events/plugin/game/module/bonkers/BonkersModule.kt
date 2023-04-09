@@ -122,7 +122,7 @@ object BonkersModule : EventModule
 
     fun startNewConquestEvent(region: Cuboid)
     {
-        ConquestKothMix(region, 60 * 5).configure()
+        ConquestKothMix(region, 60 * 5, startNewOneAfter = true).configure()
     }
 
     private var spawnCampInvincibility = false
@@ -143,6 +143,25 @@ object BonkersModule : EventModule
             end = {
                 spawnCampInvincibility = true
                 Bukkit.broadcastMessage("${CC.GRAY}You can now take damage.")
+            },
+            update = {
+
+            }
+        )
+
+    private fun createCentralKothCreationRunner() =
+        createRunner(
+            seconds = 15,
+            end = {
+                ConquestKothMix(
+                    Cuboid(
+                        loc(495.0, 65.0, 495.0),
+                        loc(505.0, 60.0, 505.0),
+                    ),
+                    60 * 5,
+                    startNewOneAfter = false,
+                    specialCentral = true
+                ).configure()
             },
             update = {
 
