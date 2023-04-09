@@ -257,7 +257,7 @@ object BonkersModule : EventModule
                         .build()
                 )
 
-                delayed(60L) {
+                delayed(6 * 20L) {
                     it.block.type = original
                 }
             }
