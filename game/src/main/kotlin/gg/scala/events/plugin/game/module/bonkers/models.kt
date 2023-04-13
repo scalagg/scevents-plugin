@@ -252,7 +252,7 @@ data class ConquestKothMix(
     var runner: DiminutionRunnable? = null
 
     fun Location.stringify() = "($x, $y, $z)"
-    fun special() = if (specialCentral) "Central " else ""
+    fun special() = if (specialCentral) "Classic " else "Conquest "
 
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
@@ -310,8 +310,8 @@ data class ConquestKothMix(
         },
         update = {
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GREEN}${special()}Koth ${region.lowerNE.stringify()} will capture in ${
-                    DurationFormatUtils.formatDurationWords(it * 1000L, true, true)
+                "$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                    DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
                 }"
             )
         }
@@ -322,7 +322,7 @@ data class ConquestKothMix(
 
     fun configure()
     {
-        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.GREEN}${special()}Koth has started at ${region.lowerNE.stringify()}!")
+        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
 
         Schedulers
             .async()
@@ -340,16 +340,14 @@ data class ConquestKothMix(
                         ?: return@runRepeating
 
                     currentHolder = newHolder
-                    bukkitPlayer.sendMessage(
-                        "${CC.GREEN}You are now capping ${special()}Koth for ${
-                            bukkitPlayer.team()?.data()?.colored()
-                        }${CC.GREEN}!"
-                    )
+//                    bukkitPlayer.sendMessage(
+//                        "${CC.GREEN}You are now capping ${special()}Koth for ${
+//                            bukkitPlayer.team()?.data()?.colored()
+//                        }${CC.GREEN}!"
+//                    )
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.WHITE}${
-                            bukkitPlayer.team()?.data()?.colored()
-                        }${CC.GREEN} is now capping ${special()}Koth!"
+                        "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${special()}${CC.YELLOW}Koth!"
                     )
 
                     if (runner == null)
@@ -360,9 +358,9 @@ data class ConquestKothMix(
                         runner?.cancel()
                         runner = null
 
-                        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.YELLOW}Koth is continuing under ${
-                            bukkitPlayer.team()?.data()?.colored()
-                        }'s${CC.YELLOW} capture!")
+//                        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth is now under ${
+//                            bukkitPlayer.team()?.data()?.colored()
+//                        }'s${CC.YELLOW} control!")
 
                         createNewRunner()
                     }
@@ -395,12 +393,13 @@ data class ConquestKothMix(
                     if (!futureHolders.contains(it.player.uniqueId))
                     {
                         futureHolders.push(it.player.uniqueId)
-                        it.player.sendMessage("${CC.AQUA}HEYY GIRLBOSS. ${CC.YELLOW}You entered: ${name()}")
+                        it.player.sendMessage("${CC.YELLOW}You entered: ${name()}")
 
-                        if (currentHolder != null)
-                        {
-                            it.player.sendMessage("${CC.WHITE}You're queued up to capture if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves. (#${futureHolders.size})")
-                        }
+                        // Debug for who's next up for queue.
+//                        if (currentHolder != null)
+//                        {
+//                            it.player.sendMessage("${CC.WHITE}You're queued up to capture if ${CC.BOLD}${currentHolder!!.username()}${CC.WHITE} leaves. (#${futureHolders.size})")
+//                        }
                     }
                 }
             } else
@@ -433,20 +432,19 @@ data class ConquestKothMix(
                         runner = null
                     }
 
-                    it.player.sendMessage("${CC.BLACK}bestie why u leaving :(, it's giving.... DIVORCE. ${CC.YELLOW}You exited: ${name()}")
+                    it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
                     it.player.sendMessage(
                         "${CC.RED}You are no longer capping for your team!"
                     )
 
-                    if (nextCaptureSameTeam)
-                    {
-                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though SLAY.")
-                    }
+                    // Do not tell, we're supposed to reset timer anyways.
+//                    if (nextCaptureSameTeam)
+//                    {
+//                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though.")
+//                    }
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.RED}HELLO???? ${
-                            it.player.team()?.data()?.colored()
-                        }${CC.RED} is no longer controling ${special()}Koth!"
+                        "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${special()}${CC.YELLOW}Koth has been lost!"
                     )
                 }
 

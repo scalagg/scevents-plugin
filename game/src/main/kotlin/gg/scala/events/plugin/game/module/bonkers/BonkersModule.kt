@@ -2,7 +2,6 @@ package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsGameDisqualificationHandler
-import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -22,21 +21,13 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Effect
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
-import org.bukkit.event.player.PlayerTeleportEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
@@ -149,7 +140,7 @@ object BonkersModule : EventModule
             seconds = 15,
             end = {
                 spawnCampInvincibility = true
-                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage. SLAY QUEEN")
+                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage.")
             },
             update = {
 
@@ -186,7 +177,7 @@ object BonkersModule : EventModule
             claims[it.key + "_mine"] = it.value.region
         }
 
-        claims["central_mine"] = Cuboid(
+        claims["Classic"] = Cuboid(
             loc(559.500, 0.0, 559.500),
             loc(441.500, 144.0, 441.500)
         )
@@ -228,28 +219,64 @@ object BonkersModule : EventModule
         )
 
         Events
-            .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
-            .filter {
-                !it.player.hasMetadata("spectator")
-            }
-            .handler {
-                val claim = it.block.findClaim()
+                .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
+                .filter {
+                    !it.player.hasMetadata("spectator")
+                }
+                .handler {
+                    val claim = it.block.findClaim()
 
-                if (claim == null)
-                {
-                    it.isCancelled = true
-                    return@handler
+                    if (claim == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    val central = it.block
+                            .findClaimContextual("central")
+                            ?: return@handler
+
+                    if (central == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    if (it.player.location.y > 42)
+                    {
+                        it.isCancelled = true
+                    }
                 }
 
-                val central = it.block
-                    .findClaimContextual("central")
-                    ?: return@handler
-
-                if (it.player.location.y > 42)
-                {
-                    it.isCancelled = true
+        Events
+                .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGH)
+                .filter {
+                    !it.player.hasMetadata("spectator")
                 }
-            }
+                .handler {
+                    val claim = it.block.findClaim()
+
+                    if (claim == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    val central = it.block
+                            .findClaimContextual("central")
+                            ?: return@handler
+
+                    if (central == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    if (it.player.location.y > 42)
+                    {
+                        it.isCancelled = true
+                    }
+                }
 
         Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
@@ -292,14 +319,66 @@ object BonkersModule : EventModule
                         .build()
                 )
 
-                it.player.sendMessage("${ChatColor.LIGHT_PURPLE}YAS QUEEN! U SLAYED. GO GET UR ${original.name} BESTIEEEE")
-
                 delayed(6 * 20L) {
                     it.block.type = original
-                    it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
-                    it.player.playEffect(it.player.location, Effect.RECORD_PLAY, Material.RECORD_9)
                 }
             }
+
+        Events
+                .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
+                .filter {
+                    it.block != null && !it.player.hasMetadata("spectator")
+                }
+                .handler {
+                    val claim = it.block
+                            .findClaimContextual("base")
+                            ?: return@handler
+
+                    if (claim == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    val mapping = this.mappings[claim.key.split("_")[0]]
+
+                    if (mapping != null) {
+                        if (it.player.team()?.id != mapping.teamId && !mapping.raidable()) {
+                            it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
+                            it.isCancelled = true
+                            return@handler
+                        }
+                    }
+                }
+
+        Events
+                .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGHEST)
+                .filter {
+                    it.block != null && !it.player.hasMetadata("spectator")
+                }
+                .handler {
+                    val claim = it.block
+                            .findClaimContextual("base")
+                            ?: return@handler
+
+                    if (claim == null)
+                    {
+                        it.player.sendMessage("${CC.RED}You cannot do this in the mine!")
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    val mapping = this.mappings[claim.key.split("_")[0]]
+
+                    if (mapping != null) {
+                        if (it.player.team()?.id != mapping.teamId && !mapping.raidable()) {
+                            it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
+                            it.isCancelled = true
+                            return@handler
+                        }
+                    }
+                }
+
 
         Events
             .subscribe(PlayerInteractEvent::class.java, EventPriority.HIGHEST)
@@ -315,11 +394,13 @@ object BonkersModule : EventModule
                         it.player.sendMessage("${CC.RED}You cannot do this in ${claim.key.split("_")[0]} territory!")
                     }
 
-                if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
-                {
-                    it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
-                    it.isCancelled = true
-                    return@handler
+                if(it.clickedBlock.type.name.contains("FENCE") || it.clickedBlock.type.name.contains("DOOR") || it.clickedBlock.type.name.contains("PLATE") || it.clickedBlock.type.name.contains("CHEST")) {
+                    if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
+                    {
+                        it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
+                        it.isCancelled = true
+                        return@handler
+                    }
                 }
 
                 it.isCancelled = false
@@ -337,15 +418,15 @@ object BonkersModule : EventModule
 
             if (claim == null && oldClaim != null)
             {
-                it.player.sendMessage("${CC.GOLD}Fuck you bestie. Why u leaving. ${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key}")
-                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.WHITE}Warzone")
+                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key}")
+                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
             }
 
             if (claim != null && oldClaim == null)
             {
-                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.WHITE}Warzone")
-                it.player.sendMessage("${CC.PINK}Welcome bestie. ${CC.YELLOW}You entered: ${CC.GREEN}${claim.key}")
+                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
+                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.GREEN}${claim.key}")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
             }
         }
@@ -385,7 +466,6 @@ object BonkersModule : EventModule
 
                                 if (data.raidable() && !previouslyRaidable)
                                 {
-                                    sendMessage("${CC.D_RED}BITCH U GONE RAIDABLE! SAVE YOURSELF!")
                                     playSound(location, Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f)
                                 }
                             }

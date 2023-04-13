@@ -42,7 +42,7 @@ class ShopMenu : Menu("Shop")
 
             if (balance < amount)
             {
-                player.sendMessage("${CC.RED}You don't have enough money bestie!")
+                player.sendMessage("${CC.RED}You don't have enough money for this!")
                 return@toButton
             }
 
@@ -58,7 +58,7 @@ class ShopMenu : Menu("Shop")
 
             player.updateInventory()
             player.sendMessage(
-                "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$amount${CC.GREEN} bestie!"
+                "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$$amount${CC.GREEN}!"
             )
         }
 
