@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.player.handler.CgsGameDisqualificationHandler
 import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
@@ -393,11 +394,17 @@ object BonkersModule : EventModule
                         delayed(1L) {
                             if (data.raidable() && previouslyRaidable)
                             {
-                                CgsSpectatorHandler.setSpectator(it.participant, true)
+                                CgsGameDisqualificationHandler.disqualifyPlayer(
+                                    player = it.participant,
+                                    broadcastNotification = true, setSpectator = true
+                                )
                                 return@delayed
                             }
 
-                            it.participant.teleport(data.spawnLocation)
+                            BonkersRespawnTimer(it.participant)
+                                .runTaskTimer(
+                                    CgsGameEngine.INSTANCE.plugin, 1L, 20L
+                                )
                         }
                     }
 
@@ -448,8 +455,8 @@ object BonkersModule : EventModule
                                     actionLambda(player)
                                 }
                             }
-
                             entity.initializeData()
+
                             EntityHandler.trackEntity(entity)
                         }
 
