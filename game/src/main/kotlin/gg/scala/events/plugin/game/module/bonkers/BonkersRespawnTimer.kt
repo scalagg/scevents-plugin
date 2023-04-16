@@ -61,7 +61,7 @@ class BonkersRespawnTimer(
                             ),
                         Title.Times.times(
                             Duration.ofMillis(0L),
-                            Duration.ofMillis(1000L),
+                            Duration.ofMillis(1100L),
                             Duration.ofMillis(0L),
                         )
                     )
