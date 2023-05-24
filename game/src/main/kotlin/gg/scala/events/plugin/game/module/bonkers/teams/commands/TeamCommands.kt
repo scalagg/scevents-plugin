@@ -12,6 +12,7 @@ import gg.scala.commons.acf.annotation.Subcommand
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
+import gg.scala.events.plugin.game.module.bonkers.data
 import gg.scala.lemon.player.LemonPlayer
 import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.events.plugin.game.module.bonkers.teams.joinTeam
@@ -61,9 +62,12 @@ object TeamCommands : ScalaCommand()
             ?: throw ConditionFailedException(
                 "Team #$teamId does not exist in this game."
             )
+        val teamData = team.data()!!
 
         player.sendMessage(
-            "${CC.GREEN}Team #$teamId:",
+            "${CC.WHITE}Team ${teamData.colored()}${CC.WHITE}:",
+            "${CC.WHITE}Location: ${teamData.color}${teamData.spawnLocation.x}, ${teamData.spawnLocation.y}, ${teamData.spawnLocation.z}",
+            "",
             "${CC.GRAY}Participants:"
         )
 

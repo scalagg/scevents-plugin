@@ -1,7 +1,6 @@
 package gg.scala.events.plugin.game.module.bonkers.teams.commands
 
 import gg.scala.commons.acf.annotation.CommandAlias
-import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
