@@ -239,6 +239,7 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
 data class ConquestKothMix(
     val region: Cuboid,
     val seconds: Int,
+    val name: String,
     val startNewOneAfter: Boolean = false,
     val specialCentral: Boolean = false
 )
@@ -294,7 +295,10 @@ data class ConquestKothMix(
             {
                 Schedulers.sync()
                     .runLater({
-                        BonkersModule.startNewConquestEvent(BonkersModule.conquests.random())
+                        BonkersModule.conquests.entries.random()
+                            .apply {
+                                BonkersModule.startNewConquestEvent(value, key)
+                            }
                     }, 30 * 20)
             }
 

@@ -103,28 +103,28 @@ object BonkersModule : EventModule
     override val visibilityAdapter = VisibilityAdapter
 
     val playerAccounts = mutableMapOf<UUID, Account>()
-    val conquests = mutableListOf(
-        Cuboid(
+    val conquests = mutableMapOf(
+        "NE" to Cuboid(
             loc(385.0, 46.0, 358.0),
             loc(372.0, 60.0, 372.0)
         ),
-        Cuboid(
+        "W" to Cuboid(
             loc(642.0, 46.0, 372.0),
             loc(628.0, 60.0, 358.0)
         ),
-        Cuboid(
+        "E" to Cuboid(
             loc(358.0, 46.0, 628.0),
             loc(372.0, 60.0, 642.0)
         ),
-        Cuboid(
+        "S" to Cuboid(
             loc(628.0, 46.0, 642.0),
             loc(642.0, 60.0, 628.0)
         )
     )
 
-    fun startNewConquestEvent(region: Cuboid)
+    fun startNewConquestEvent(region: Cuboid, name: String)
     {
-        ConquestKothMix(region, 60 * 5, startNewOneAfter = true).configure()
+        ConquestKothMix(region, 60 * 5, name = name, startNewOneAfter = true).configure()
     }
 
     private var spawnCampInvincibility = false
@@ -134,7 +134,10 @@ object BonkersModule : EventModule
             // TODO: change back to 60
             seconds = 5 * 4,
             end = {
-                startNewConquestEvent(conquests.random())
+                conquests.entries.random()
+                    .apply {
+                        startNewConquestEvent(value, key)
+                    }
             },
             update = {
             }
@@ -163,6 +166,7 @@ object BonkersModule : EventModule
                     ),
                     60 * 5,
                     startNewOneAfter = false,
+                    name = "",
                     specialCentral = true
                 ).configure()
             },
@@ -182,7 +186,7 @@ object BonkersModule : EventModule
             claims[it.key + "_mine"] = it.value.region
         }
 
-        TablistService.register(PleaseKillMeNowTabPopulator())
+        TablistService.register(PleaseKillMeNowTabPopulator)
 
         claims["Classic"] = Cuboid(
             loc(559.500, 0.0, 559.500),
@@ -238,62 +242,62 @@ object BonkersModule : EventModule
         )
 
         Events
-                .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
-                .filter {
-                    !it.player.hasMetadata("spectator")
+            .subscribe(BlockBreakEvent::class.java, EventPriority.HIGH)
+            .filter {
+                !it.player.hasMetadata("spectator")
+            }
+            .handler {
+                val claim = it.block.findClaim()
+
+                if (claim == null)
+                {
+                    it.isCancelled = true
+                    return@handler
                 }
-                .handler {
-                    val claim = it.block.findClaim()
 
-                    if (claim == null)
-                    {
-                        it.isCancelled = true
-                        return@handler
-                    }
+                val central = it.block
+                    .findClaimContextual("central")
 
-                    val central = it.block
-                            .findClaimContextual("central")
-
-                    if (central == null)
-                    {
-                        it.isCancelled = true
-                        return@handler
-                    }
-
-                    if (it.player.location.y > 42)
-                    {
-                        it.isCancelled = true
-                    }
+                if (central == null)
+                {
+                    it.isCancelled = true
+                    return@handler
                 }
+
+                if (it.player.location.y > 42)
+                {
+                    it.isCancelled = true
+                }
+            }
 
         Events
-                .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGH)
-                .filter {
-                    !it.player.hasMetadata("spectator")
+            .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGH)
+            .filter {
+                !it.player.hasMetadata("spectator")
+            }
+            .handler {
+                val claim = it.block.findClaim()
+
+                if (claim == null)
+                {
+                    it.isCancelled = true
+                    return@handler
                 }
-                .handler {
-                    val claim = it.block.findClaim()
 
-                    if (claim == null)
-                    {
-                        it.isCancelled = true
-                        return@handler
-                    }
+                val central = it.block
+                    .findClaimContextual("central")
 
-                    val central = it.block
-                            .findClaimContextual("central")
-
-                    if (central == null)
-                    {
-                        it.isCancelled = true
-                        return@handler
-                    }
-
-                    if (it.player.location.y > 42)
-                    {
-                        it.isCancelled = true
-                    }
+                if (central == null)
+                {
+                    it.isCancelled = true
+                    return@handler
                 }
+
+                if (it.player.location.y > 42)
+                {
+                    it.isCancelled = true
+                }
+            }
 
         Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
@@ -342,57 +346,61 @@ object BonkersModule : EventModule
             }
 
         Events
-                .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
-                .filter {
-                    it.block != null && !it.player.hasMetadata("spectator")
-                }
-                .handler {
-                    val claim = it.block
-                            .findClaimContextual("base")
+            .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
+            .filter {
+                it.block != null && !it.player.hasMetadata("spectator")
+            }
+            .handler {
+                val claim = it.block
+                    .findClaimContextual("base")
 
-                    if (claim == null)
+                if (claim == null)
+                {
+                    it.isCancelled = true
+                    return@handler
+                }
+
+                val mapping = this.mappings[claim.key.split("_")[0]]
+
+                if (mapping != null)
+                {
+                    if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
                     {
+                        it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                         it.isCancelled = true
                         return@handler
                     }
-
-                    val mapping = this.mappings[claim.key.split("_")[0]]
-
-                    if (mapping != null) {
-                        if (it.player.team()?.id != mapping.teamId && !mapping.raidable()) {
-                            it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
-                            it.isCancelled = true
-                            return@handler
-                        }
-                    }
                 }
+            }
 
         Events
-                .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGHEST)
-                .filter {
-                    it.block != null && !it.player.hasMetadata("spectator")
-                }
-                .handler {
-                    val claim = it.block
-                            .findClaimContextual("base")
+            .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGHEST)
+            .filter {
+                it.block != null && !it.player.hasMetadata("spectator")
+            }
+            .handler {
+                val claim = it.block
+                    .findClaimContextual("base")
 
-                    if (claim == null)
+                if (claim == null)
+                {
+                    it.player.sendMessage("${CC.RED}You cannot do this in the mine!")
+                    it.isCancelled = true
+                    return@handler
+                }
+
+                val mapping = this.mappings[claim.key.split("_")[0]]
+
+                if (mapping != null)
+                {
+                    if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
                     {
-                        it.player.sendMessage("${CC.RED}You cannot do this in the mine!")
+                        it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                         it.isCancelled = true
                         return@handler
                     }
-
-                    val mapping = this.mappings[claim.key.split("_")[0]]
-
-                    if (mapping != null) {
-                        if (it.player.team()?.id != mapping.teamId && !mapping.raidable()) {
-                            it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
-                            it.isCancelled = true
-                            return@handler
-                        }
-                    }
                 }
+            }
 
 
         Events
@@ -409,7 +417,11 @@ object BonkersModule : EventModule
                         it.player.sendMessage("${CC.RED}You cannot do this in ${claim.key.split("_")[0]} territory!")
                     }
 
-                if(it.clickedBlock.type.name.contains("FENCE") || it.clickedBlock.type.name.contains("DOOR") || it.clickedBlock.type.name.contains("PLATE") || it.clickedBlock.type.name.contains("CHEST")) {
+                if (it.clickedBlock.type.name.contains("FENCE") || it.clickedBlock.type.name.contains("DOOR") || it.clickedBlock.type.name.contains(
+                        "PLATE"
+                    ) || it.clickedBlock.type.name.contains("CHEST")
+                )
+                {
                     if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
                     {
                         it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
