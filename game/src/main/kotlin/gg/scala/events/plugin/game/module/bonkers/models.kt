@@ -253,13 +253,12 @@ data class ConquestKothMix(
     var runner: DiminutionRunnable? = null
 
     fun Location.stringify() = "($x, $y, $z)"
-    fun special() = if (specialCentral) "Classic " else "Conquest "
 
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
         end = {
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.B_GREEN}${special()}Koth ${region.lowerNE.stringify()} was completed!"
+                "$PREFIX_KOTH${CC.B_GREEN}${name}Koth ${region.lowerNE.stringify()} was completed!"
             )
 
             if (currentHolder == null)
@@ -282,7 +281,7 @@ data class ConquestKothMix(
             }
 
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${special()}Koth ${region.lowerNE.stringify()} in 5 seconds!"
+                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${name}Koth ${region.lowerNE.stringify()} in 5 seconds!"
             )
 
             Schedulers
@@ -314,7 +313,7 @@ data class ConquestKothMix(
         },
         update = {
             Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                "$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}Koth ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
                     DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
                 }"
             )
@@ -326,7 +325,11 @@ data class ConquestKothMix(
 
     fun configure()
     {
-        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+        if (specialCentral) {
+            Bukkit.broadcastMessage("$PREFIX_KOTH${name}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+        } else {
+            Bukkit.broadcastMessage("$PREFIX_CONQUEST${name}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+        }
 
         Schedulers
             .async()
@@ -345,13 +348,13 @@ data class ConquestKothMix(
 
                     currentHolder = newHolder
 //                    bukkitPlayer.sendMessage(
-//                        "${CC.GREEN}You are now capping ${special()}Koth for ${
+//                        "${CC.GREEN}You are now capping ${name}Koth for ${
 //                            bukkitPlayer.team()?.data()?.colored()
 //                        }${CC.GREEN}!"
 //                    )
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${special()}${CC.YELLOW}Koth!"
+                        "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${name}${CC.YELLOW}Koth!"
                     )
 
                     if (runner == null)
@@ -362,7 +365,7 @@ data class ConquestKothMix(
                         runner?.cancel()
                         runner = null
 
-//                        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.BLUE}${special()}${CC.YELLOW}Koth is now under ${
+//                        Bukkit.broadcastMessage("$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}Koth is now under ${
 //                            bukkitPlayer.team()?.data()?.colored()
 //                        }'s${CC.YELLOW} control!")
 
@@ -381,7 +384,7 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        fun name() = "${CC.GOLD}${special()}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
+        fun name() = "${CC.GOLD}${name}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
@@ -448,7 +451,7 @@ data class ConquestKothMix(
 //                    }
 
                     Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${special()}${CC.YELLOW}Koth has been lost!"
+                        "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${name}${CC.YELLOW}Koth has been lost!"
                     )
                 }
 

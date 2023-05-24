@@ -26,6 +26,7 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Blue
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -104,22 +105,22 @@ object BonkersModule : EventModule
 
     val playerAccounts = mutableMapOf<UUID, Account>()
     val conquests = mutableMapOf(
-        "NE" to Cuboid(
+        "${CC.BLUE}N${CC.YELLOW}W " to Cuboid(
             loc(385.0, 46.0, 358.0),
             loc(372.0, 60.0, 372.0)
         ),
-        "W" to Cuboid(
+        "${CC.BLUE}N${CC.GREEN}E " to Cuboid(
             loc(642.0, 46.0, 372.0),
             loc(628.0, 60.0, 358.0)
         ),
-        "E" to Cuboid(
+        "${CC.RED}S${CC.YELLOW}W " to Cuboid(
             loc(358.0, 46.0, 628.0),
             loc(372.0, 60.0, 642.0)
         ),
-        "S" to Cuboid(
+        "${CC.RED}S${CC.GREEN}E " to Cuboid(
             loc(628.0, 46.0, 642.0),
             loc(642.0, 60.0, 628.0)
-        )
+        ),
     )
 
     fun startNewConquestEvent(region: Cuboid, name: String)
@@ -166,7 +167,7 @@ object BonkersModule : EventModule
                     ),
                     60 * 5,
                     startNewOneAfter = false,
-                    name = "",
+                    name = "${CC.BLUE}Classic ",
                     specialCentral = true
                 ).configure()
             },
@@ -188,7 +189,7 @@ object BonkersModule : EventModule
 
         TablistService.register(PleaseKillMeNowTabPopulator)
 
-        claims["Classic"] = Cuboid(
+        claims["central_mine"] = Cuboid(
             loc(559.500, 0.0, 559.500),
             loc(441.500, 144.0, 441.500)
         )
