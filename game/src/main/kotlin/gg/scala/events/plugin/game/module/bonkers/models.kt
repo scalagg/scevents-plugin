@@ -393,7 +393,7 @@ data class ConquestKothMix(
                     if (!futureHolders.contains(it.player.uniqueId))
                     {
                         futureHolders.push(it.player.uniqueId)
-                        it.player.sendMessage("${CC.YELLOW}You entered: ${name()}")
+                        it.player.sendMessage("${CC.YELLOW}You entered: ${name().replace("_base", "")}")
 
                         // Debug for who's next up for queue.
 //                        if (currentHolder != null)

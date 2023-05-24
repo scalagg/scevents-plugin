@@ -221,13 +221,14 @@ sealed interface EventType
             ),
             preStartVoting = false,
             disqualifyOnLogout = false,
-            spectateOnDeath = false,
+            spectateOnDeath = true,
             showTabHearts = false,
-            showNameHearts = true,
+            showNameHearts = false,
             usesCustomArenaWorld = true,
             gameModes = listOf(mode)
         ).apply {
             this.configureSpectatorChat = true
+
         }
     }
 

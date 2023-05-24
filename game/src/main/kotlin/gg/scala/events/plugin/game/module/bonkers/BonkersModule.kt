@@ -4,6 +4,8 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsGameDisqualificationHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.commons.tablist.TablistPopulator
+import gg.scala.commons.tablist.TablistService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
@@ -15,6 +17,7 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
+import io.github.nosequel.tab.shared.entry.TabElement
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -34,6 +37,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 /**
  * @author GrowlyX
@@ -56,7 +60,7 @@ object BonkersModule : EventModule
         "Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
-            teamName = "Blue",
+            teamName = "Slay",
             spawnLocation = loc(500.500, 53.0, 322.500),
             region = Cuboid(
                 loc(454.500, 0.0, 301.500),
@@ -66,7 +70,7 @@ object BonkersModule : EventModule
         "Red" to TeamData(
             teamId = 2,
             color = ChatColor.RED,
-            teamName = "Red",
+            teamName = "Slay",
             spawnLocation = loc(500.500, 53.0, 678.500),
             region = Cuboid(
                 loc(546.500, 0.0, 649.500),
@@ -76,7 +80,7 @@ object BonkersModule : EventModule
         "Green" to TeamData(
             teamId = 3,
             color = ChatColor.GREEN,
-            teamName = "Green",
+            teamName = "Slay",
             spawnLocation = loc(678.500, 53.0, 500.500),
             region = Cuboid(
                 loc(699.500, 0.0, 454.500),
@@ -86,7 +90,7 @@ object BonkersModule : EventModule
         "Yellow" to TeamData(
             teamId = 4,
             color = ChatColor.YELLOW,
-            teamName = "Yellow",
+            teamName = "Slay",
             spawnLocation = loc(322.500, 53.0, 500.500),
             region = Cuboid(
                 loc(301.500, 0.0, 546.500),
@@ -180,6 +184,8 @@ object BonkersModule : EventModule
             claims[it.key + "_base"] = it.value.region
             claims[it.key + "_mine"] = it.value.region
         }
+
+        TablistService.register(PleaseKillMeNowTabPopulator())
 
         claims["Classic"] = Cuboid(
             loc(559.500, 0.0, 559.500),
@@ -430,7 +436,7 @@ object BonkersModule : EventModule
 
             if (claim == null && oldClaim != null)
             {
-                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key}")
+                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key.replace("_base", "")}")
                 it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
             }
@@ -438,7 +444,7 @@ object BonkersModule : EventModule
             if (claim != null && oldClaim == null)
             {
                 it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
-                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.GREEN}${claim.key}")
+                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
             }
         }
