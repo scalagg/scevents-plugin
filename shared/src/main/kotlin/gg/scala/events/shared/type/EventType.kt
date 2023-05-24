@@ -208,11 +208,11 @@ sealed interface EventType
             override fun getMaxTeams() = 4
             override fun getTeamSize() = 5
 
-            override fun getName() = "Bonkers"
+            override fun getName() = "Bunkers"
         }
 
         override val info = CgsGameGeneralInfo(
-            fancyNameRender = "Bonkers",
+            fancyNameRender = "Bunkers",
             gameVersion = 1.0F,
             minimumPlayers = 2,
             startingCountdownSec = 6,
@@ -233,6 +233,6 @@ sealed interface EventType
 
     companion object
     {
-        val TYPES = mutableListOf(Sumo, WoolShuffle, Bonkers)
+        val TYPES = mutableListOf(Sumo, /*WoolShuffle,*/ Bonkers)
     }
 }

@@ -95,7 +95,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
     private val format = SimpleDateFormat()
 
-    override fun getTitle() = "${CC.B_GOLD}Bunkers"
+    override fun getTitle() = "${CC.B_GOLD}BUNKERS"
 
     override fun render(
         lines: LinkedList<String>,

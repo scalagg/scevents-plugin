@@ -7,6 +7,10 @@ import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
+import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
+import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
+import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
+import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamInvitesCommand
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
@@ -182,6 +186,18 @@ object BonkersModule : EventModule
             loc(441.500, 144.0, 441.500)
         )
 
+        listOf(
+            TeamChatCommand,
+            TeamCommands,
+            TeamInvitesCommand
+        ).forEach {
+            plugin.flavor().inject(it)
+            plugin.commandManager.registerCommand(it)
+        }
+
+        plugin.flavor().inject(GameTeamService)
+        GameTeamService.configureTeamResources()
+
         Events
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
@@ -234,7 +250,6 @@ object BonkersModule : EventModule
 
                     val central = it.block
                             .findClaimContextual("central")
-                            ?: return@handler
 
                     if (central == null)
                     {
@@ -264,7 +279,6 @@ object BonkersModule : EventModule
 
                     val central = it.block
                             .findClaimContextual("central")
-                            ?: return@handler
 
                     if (central == null)
                     {
@@ -332,7 +346,6 @@ object BonkersModule : EventModule
                 .handler {
                     val claim = it.block
                             .findClaimContextual("base")
-                            ?: return@handler
 
                     if (claim == null)
                     {
@@ -359,7 +372,6 @@ object BonkersModule : EventModule
                 .handler {
                     val claim = it.block
                             .findClaimContextual("base")
-                            ?: return@handler
 
                     if (claim == null)
                     {
