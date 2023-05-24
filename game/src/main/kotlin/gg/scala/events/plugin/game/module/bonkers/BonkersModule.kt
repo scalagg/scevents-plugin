@@ -4,7 +4,6 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsGameDisqualificationHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
-import gg.scala.commons.tablist.TablistPopulator
 import gg.scala.commons.tablist.TablistService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
@@ -17,7 +16,6 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
-import io.github.nosequel.tab.shared.entry.TabElement
 import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -37,7 +35,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 /**
  * @author GrowlyX

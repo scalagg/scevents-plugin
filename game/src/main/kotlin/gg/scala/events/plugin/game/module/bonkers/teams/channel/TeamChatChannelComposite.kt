@@ -1,5 +1,6 @@
 package gg.scala.events.plugin.game.module.bonkers.teams.channel
 
+import gg.scala.events.plugin.game.module.bonkers.data
 import gg.scala.lemon.channel.ChatChannelComposite
 import gg.scala.lemon.player.rank.Rank
 import gg.scala.lemon.util.QuickAccess.username
@@ -27,7 +28,7 @@ object TeamChatChannelComposite : ChatChannelComposite
             ?: return Component.text("")
 
         return LegacyComponentSerializer.legacySection()
-            .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[#${senderPlayer.team?.id}] ${rank.color}${
+            .deserialize("${CC.GOLD}[Team] ${CC.GRAY}[${senderPlayer.team?.data()!!.colored()}${CC.GRAY}] ${rank.color}${
                 sender.username()
             }${CC.GRAY}: ${CC.RESET}$message")
     }

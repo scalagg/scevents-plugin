@@ -18,7 +18,7 @@ object TeamChatCommand : ScalaCommand()
     @Inject
     lateinit var plugin: ScalaEventsGamePlugin
 
-    @CommandAlias("teamchat|tc")
+    @CommandAlias("teamchat|tc|factionchat|fc")
     fun onTeamChat(player: ScalaPlayer)
     {
         if (player.bukkit().hasMetadata("teamchat"))

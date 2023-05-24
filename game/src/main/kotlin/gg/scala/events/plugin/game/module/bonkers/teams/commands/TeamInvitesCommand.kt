@@ -20,7 +20,7 @@ object TeamInvitesCommand : ScalaCommand()
     @Inject
     lateinit var plugin: ScalaEventsGamePlugin
 
-    @CommandAlias("toggleteaminvites|teaminvites|tivs")
+    @CommandAlias("toggleteaminvites|teaminvites|tivs|togglefactioninvites|togglefacinvs|tfis")
     fun onTeamInvites(player: ScalaPlayer)
     {
         if (player.bukkit().hasMetadata(teamInvitesMetadata))

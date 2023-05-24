@@ -23,7 +23,7 @@ import net.evilblock.cubed.util.CC
  * @author GrowlyX
  * @since 4/26/2023
  */
-@CommandAlias("faction|f")
+@CommandAlias("faction|fac|team|team")
 object TeamCommands : ScalaCommand()
 {
     @Default
