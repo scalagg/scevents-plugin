@@ -60,7 +60,7 @@ object BonkersModule : EventModule
         "Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
-            teamName = "Slay",
+            teamName = "Blue",
             spawnLocation = loc(500.500, 53.0, 322.500),
             region = Cuboid(
                 loc(454.500, 0.0, 301.500),
@@ -70,7 +70,7 @@ object BonkersModule : EventModule
         "Red" to TeamData(
             teamId = 2,
             color = ChatColor.RED,
-            teamName = "Slay",
+            teamName = "Red",
             spawnLocation = loc(500.500, 53.0, 678.500),
             region = Cuboid(
                 loc(546.500, 0.0, 649.500),
@@ -80,7 +80,7 @@ object BonkersModule : EventModule
         "Green" to TeamData(
             teamId = 3,
             color = ChatColor.GREEN,
-            teamName = "Slay",
+            teamName = "Green",
             spawnLocation = loc(678.500, 53.0, 500.500),
             region = Cuboid(
                 loc(699.500, 0.0, 454.500),
@@ -90,7 +90,7 @@ object BonkersModule : EventModule
         "Yellow" to TeamData(
             teamId = 4,
             color = ChatColor.YELLOW,
-            teamName = "Slay",
+            teamName = "Yellow",
             spawnLocation = loc(322.500, 53.0, 500.500),
             region = Cuboid(
                 loc(301.500, 0.0, 546.500),
