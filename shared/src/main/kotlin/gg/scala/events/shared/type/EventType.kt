@@ -208,7 +208,7 @@ sealed interface EventType
             override fun getMaxTeams() = 4
             override fun getTeamSize() = 5
 
-            override fun getName() = "Bunkers"
+            override fun getName() = "${CC.DARK_AQUA}Bunkers"
         }
 
         override val info = CgsGameGeneralInfo(
