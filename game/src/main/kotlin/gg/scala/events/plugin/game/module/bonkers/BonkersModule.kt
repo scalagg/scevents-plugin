@@ -26,6 +26,7 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Blue
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -54,7 +55,7 @@ object BonkersModule : EventModule
         )
 
     val mappings = mutableMapOf(
-        "Blue" to TeamData(
+        "${CC.BLUE}Blue" to TeamData(
             teamId = 1,
             color = ChatColor.BLUE,
             teamName = "Blue",
@@ -64,7 +65,7 @@ object BonkersModule : EventModule
                 loc(546.500, 144.0, 351.500)
             )
         ),
-        "Red" to TeamData(
+        "${CC.RED}Red" to TeamData(
             teamId = 2,
             color = ChatColor.RED,
             teamName = "Red",
@@ -74,7 +75,7 @@ object BonkersModule : EventModule
                 loc(454.500, 144.0, 699.500)
             )
         ),
-        "Green" to TeamData(
+        "${CC.GREEN}Green" to TeamData(
             teamId = 3,
             color = ChatColor.GREEN,
             teamName = "Green",
@@ -84,7 +85,7 @@ object BonkersModule : EventModule
                 loc(649.500, 144.0, 546.500)
             )
         ),
-        "Yellow" to TeamData(
+        "${CC.YELLOW}Yellow" to TeamData(
             teamId = 4,
             color = ChatColor.YELLOW,
             teamName = "Yellow",
@@ -104,27 +105,27 @@ object BonkersModule : EventModule
 
     val playerAccounts = mutableMapOf<UUID, Account>()
     val conquests = mutableMapOf(
-        "NE" to Cuboid(
+        "${CC.BLUE}North ${CC.YELLOW}West " to Cuboid(
             loc(385.0, 46.0, 358.0),
             loc(372.0, 60.0, 372.0)
         ),
-        "W" to Cuboid(
+        "${CC.BLUE}North ${CC.GREEN}East " to Cuboid(
             loc(642.0, 46.0, 372.0),
             loc(628.0, 60.0, 358.0)
         ),
-        "E" to Cuboid(
+        "${CC.RED}South ${CC.YELLOW}West " to Cuboid(
             loc(358.0, 46.0, 628.0),
             loc(372.0, 60.0, 642.0)
         ),
-        "S" to Cuboid(
+        "${CC.RED}South ${CC.GREEN}East " to Cuboid(
             loc(628.0, 46.0, 642.0),
             loc(642.0, 60.0, 628.0)
-        )
+        ),
     )
 
     fun startNewConquestEvent(region: Cuboid, name: String)
     {
-        ConquestKothMix(region, 60 * 5, name = name, startNewOneAfter = true).configure()
+        ConquestKothMix(region, active = true, 60 * 5, name = name, startNewOneAfter = true).configure()
     }
 
     private var spawnCampInvincibility = false
@@ -164,9 +165,10 @@ object BonkersModule : EventModule
                         loc(495.0, 65.0, 495.0),
                         loc(505.0, 60.0, 505.0),
                     ),
+                    active = true,
                     60 * 5,
                     startNewOneAfter = false,
-                    name = "",
+                    name = "${CC.BLUE}Classic ",
                     specialCentral = true
                 ).configure()
             },
@@ -188,7 +190,7 @@ object BonkersModule : EventModule
 
         TablistService.register(PleaseKillMeNowTabPopulator)
 
-        claims["Classic"] = Cuboid(
+        claims["central_mine"] = Cuboid(
             loc(559.500, 0.0, 559.500),
             loc(441.500, 144.0, 441.500)
         )
@@ -433,27 +435,23 @@ object BonkersModule : EventModule
                 it.isCancelled = false
             }
 
-        fun handleGenericMovementEvent(it: GenericMovementEvent)
-        {
+        fun handleGenericMovementEvent(it: GenericMovementEvent) {
             val claim = it.to.block.findClaim()
             val oldClaim = it.from.block.findClaim()
 
-            if (oldClaim == null && claim == null)
-            {
+            if (oldClaim == null && claim == null) {
                 return
             }
 
-            if (claim == null && oldClaim != null)
-            {
-                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}${oldClaim.key.replace("_base", "")}")
+            if (claim == null && oldClaim != null) {
+                it.player.sendMessage(if (oldClaim.key.equals("central_mine")) "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("_base", "")}")
                 it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
             }
 
-            if (claim != null && oldClaim == null)
-            {
+            if (claim != null && oldClaim == null) {
                 it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
-                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}")
+                it.player.sendMessage(if (claim.key.equals("central_mine")) "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}")
                 it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
             }
         }
