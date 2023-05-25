@@ -11,8 +11,7 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
-import gg.scala.lemon.LemonConstants
-import gg.scala.lemon.util.QuickAccess.username
+import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -20,8 +19,9 @@ import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
+import net.evilblock.cubed.util.Color
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.EventUtils
-import net.evilblock.cubed.util.bukkit.Rainbow
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.math.Numbers
@@ -91,72 +91,167 @@ data class GenericMovementEvent(
     val from: Location
 )
 
+object AnimatedBunkersTitle : AnimatedScoreboardTitle()
+{
+    private val internal = mutableListOf<String>()
+
+    init
+    {
+        for (i in 0..50)
+        {
+            internal.add("${CC.B_PRI}BUNKERS")
+        }
+
+        internal.add(
+                Color.translate(
+                        "&8&lB&6&lU&e&lNKERS"
+                )
+        )
+
+        internal.add(
+                Color.translate(
+                        "&8&lBU&6&lN&e&lKERS"
+                )
+        )
+
+        internal.add(
+                Color.translate(
+                        "&8&lBUN&6&lK&e&lERS"
+                )
+        )
+
+        internal.add(
+                Color.translate(
+                        "&8&lBUNK&6&lE&e&lRS"
+                )
+        )
+
+        internal.add(
+                Color.translate(
+                        "&8&lBUNKE&6&lR&e&lS"
+                )
+        )
+
+        internal.add(
+                Color.translate(
+                        "&8&lBUNKERS&6&l"
+                )
+        )
+
+        for (i in 0..5)
+        {
+            internal.add(
+                    Color.translate(
+                            "&8&lBUNKERS"
+                    )
+            )
+        }
+
+        for (i in 0..4)
+        {
+            internal.add(
+                    Color.translate(
+                            "&6&lBUNKERS"
+                    )
+            )
+        }
+
+        for (i in 0..5)
+        {
+            internal.add(
+                    Color.translate(
+                            "&8&lBUNKERS"
+                    )
+            )
+        }
+
+        initialize()
+    }
+
+    override fun getAnimations(): List<String>
+    {
+        return internal
+    }
+}
+
 object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
     private val format = SimpleDateFormat()
 
-    override fun getTitle() = "${CC.B_GOLD}BUNKERS"
+    override fun getTitle() = AnimatedBunkersTitle.current.toString()
 
-    override fun render(
-        lines: LinkedList<String>,
-        player: Player, state: CgsGameState
-    )
+    override fun render(lines: LinkedList<String>, player: Player, state: CgsGameState)
     {
         lines += ""
 
         if (state == CgsGameState.STARTING)
         {
-            lines += "${CC.GOLD}Game starts in:"
-            lines += "${
+            lines += " ${CC.GOLD}Game starts in:"
+            lines += " ${
                 StartingStateRunnable.PRE_START_TIME 
             } seconds"
             lines += ""
-            lines += "${CC.WHITE}Selected team: ${
+            lines += " ${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
             }"
         } else if (state.isAfter(CgsGameState.STARTED))
         {
-            lines += "Game Time: ${CC.GOLD}${
+            lines += " Game Time: ${CC.GOLD}${
                 TimeUtil.formatIntoMMSS(
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += "Balance: ${CC.GOLD}${
+            lines += " Balance: ${CC.GOLD}$${
                 Numbers.format(
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
             }"
 
-            player.team()?.data()
-                ?.apply {
-                    lines += ""
-                    lines += "DTR: ${CC.GREEN}${dtr}"
-                    lines += "Team: ${colored()}"
-                }
+            // TODO: ADD Status for when Conquest Starts
 
-            lines += "Kills: ${CC.GOLD}${
-                runCatching {
-                    CgsGameEngine.INSTANCE
-                        .getStatistics(CgsPlayerHandler.find(player)!!)
-                        .gameKills.value
-                }.getOrNull() ?: 0
-            }"
+//            lines += ""
+//            lines += " ${CC.BD_AQUA}Conquest"
+//            lines += " Location: ${CC.RED}South ${CC.GREEN}East"
+//            lines += " Time: ${CC.YELLOW}${
+//                TimeUtil.formatIntoMMSS(
+//                        ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
+//                )
+//            }"
+//            lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${CC.YELLOW}Yellow"
+
+            // TODO: ADD Status for when KoTH Starts
+
+//            lines += ""
+//            lines += " ${CC.B_GOLD}KingOfTheHill"
+//            lines += " Location: ${CC.BLUE}Classic"
+//            lines += " Time: ${CC.YELLOW}${
+//                TimeUtil.formatIntoMMSS(
+//                        ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
+//                )
+//            }"
+//            lines += " ${CC.GOLD}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${CC.YELLOW}Yellow"
+
+            // TODO: ADD Next Event Scoreboard Status
+
+//            lines += ""
+//            lines += " ${CC.B_GOLD}Next Event"
+//            lines += " ${CC.I_GRAY}Starting in 5 seconds..."
         } else if (state == CgsGameState.WAITING)
         {
-            lines += "${CC.GOLD}Waiting:"
-            lines += "${
+            lines += " ${CC.GOLD}Waiting:"
+            lines += " ${
                 Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
             } more players."
-            lines += ""
-            lines += "${CC.WHITE}Selected team: ${
+            lines += " "
+            lines += " ${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
@@ -164,7 +259,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += "${CC.GRAY}www.tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+        lines += " ${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
     }
 }
 
@@ -236,8 +331,9 @@ fun Block.findClaimContextual(context: String) = BonkersModule.claims.entries
 
 fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$name"
 
-data class ConquestKothMix(
+ data class ConquestKothMix(
     val region: Cuboid,
+    val active: Boolean = false,
     val seconds: Int,
     val name: String,
     val startNewOneAfter: Boolean = false,
@@ -257,9 +353,15 @@ data class ConquestKothMix(
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
         end = {
-            Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.B_GREEN}${name}Koth ${region.lowerNE.stringify()} was completed!"
-            )
+            if (specialCentral) {
+                Bukkit.broadcastMessage(
+                        "$PREFIX_KOTH${CC.YELLOW}${name}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
+                )
+            } else {
+                Bukkit.broadcastMessage(
+                        "$PREFIX_CONQUEST${CC.YELLOW}${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
+                )
+            }
 
             if (currentHolder == null)
             {
@@ -269,20 +371,34 @@ data class ConquestKothMix(
                 val holder = Bukkit.getPlayer(currentHolder)
                 val holderTeam = holder?.team()?.data()
 
-                Bukkit.broadcastMessage(
-                    "$PREFIX_KOTH${CC.WHITE}${
-                        Bukkit.getPlayer(currentHolder)?.colorfulName()
-                    }${CC.GRAY} captured koth for ${
-                        holderTeam?.color
-                    }${
-                        holderTeam?.teamName
-                    }${CC.GRAY}!"
-                )
+                if (specialCentral) {
+                    Bukkit.broadcastMessage(
+                            "$PREFIX_KOTH${CC.WHITE}${
+                                Bukkit.getPlayer(currentHolder)?.colorfulName()
+                            }${CC.GRAY} captured KoTH for ${
+                                holderTeam?.color
+                            }${
+                                holderTeam?.teamName
+                            }${CC.GRAY}!"
+                    )
+                } else {
+                    Bukkit.broadcastMessage(
+                            "$PREFIX_CONQUEST${CC.WHITE}${
+                                Bukkit.getPlayer(currentHolder)?.colorfulName()
+                            }${CC.GRAY} captured Conquest for ${
+                                holderTeam?.color
+                            }${
+                                holderTeam?.teamName
+                            }${CC.GRAY}!"
+                    )
+                }
             }
 
-            Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.GOLD}Loot is dropping at the center of ${name}Koth ${region.lowerNE.stringify()} in 5 seconds!"
-            )
+            if (!specialCentral) {
+                Bukkit.broadcastMessage(
+                        "$PREFIX_CONQUEST${CC.YELLOW}Loot is dropping at the center of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}in 5 seconds!"
+                )
+            }
 
             Schedulers
                 .sync()
@@ -312,11 +428,19 @@ data class ConquestKothMix(
             terminable.closeAndReportException()
         },
         update = {
-            Bukkit.broadcastMessage(
-                "$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}Koth ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
-                    DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
-                }"
-            )
+            if (specialCentral) {
+                Bukkit.broadcastMessage(
+                        "$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                            DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
+                        }"
+                )
+            } else {
+                Bukkit.broadcastMessage(
+                        "$PREFIX_CONQUEST${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                            DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
+                        }"
+                )
+            }
         }
     ).apply {
         runner?.cancel()
@@ -326,9 +450,9 @@ data class ConquestKothMix(
     fun configure()
     {
         if (specialCentral) {
-            Bukkit.broadcastMessage("$PREFIX_KOTH${name}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+            Bukkit.broadcastMessage("$PREFIX_KOTH${name}${CC.YELLOW}KoTH has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
         } else {
-            Bukkit.broadcastMessage("$PREFIX_CONQUEST${name}${CC.YELLOW}Koth has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+            Bukkit.broadcastMessage("$PREFIX_CONQUEST${CC.YELLOW}The ${name}${CC.YELLOW}Conquest ${CC.YELLOW}has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
         }
 
         Schedulers
@@ -353,9 +477,15 @@ data class ConquestKothMix(
 //                        }${CC.GREEN}!"
 //                    )
 
-                    Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${name}${CC.YELLOW}Koth!"
-                    )
+                    if (specialCentral) {
+                        Bukkit.broadcastMessage(
+                                "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${name}${CC.YELLOW}KoTH!"
+                        )
+                    } else {
+                        Bukkit.broadcastMessage(
+                                "$PREFIX_CONQUEST${CC.YELLOW}Someone is now capping ${name}${CC.YELLOW}Conquest${CC.YELLOW}!"
+                        )
+                    }
 
                     if (runner == null)
                     {
@@ -384,7 +514,7 @@ data class ConquestKothMix(
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        fun name() = "${CC.GOLD}${name}Koth ${CC.GRAY}${region.lowerNE.stringify()}"
+        fun name() = if (specialCentral) "${name}${CC.GOLD}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()}" else "${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()}"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
@@ -450,9 +580,15 @@ data class ConquestKothMix(
 //                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though.")
 //                    }
 
-                    Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${name}${CC.YELLOW}Koth has been lost!"
-                    )
+                    if (specialCentral) {
+                        Bukkit.broadcastMessage(
+                                "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${name}${CC.YELLOW}KoTH has been lost!"
+                        )
+                    } else {
+                        Bukkit.broadcastMessage(
+                                "$PREFIX_CONQUEST${CC.YELLOW}Control of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}has been lost!"
+                        )
+                    }
                 }
 
                 if (futureHolders.contains(it.player.uniqueId))
