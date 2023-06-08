@@ -3,23 +3,18 @@ package gg.scala.events.plugin.external.menu
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.agnostic.sync.server.impl.GameServer
-import gg.scala.events.plugin.external.feature.EventPlayerFeature
 import gg.scala.events.plugin.external.feature.EventStatusFeature
-import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.events.shared.type.EventType
 import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
-import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.time.TimeUtil
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 /**
  * @author GrowlyX
@@ -105,23 +100,6 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
 
                 player.sendMessage("${CC.RED}There is no event running!")
             }
-
-        val profile = EventPlayerFeature.find(player)
-
-        if (profile != null)
-        {
-            buttons[4] = ItemBuilder
-                .of(Material.BREWING_STAND_ITEM)
-                .name("${CC.PRI}Your Statistics")
-                .addToLore(
-                    "${CC.WHITE}Kills: ${CC.GOLD}${profile.kills.value}",
-                    "${CC.WHITE}Deaths: ${CC.GOLD}${profile.deaths.value}",
-                    "",
-                    "${CC.WHITE}Wins: ${CC.GOLD}${profile.wins.value}",
-                    "${CC.WHITE}Losses: ${CC.GOLD}${profile.losses.value}",
-                )
-                .toButton()
-        }
 
         buttons[6] = ItemBuilder
             .of(XMaterial.FIRE_CHARGE)

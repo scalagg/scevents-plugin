@@ -18,6 +18,9 @@ interface EventModule
     val visibilityAdapter: CgsGameVisibilityAdapter
     val nametagProvider: CgsGameNametagAdapter
 
+    val bitchRequiredSwmLoadedWorld: String?
+        get() = null
+
     val gameSnapshot: CgsGameSnapshot
 
     fun configure()

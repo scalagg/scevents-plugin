@@ -22,7 +22,6 @@ import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
-import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.nms.MinecraftReflection
@@ -63,9 +62,12 @@ object SumoModule : EventModule
     private var currentlyPlaying: Pair<UUID, UUID>? = null
     private var winner: String? = null
 
-    private operator fun <A, B> Pair<A, B>.contains(uniqueId: B): Boolean
+    override val bitchRequiredSwmLoadedWorld: String?
+        get() = "sumo"
+
+    private operator fun Pair<*, *>.contains(element: Any): Boolean
     {
-        return first == uniqueId || second == uniqueId
+        return first == element || second == element
     }
 
     private fun <A> Pair<A, A>.forEach(function: (A) -> Unit)
@@ -81,14 +83,14 @@ object SumoModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_PRI}Events ${CC.GRAY}(BETA)"
+        override fun getTitle() = "${CC.B_PRI}Sumo Event"
 
         override fun render(
             lines: LinkedList<String>,
             player: Player, state: CgsGameState
         )
         {
-            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
+            lines += ""
 
             when (state)
             {
@@ -151,8 +153,7 @@ object SumoModule : EventModule
             }
 
             lines += ""
-            lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
-            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
+            lines += " ${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
         }
     }
 
@@ -190,7 +191,7 @@ object SumoModule : EventModule
     {
         val lobby = Location(
             Bukkit.getWorld("world"),
-            294143.5, 75.000, 49050.5, 90.0F, 0.0F
+            -15.5, 48.000, 34.5, -180.0F, 0.0F
         )
 
         Events
@@ -248,12 +249,12 @@ object SumoModule : EventModule
 
         val a = Location(
             Bukkit.getWorld("world"),
-            294111.500, 73.000, 49050.500, -90.0F, 0.0F
+            -22.5, 67.0, 5.5, -90f, 0.0f
         )
 
         val b = Location(
             Bukkit.getWorld("world"),
-            294121.500, 73.000, 49050.500, 90.0F, 0.0F
+            -8.5, 67.0, 5.5, 90f, 0.0f
         )
 
         val locations = listOf(a, b)

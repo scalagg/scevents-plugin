@@ -103,10 +103,6 @@ class EventsViewMenu : Menu(
                             .publish(
                                 AwareThreadContext.SYNC
                             )
-
-                        Tasks.delayed(10L) {
-                            VelocityRedirectSystem.redirect(player, gameServer.id)
-                        }
                     }
         }
 

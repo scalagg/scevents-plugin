@@ -1,6 +1,7 @@
 package gg.scala.events.plugin.game.module
 
 import gg.scala.aware.message.AwareMessage
+import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -58,6 +59,8 @@ object EventOrchestrator
                     return@listen
                 }
 
+                eventStarted = true
+
                 val type = Class.forName(
                     retrieve("eventType")
                 )
@@ -86,7 +89,16 @@ object EventOrchestrator
                     inject(EventOmnibus)
                 }
 
-                eventStarted = true
+                AwareMessage
+                    .of(
+                        "send-user",
+                        ScalaEventsChannel.channel(),
+                        "user" to retrieve<UUID>("uniqueId"),
+                        "server" to ServerSync.getLocalGameServer().id
+                    )
+                    .publish(
+                        AwareThreadContext.SYNC
+                    )
             }
 
         ScalaEventsChannel

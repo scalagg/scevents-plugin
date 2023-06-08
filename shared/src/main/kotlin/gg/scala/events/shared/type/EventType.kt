@@ -39,23 +39,23 @@ sealed interface EventType
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "world"
+                    override fun getBukkitWorldName() = "sumo"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
-                    override fun getId() = "world"
+                    override fun getId() = "sumo"
 
                     override fun getMaterial() = Material.ARROW to 1
                     override fun getName() = "sumo"
 
                     override fun getPreLobbyLocation() = Location(
-                        Bukkit.getWorld("world"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                        Bukkit.getWorld("sumo"),
+                        -15.5, 48.000, 34.5, -180.0F, 0.0F
                     )
 
                     override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld("world"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                        Bukkit.getWorld("sumo"),
+                        -15.5, 48.000, 34.5, -180.0F, 0.0F
                     )
                 }
             )
