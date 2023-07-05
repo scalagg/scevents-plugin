@@ -100,27 +100,6 @@ object EventOmnibus
                         "server" to ServerSync.local.id
                     )
 
-                Schedulers
-                    .sync()
-                    .runRepeating({ task ->
-                        if (Players.all().isEmpty())
-                        {
-                            task.closeAndReportException()
-                            return@runRepeating
-                        }
-
-                        if (
-                            engine.gameState != CgsGameState.WAITING &&
-                            engine.gameState != CgsGameState.STARTING
-                        )
-                        {
-                            task.closeAndReportException()
-                            return@runRepeating
-                        }
-
-                        message.publish()
-                    }, 0L, 20L * 20L)
-
                 hasFirstPlayerJoined = true
             }
     }

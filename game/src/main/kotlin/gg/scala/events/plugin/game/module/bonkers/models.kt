@@ -259,7 +259,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += " ${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+        lines += "${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
     }
 }
 

@@ -39,7 +39,7 @@ sealed interface EventType
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "sumo"
+                    override fun getBukkitWorldName() = "Sumo"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
@@ -75,7 +75,7 @@ sealed interface EventType
             fancyNameRender = "Sumo",
             gameVersion = 1.0F,
             minimumPlayers = 2,
-            startingCountdownSec = 61,
+            startingCountdownSec = 5,
             awards = CgsGameAwardInfo(
                 false, 0..100, 0..100
             ),

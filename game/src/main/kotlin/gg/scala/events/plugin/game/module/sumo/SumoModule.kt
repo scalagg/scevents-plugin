@@ -24,9 +24,11 @@ import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
+import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.nms.MinecraftReflection
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
+import net.evilblock.cubed.visibility.VisibilityHandler
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -153,7 +155,7 @@ object SumoModule : EventModule
             }
 
             lines += ""
-            lines += " ${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+            lines += "${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
         }
     }
 
@@ -190,7 +192,7 @@ object SumoModule : EventModule
     override fun configure()
     {
         val lobby = Location(
-            Bukkit.getWorld("world"),
+            Bukkit.getWorld("Sumo"),
             -15.5, 48.000, 34.5, -180.0F, 0.0F
         )
 
@@ -198,30 +200,39 @@ object SumoModule : EventModule
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
                 it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
-                it.player.sendMessage("${CC.GREEN}Welcome to the ${CC.GOLD}Sumo${CC.GREEN} event!")
-                it.player.sendMessage("${CC.YELLOW}Please wait for others to join...")
+                it.player.sendMessage("${CC.GREEN}Welcome to the Sumo event!")
+                it.player.sendMessage("${CC.GREEN}Please wait for others to join...")
                 it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
+
+                it.player.removeMetadata("frozenaf", plugin)
 
                 if (engine.gameState == CgsGameState.STARTING)
                 {
                     it.player.teleport(lobby)
+                    Tasks.delayed(1L) {
+                        VisibilityHandler.update(it.player)
+                        it.player.sendMessage(
+
+                            it.player.scoreboard.teams.joinToString(",") { it.name }
+                        )
+                    }
                 }
             }
 
         Events
             .subscribe(PlayerMoveEvent::class.java)
-            .filter(EventUtils::hasPlayerMoved)
             .filter {
-                it.player.hasMetadata("frozenaf")
+                it.player.hasMetadata("frozenaf") &&
+                    it.from.x.toInt() != it.to.x.toInt() || it.from.z.toInt() != it.to.z.toInt()
             }
             .handler {
-                val location = it.player.location.clone()
-                    .apply {
-                        x = x.toInt() + 0.500
-                        z = z.toInt() + 0.500
-                    }
+                val thing = it.from.clone()
+                thing.x = thing.x.toInt() + (0.500 * (if (thing.x < 0) -1 else 1))
+                thing.z = thing.z.toInt() + (0.500 * (if (thing.z < 0) -1 else 1))
 
-                it.player.teleport(location)
+                it.player.teleport(
+                    thing
+                )
             }
 
         Events
@@ -248,13 +259,13 @@ object SumoModule : EventModule
         var currentRound = 1
 
         val a = Location(
-            Bukkit.getWorld("world"),
-            -22.5, 67.0, 5.5, -90f, 0.0f
+            Bukkit.getWorld("Sumo"),
+            -22.5, 47.0, 5.5, -90f, 0.0f
         )
 
         val b = Location(
-            Bukkit.getWorld("world"),
-            -8.5, 67.0, 5.5, 90f, 0.0f
+            Bukkit.getWorld("Sumo"),
+            -8.5, 47.0, 5.5, 90f, 0.0f
         )
 
         val locations = listOf(a, b)
