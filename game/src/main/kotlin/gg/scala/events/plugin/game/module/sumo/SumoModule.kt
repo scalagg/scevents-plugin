@@ -20,12 +20,14 @@ import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
+import me.lucko.helper.event.filter.EventFilters
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.nms.MinecraftReflection
+import net.evilblock.cubed.util.text.TextUtil
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
 import net.evilblock.cubed.visibility.VisibilityHandler
@@ -85,7 +87,7 @@ object SumoModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_PRI}Sumo Event"
+        override fun getTitle() = "${CC.B_PRI}SUMO"
 
         override fun render(
             lines: LinkedList<String>,
@@ -199,40 +201,35 @@ object SumoModule : EventModule
         Events
             .subscribe(PlayerJoinEvent::class.java)
             .handler {
-                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
-                it.player.sendMessage("${CC.GREEN}Welcome to the Sumo event!")
-                it.player.sendMessage("${CC.GREEN}Please wait for others to join...")
-                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}--------------------------------------")
+                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(53)}")
+                TextUtil.sendCenteredMessage(it.player, "${CC.GREEN}Welcome to the ${CC.GOLD}Sumo${CC.GREEN} event!")
+                TextUtil.sendCenteredMessage(it.player, "${CC.GRAY}Please wait for others to join...")
+                it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(53)}")
 
                 it.player.removeMetadata("frozenaf", plugin)
+
+                Tasks.delayed(1L) {
+                    VisibilityHandler.update(it.player)
+                }
 
                 if (engine.gameState == CgsGameState.STARTING)
                 {
                     it.player.teleport(lobby)
-                    Tasks.delayed(1L) {
-                        VisibilityHandler.update(it.player)
-                        it.player.sendMessage(
-
-                            it.player.scoreboard.teams.joinToString(",") { it.name }
-                        )
-                    }
                 }
             }
 
         Events
             .subscribe(PlayerMoveEvent::class.java)
             .filter {
-                it.player.hasMetadata("frozenaf") &&
-                    it.from.x.toInt() != it.to.x.toInt() || it.from.z.toInt() != it.to.z.toInt()
+                EventFilters
+                    .ignoreSameBlockAndY<PlayerMoveEvent>()
+                    .test(it)
+            }
+            .filter {
+                it.player.hasMetadata("frozenaf")
             }
             .handler {
-                val thing = it.from.clone()
-                thing.x = thing.x.toInt() + (0.500 * (if (thing.x < 0) -1 else 1))
-                thing.z = thing.z.toInt() + (0.500 * (if (thing.z < 0) -1 else 1))
-
-                it.player.teleport(
-                    thing
-                )
+                it.player.teleport(it.from)
             }
 
         Events

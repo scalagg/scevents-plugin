@@ -1,3 +1,4 @@
 dependencies {
     compileOnly("gg.scala.cgs:common:1.4.1")
+    compileOnly "gg.scala.lemon:bukkit:1.4.0"
 }

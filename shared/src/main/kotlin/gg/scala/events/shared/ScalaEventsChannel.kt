@@ -3,12 +3,15 @@ package gg.scala.events.shared
 import gg.scala.aware.AwareBuilder
 import gg.scala.aware.codec.codecs.interpretation.AwareMessageCodec
 import gg.scala.aware.message.AwareMessage
+import gg.scala.lemon.redirection.impl.VelocityRedirectSystem
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.ScalaCommonsSpigot
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.FancyMessage
 import net.md_5.bungee.api.chat.ClickEvent
+import org.bukkit.Bukkit
+import java.util.*
 import java.util.logging.Logger
 
 /**
@@ -23,6 +26,18 @@ object ScalaEventsChannel
             .codec(AwareMessageCodec)
             .logger(Logger.getAnonymousLogger())
             .build()
+
+        aware.listen("send-user") {
+            val player = Bukkit
+                .getPlayer(
+                    retrieve<UUID>("user")
+                )
+                ?: return@listen
+
+            VelocityRedirectSystem.redirect(
+                player, retrieve("server")
+            )
+        }
 
         aware
             .listen("event-alert") {

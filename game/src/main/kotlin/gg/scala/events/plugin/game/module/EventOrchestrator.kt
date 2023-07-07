@@ -88,6 +88,17 @@ object EventOrchestrator
 
                     inject(EventOmnibus)
                 }
+
+                AwareMessage
+                    .of(
+                        "send-user",
+                        ScalaEventsChannel.channel(),
+                        "user" to retrieve<UUID>("uniqueId"),
+                        "server" to ServerSync.getLocalGameServer().id
+                    )
+                    .publish(
+                        AwareThreadContext.SYNC
+                    )
             }
 
         ScalaEventsChannel

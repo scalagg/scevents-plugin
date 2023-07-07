@@ -54,11 +54,11 @@ class EventsViewMenu : Menu(
             buttons[10 + buttons.size] =
                 ItemBuilder
                     .copyOf(type.icon)
-                    .name("${CC.B_GREEN}${type.info.fancyNameRender}")
+                    .name("${CC.GREEN}${type.info.fancyNameRender}")
                     .setLore(
                         TextSplitter.split(
                             text = type.description,
-                            linePrefix = CC.WHITE
+                            linePrefix = CC.GRAY
                         )
                     )
                     .addToLore(
