@@ -77,7 +77,7 @@ sealed interface EventType
             minimumPlayers = 2,
             startingCountdownSec = 5,
             awards = CgsGameAwardInfo(
-                false, 0..100, 0..100
+                true, 300..400, 50..100
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,
@@ -147,7 +147,7 @@ sealed interface EventType
             minimumPlayers = 2,
             startingCountdownSec = 61,
             awards = CgsGameAwardInfo(
-                false, 0..100, 0..100
+                true, 300..400, 50..100
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,
@@ -217,7 +217,7 @@ sealed interface EventType
             minimumPlayers = 2,
             startingCountdownSec = 6,
             awards = CgsGameAwardInfo(
-                false, 0..100, 0..100
+                true, 300..400, 50..100
             ),
             preStartVoting = false,
             disqualifyOnLogout = false,

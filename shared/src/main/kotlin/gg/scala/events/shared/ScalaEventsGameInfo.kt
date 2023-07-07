@@ -13,7 +13,7 @@ object ScalaEventsGameInfo : CgsGameGeneralInfo(
     minimumPlayers = 2,
     startingCountdownSec = 21,
     awards = CgsGameAwardInfo(
-        false, 0..100, 0..100
+        true, 0..100, 0..100
     ),
     preStartVoting = false,
     disqualifyOnLogout = true,
