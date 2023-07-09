@@ -51,7 +51,7 @@ object BonkersModule : EventModule
 
     private fun loc(x: Double, y: Double, z: Double) =
         Location(
-            Bukkit.getWorld("world"), x, y, z
+            Bukkit.getWorld("Sumo"), x, y, z
         )
 
     val mappings = mutableMapOf(

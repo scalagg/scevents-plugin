@@ -155,24 +155,24 @@ object WoolShuffleModule : EventModule
     override val visibilityAdapter = VisibilityAdapter
 
     val middleOfArena = Location(
-        Bukkit.getWorld("world"),
+        Bukkit.getWorld("Sumo"),
         294116.500, 73.000, 49050.500
     )
 
     override fun configure()
     {
         val lobby = Location(
-            Bukkit.getWorld("world"),
+            Bukkit.getWorld("Sumo"),
             294143.5, 75.000, 49050.5, 90.0F, 0.0F
         )
 
         val platform = Cuboid(
             Location(
-                Bukkit.getWorld("world"),
+                Bukkit.getWorld("Sumo"),
                 294104.000, 72.000, 49039.000
             ),
             Location(
-                Bukkit.getWorld("world"),
+                Bukkit.getWorld("Sumo"),
                 294129.000, 72.000, 49060.000
             )
         )

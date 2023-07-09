@@ -109,22 +109,22 @@ sealed interface EventType
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "world"
+                    override fun getBukkitWorldName() = "Sumo"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
-                    override fun getId() = "world"
+                    override fun getId() = "Sumo"
 
                     override fun getMaterial() = Material.ARROW to 1
                     override fun getName() = "wool_shuffle"
 
                     override fun getPreLobbyLocation() = Location(
-                        Bukkit.getWorld("world"),
+                        Bukkit.getWorld("Sumo"),
                         294143.5, 74.000, 49050.5, 90.0F, 0.0F
                     )
 
                     override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld("world"),
+                        Bukkit.getWorld("Sumo"),
                         294143.5, 74.000, 49050.5, 90.0F, 0.0F
                     )
                 }
@@ -172,29 +172,29 @@ sealed interface EventType
             .build()
 
         override val description =
-            "Jay has gone Bonkers."
+            "4-team, HCF-style minigame."
 
         override val mode = object : CgsGameMode
         {
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "world"
+                    override fun getBukkitWorldName() = "Sumo"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
-                    override fun getId() = "world"
+                    override fun getId() = "Sumo"
 
                     override fun getMaterial() = Material.CHEST to 1
                     override fun getName() = "bonkers"
 
                     override fun getPreLobbyLocation() = Location(
-                        Bukkit.getWorld("world"),
+                        Bukkit.getWorld("Sumo"),
                         0.500, 60.000, 0.500
                     )
 
                     override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld("world"),
+                        Bukkit.getWorld("Sumo"),
                         500.500, 60.000, 500.500
                     )
                 }
