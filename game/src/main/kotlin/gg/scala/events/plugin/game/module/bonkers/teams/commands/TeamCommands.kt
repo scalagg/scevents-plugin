@@ -18,6 +18,7 @@ import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.events.plugin.game.module.bonkers.teams.joinTeam
 import gg.scala.events.plugin.game.module.bonkers.teams.sendTeamInviteTo
 import gg.scala.events.plugin.game.module.bonkers.teams.team
+import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
 import net.evilblock.cubed.util.CC
 
 /**
@@ -148,6 +149,26 @@ object TeamCommands : ScalaCommand()
     fun onJoin(player: ScalaPlayer, team: Int)
     {
         player.bukkit().joinTeam(team)
+    }
+
+    @Subcommand("home|hq")
+    @Description("Teleport to your team's set spawn location")
+    fun onTeamSpawn(player: ScalaPlayer)
+    {
+        val team = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not in a team right now!"
+            )
+
+        if (TeamHomeTimer.isActive(player.bukkit()))
+        {
+            throw ConditionFailedException(
+                "You are already on team home timer!"
+            )
+        }
+
+        TeamHomeTimer.addOrOverride(player.bukkit())
+        player.sendMessage("${CC.GREEN}You have started your team home timer!")
     }
 
     @Subcommand("view")
