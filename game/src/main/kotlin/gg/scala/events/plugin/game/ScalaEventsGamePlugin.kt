@@ -8,8 +8,6 @@ import gg.scala.commons.annotations.custom.CustomAnnotationProcessors
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
-import gg.scala.events.plugin.game.module.bonkers.BonkersModule
-import gg.scala.events.plugin.game.module.sumo.SumoModule
 import gg.scala.events.shared.ScalaEventsChannel
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
@@ -34,8 +32,8 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
     @ContainerPreEnable
     fun containerPreEnable()
     {
-        listOf(BonkersModule, SumoModule)
-            .forEach {
+        CustomAnnotationProcessors
+            .process<EventBind> {
                 val annotation = it.javaClass
                     .getAnnotation(
                         EventBind::class.java
