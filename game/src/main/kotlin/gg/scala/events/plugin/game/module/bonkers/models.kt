@@ -53,7 +53,8 @@ data class TeamData(
     val color: ChatColor,
     val spawnLocation: Location,
     val region: Cuboid,
-    var dtr: Double = 5.0
+    var dtr: Double = 5.0,
+    var balance: Int = 0
 )
 {
     fun colored() = "$color$teamName"
