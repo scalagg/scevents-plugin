@@ -89,7 +89,7 @@ object TeamCommands : ScalaCommand()
             if (max < deposit)
             {
                 throw ConditionFailedException(
-                    "${CC.RED}You do not have enough balance to deposit. You need $${CC.YELLOW}${deposit - max} ${CC.RED}more."
+                    "${CC.RED}You do not have enough balance to deposit. You need ${CC.YELLOW}$${deposit - max} ${CC.RED}more."
                 )
             }
 
