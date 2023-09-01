@@ -17,7 +17,7 @@ object ScalaEventsGameInfo : CgsGameGeneralInfo(
     ),
     preStartVoting = false,
     disqualifyOnLogout = true,
-    spectateOnDeath = true,
+    spectateOnDeath = false,
     showTabHearts = false,
     showNameHearts = true,
     usesCustomArenaWorld = true,

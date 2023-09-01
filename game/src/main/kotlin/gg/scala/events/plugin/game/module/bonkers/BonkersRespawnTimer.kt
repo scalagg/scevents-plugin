@@ -41,7 +41,7 @@ class BonkersRespawnTimer(
         {
             6 ->
             {
-                CgsSpectatorHandler.setSpectator(this.player)
+                CgsSpectatorHandler.setSpectator(this.player, temporary = true)
 
                 this.player.teleport(
                     CgsGameEngine.INSTANCE.gameArena!!.getPreLobbyLocation()

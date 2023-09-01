@@ -221,7 +221,7 @@ sealed interface EventType
             ),
             preStartVoting = false,
             disqualifyOnLogout = false,
-            spectateOnDeath = true,
+            spectateOnDeath = false,
             showTabHearts = false,
             showNameHearts = false,
             usesCustomArenaWorld = true,
