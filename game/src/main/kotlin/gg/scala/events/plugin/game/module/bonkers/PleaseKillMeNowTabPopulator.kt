@@ -77,6 +77,7 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
                 y++,
                 "${ChatColor.GRAY}Online: ${ChatColor.WHITE}${player.team()!!.alive.size}/${player.team()!!.participants.size}"
             )
+            layout.add(1, y++, "${ChatColor.GRAY}Balance: $${team.balance}")
         }
 
         y = 3

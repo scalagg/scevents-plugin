@@ -9,7 +9,6 @@ import gg.scala.commons.acf.annotation.Description
 import gg.scala.commons.acf.annotation.HelpCommand
 import gg.scala.commons.acf.annotation.Optional
 import gg.scala.commons.acf.annotation.Subcommand
-import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.module.bonkers.account
@@ -96,6 +95,51 @@ object TeamCommands : ScalaCommand()
             teamData.balance += deposit
             account.balance -= deposit
             player.sendMessage("${CC.GREEN}You have deposited ${CC.WHITE}$$deposit ${CC.GREEN}into your team's balance.")
+        }
+    }
+
+    @Subcommand("withdraw|w")
+    @Description("Withdraw a certain amount from your team's balance.")
+    fun onWithdraw(player: ScalaPlayer, amount: String)
+    {
+        val account = player.bukkit().account()
+        val team = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not in a team right now!"
+            )
+        val teamData = team.data()!!
+        val max = account.balance
+
+        if (amount.equals("all", ignoreCase = true))
+        {
+            account.balance += teamData.balance
+            teamData.balance = 0
+
+            player.sendMessage("${CC.GREEN}You have withdrew ${CC.WHITE}$${max} ${CC.GREEN}from your team's balance.")
+        } else
+        {
+            val withdrawal = amount.toIntOrNull()
+                ?: throw ConditionFailedException(
+                    "${CC.YELLOW}$amount ${CC.RED}is not a valid integer."
+                )
+
+            if (withdrawal == 0)
+            {
+                throw ConditionFailedException(
+                    "${CC.RED}You cannot withdraw $0."
+                )
+            }
+
+            if (teamData.balance < withdrawal)
+            {
+                throw ConditionFailedException(
+                    "${CC.RED}Your team does not have enough money to withdraw. You need ${CC.YELLOW}$${withdrawal - teamData.balance} ${CC.RED}more."
+                )
+            }
+
+            account.balance += withdrawal
+            teamData.balance -= withdrawal
+            player.sendMessage("${CC.GREEN}You have withdrew ${CC.WHITE}$$withdrawal ${CC.GREEN}from your team's balance.")
         }
     }
 
