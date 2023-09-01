@@ -62,8 +62,6 @@ subprojects {
     shadowJar {
         archiveClassifier.set("")
 
-        exclude "**/*.kotlin_metadata"
-        exclude "**/*.kotlin_builtins"
         exclude "META-INF/"
 
         archiveFileName = "scala-events-plugin-${project.name}.jar"

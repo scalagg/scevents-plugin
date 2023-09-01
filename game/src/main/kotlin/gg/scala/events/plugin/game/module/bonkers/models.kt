@@ -11,6 +11,7 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
 import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
@@ -212,6 +213,15 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
             }"
+
+            if (TeamHomeTimer.isActive(player))
+            {
+                lines+= " Home Timer: ${CC.BLUE}${
+                    TimeUtil.formatIntoMMSS(
+                        ((TeamHomeTimer.fetchRemaining(player)) / 1000).toInt()
+                    )
+                }"
+            }
 
             // TODO: ADD Status for when Conquest Starts
 

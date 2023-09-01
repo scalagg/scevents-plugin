@@ -4,6 +4,7 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.events.plugin.game.module.bonkers.data
 import gg.scala.events.plugin.game.module.bonkers.team
 import gg.scala.flavor.service.Configure
+import gg.scala.flavor.service.Service
 import gg.scala.lemon.cooldown.type.PlayerStaticCooldown
 import me.lucko.helper.Events
 import net.evilblock.cubed.util.CC
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import java.util.concurrent.TimeUnit
 
+@Service
 object TeamHomeTimer : PlayerStaticCooldown(
     "Team-Home", TimeUnit.SECONDS.toMillis(10L)
 ) {

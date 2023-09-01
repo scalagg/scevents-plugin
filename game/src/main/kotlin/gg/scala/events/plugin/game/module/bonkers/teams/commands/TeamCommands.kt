@@ -109,14 +109,13 @@ object TeamCommands : ScalaCommand()
                 "You are not in a team right now!"
             )
         val teamData = team.data()!!
-        val max = account.balance
 
         if (amount.equals("all", ignoreCase = true))
         {
             account.balance += teamData.balance
             teamData.balance = 0
 
-            player.sendMessage("${CC.GREEN}You have withdrew ${CC.WHITE}$${max} ${CC.GREEN}from your team's balance.")
+            player.sendMessage("${CC.GREEN}You have withdrew ${CC.WHITE}$${account.balance} ${CC.GREEN}from your team's balance.")
         } else
         {
             val withdrawal = amount.toIntOrNull()
