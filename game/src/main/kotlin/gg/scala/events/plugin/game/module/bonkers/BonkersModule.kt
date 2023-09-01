@@ -26,7 +26,6 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Blue
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -35,23 +34,22 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 /**
  * @author GrowlyX
  * @since 3/31/2023
  */
-@Service
-@IgnoreAutoScan
-@EventBind(EventType.Bonkers::class)
 object BonkersModule : EventModule
 {
-    @Inject
-    lateinit var plugin: ScalaEventsGamePlugin
+    val plugin by lazy {
+        JavaPlugin.getPlugin(ScalaEventsGamePlugin::class.java)
+    }
 
     private fun loc(x: Double, y: Double, z: Double) =
         Location(
-            Bukkit.getWorld("Sumo"), x, y, z
+            Bukkit.getWorld("Bunkers"), x, y, z
         )
 
     val mappings = mutableMapOf(

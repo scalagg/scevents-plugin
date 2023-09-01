@@ -16,7 +16,6 @@ import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
-import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -45,6 +44,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -52,16 +52,11 @@ import java.util.concurrent.TimeUnit
  * @author GrowlyX
  * @since 10/3/2022
  */
-@Service
-@IgnoreAutoScan
-@EventBind(EventType.Sumo::class)
 object SumoModule : EventModule
 {
-    @Inject
-    lateinit var engine: ScalaEventsGameEngine
-
-    @Inject
-    lateinit var plugin: ScalaEventsGamePlugin
+    val plugin by lazy {
+        JavaPlugin.getPlugin(ScalaEventsGamePlugin::class.java)
+    }
 
     private var currentlyPlaying: Pair<UUID, UUID>? = null
     private var winner: String? = null
@@ -212,7 +207,7 @@ object SumoModule : EventModule
                     VisibilityHandler.update(it.player)
                 }
 
-                if (engine.gameState == CgsGameState.STARTING)
+                if (CgsGameEngine.INSTANCE.gameState == CgsGameState.STARTING)
                 {
                     it.player.teleport(lobby)
                 }
