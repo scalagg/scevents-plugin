@@ -228,18 +228,10 @@ object TeamCommands : ScalaCommand()
     @Description("View details for a particular team.")
     fun onView(player: ScalaPlayer, @Optional team: Int?)
     {
-        //TODO revamp handling of excess team entries
         val teamId = team ?: player.bukkit().team?.id
             ?: throw ConditionFailedException(
                 "You are not currently on a team!"
             )
-
-        if (teamId > 4)
-        {
-            throw ConditionFailedException(
-                "Team #$teamId does not exist in this game."
-            )
-        }
 
         val team = CgsGameTeamService.teams[teamId]!!
         val teamData = team.data()!!

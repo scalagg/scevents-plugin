@@ -45,7 +45,7 @@ object GameTeamService
                 .deserialize("${CC.GRAY}[${it.team!!.data()!!.colored()}${CC.GRAY}] ")
         }
 
-        for (id in 1..((Bukkit.getMaxPlayers() / gameType.teamSize) + 1))
+        for (id in 1..4)
         {
             CgsGameTeamService.teams[id] =
                 CgsGameTeamService.engine.createTeam(id)

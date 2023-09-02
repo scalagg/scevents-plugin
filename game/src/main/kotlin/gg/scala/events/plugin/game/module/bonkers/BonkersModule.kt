@@ -350,8 +350,11 @@ object BonkersModule : EventModule
                         .build()
                 )
 
+                it.player.sendMessage("${ChatColor.LIGHT_PURPLE}YAS QUEEN! U SLAYED. GO GET UR ${original.name} BESTIEEEE")
+
                 delayed(6 * 20L) {
                     it.block.type = original
+                    it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
                 }
             }
 
@@ -484,6 +487,8 @@ object BonkersModule : EventModule
         Events
             .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
             .handler {
+                it.participant.spigot().respawn()
+
                 it.participant.team()
                     ?.apply {
                         val data = this.data()!!
@@ -504,21 +509,19 @@ object BonkersModule : EventModule
                             }
                         }
 
-                        delayed(1L) {
-                            if (data.raidable() && previouslyRaidable)
-                            {
-                                CgsGameDisqualificationHandler.disqualifyPlayer(
-                                    player = it.participant,
-                                    broadcastNotification = true, setSpectator = true
-                                )
-                                return@delayed
-                            }
-
-                            BonkersRespawnTimer(it.participant)
-                                .runTaskTimer(
-                                    CgsGameEngine.INSTANCE.plugin, 1L, 20L
-                                )
+                        if (data.raidable() && previouslyRaidable)
+                        {
+                            CgsGameDisqualificationHandler.disqualifyPlayer(
+                                player = it.participant,
+                                broadcastNotification = true, setSpectator = true
+                            )
+                            return@apply
                         }
+
+                        BonkersRespawnTimer(it.participant)
+                            .runTaskTimer(
+                                CgsGameEngine.INSTANCE.plugin, 0L, 20L
+                            )
                     }
 
                 it.killer?.apply {
