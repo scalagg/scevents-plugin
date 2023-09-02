@@ -272,6 +272,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
+                } else {
+                    lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: None"
                 }
             }
 
