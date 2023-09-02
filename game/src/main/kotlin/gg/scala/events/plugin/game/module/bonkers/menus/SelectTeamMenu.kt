@@ -1,4 +1,4 @@
-package gg.scala.events.plugin.game.module.bonkers.menanus
+package gg.scala.events.plugin.game.module.bonkers.menus
 
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.module.bonkers.BonkersModule

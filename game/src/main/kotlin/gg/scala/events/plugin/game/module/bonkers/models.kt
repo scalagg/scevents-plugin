@@ -224,6 +224,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 val data = team.data()!!
 
+                lines += "${CC.WHITE}Team: ${data.colored()}"
+
                 if (data.teamFocus != null)
                 {
                     val focusTeam = CgsGameTeamService.teams[data.teamFocus]
@@ -277,17 +279,28 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 }
             }
 
-            // TODO: ADD Status for when KoTH Starts
+           val centerKoth = BonkersModule.currentCentralKoth
 
-//            lines += ""
-//            lines += "${CC.B_GOLD}KingOfTheHill"
-//            lines += "Location: ${CC.BLUE}Classic"
-//            lines += "Time: ${CC.YELLOW}${
-//                TimeUtil.formatIntoMMSS(
-//                        ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
-//                )
-//            }"
-//            lines += "${CC.GOLD}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${CC.YELLOW}Yellow"
+            if (centerKoth != null)
+            {
+                lines += ""
+                lines += "${CC.B_GOLD}KingOfTheHill"
+                lines += " Location: ${CC.BLUE}Classic"
+                lines += " Time: ${CC.YELLOW}${
+                    centerKoth.formatRemainingCaptureTime()
+                }"
+                if (centerKoth.currentHolder != null)
+                {
+                    val holdingPlayer = Bukkit.getPlayer(centerKoth.currentHolder)
+                    val team = holdingPlayer.team() ?: return
+
+                    lines += " ${CC.R}Capturer: ${
+                        team.data()!!.colored()
+                    }"
+                } else {
+                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
+                }
+            }
 
             // TODO: ADD Next Event Scoreboard Status
 
@@ -526,6 +539,7 @@ data class ConquestKothMix(
         if (specialCentral)
         {
             Bukkit.broadcastMessage("$PREFIX_KOTH${name}${CC.YELLOW}KoTH has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
+            BonkersModule.currentCentralKoth = this
         } else
         {
             BonkersModule.currentConquest = this

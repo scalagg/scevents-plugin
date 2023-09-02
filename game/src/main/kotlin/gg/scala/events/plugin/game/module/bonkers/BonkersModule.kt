@@ -11,9 +11,10 @@ import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.bonkers.commands.BalanceCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.PayCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.TagMeCommand
-import gg.scala.events.plugin.game.module.bonkers.menanus.SelectTeamMenu
+import gg.scala.events.plugin.game.module.bonkers.menus.SelectTeamMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.SellOreMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.ShopMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.TimTheEnchanterMenu
 import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
@@ -130,6 +131,7 @@ object BonkersModule : EventModule
         ),
     )
     var currentConquest: ConquestKothMix? = null
+    var currentCentralKoth: ConquestKothMix? = null
 
     fun startNewConquestEvent(region: Cuboid, name: String)
     {
@@ -590,6 +592,15 @@ object BonkersModule : EventModule
                                 .subtract(1.0, 0.0, 1.0)
                         ) {
                             ShopMenu().openMenu(it)
+                        }
+
+                        buildActionEntity(
+                            action = "Tim The Enchanter",
+                            location = it.value.spawnLocation
+                                .clone()
+                                .add(1.0, 0.0, 1.0)
+                        ) {
+                            TimTheEnchanterMenu().openMenu(it)
                         }
 
                         team.participants.forEach { player ->
