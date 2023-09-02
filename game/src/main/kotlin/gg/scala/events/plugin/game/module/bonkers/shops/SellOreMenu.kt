@@ -1,5 +1,6 @@
-package gg.scala.events.plugin.game.module.bonkers
+package gg.scala.events.plugin.game.module.bonkers.shops
 
+import gg.scala.events.plugin.game.module.bonkers.account
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC

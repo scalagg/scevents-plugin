@@ -11,6 +11,7 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
 import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
@@ -55,7 +56,8 @@ data class TeamData(
     val spawnLocation: Location,
     val region: Cuboid,
     var dtr: Double = 5.0,
-    var balance: Int = 0
+    var balance: Int = 0,
+    var teamFocus: Int? = null
 )
 {
     fun colored() = "$color$teamName"
@@ -214,11 +216,32 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 )
             }"
 
+            val team = player.team()
+
+            if (team != null)
+            {
+                val data = team.data()!!
+
+                if (data.teamFocus != null)
+                {
+                    lines += " Faction Focus: ${team.data()!!.colored()}"
+                }
+            }
+
             if (TeamHomeTimer.isActive(player))
             {
-                lines+= " Home Timer: ${CC.BLUE}${
+                lines += " Home Timer: ${CC.BLUE}${
                     TimeUtil.formatIntoMMSS(
                         ((TeamHomeTimer.fetchRemaining(player)) / 1000).toInt()
+                    )
+                }"
+            }
+
+            if (CombatTimer.isActive(player))
+            {
+                lines += " Combat Tag: ${CC.RED}${
+                    TimeUtil.formatIntoMMSS(
+                        ((CombatTimer.fetchRemaining(player )) / 1000).toInt()
                     )
                 }"
             }

@@ -11,6 +11,7 @@ import net.evilblock.cubed.util.CC
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import java.util.concurrent.TimeUnit
 
 @Service
@@ -48,6 +49,22 @@ object TeamHomeTimer : PlayerStaticCooldown(
                 }
             }
             .bindWith(CgsGameEngine.INSTANCE.plugin)
+
+        Events.subscribe(PlayerMoveEvent::class.java)
+            .filter {
+                this.isActive(it.player)
+            }
+            .handler {
+                val from = it.from
+                val to = it.to
+                val player = it.player
+
+                if (from.blockX != to.blockX || from.blockY != to.blockY || from.blockZ != to.blockZ)
+                {
+                    this.reset(player)
+                    player.sendMessage("${CC.RED}You moved! Your team home timer has been reset.")
+                }
+            }
 
         Events.subscribe(EntityDamageEvent::class.java)
             .filter {

@@ -8,10 +8,16 @@ import gg.scala.commons.tablist.TablistService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
+import gg.scala.events.plugin.game.module.bonkers.commands.BalanceCommand
+import gg.scala.events.plugin.game.module.bonkers.commands.PayCommand
+import gg.scala.events.plugin.game.module.bonkers.commands.TagMeCommand
+import gg.scala.events.plugin.game.module.bonkers.shops.SellOreMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.ShopMenu
 import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamInvitesCommand
+import gg.scala.events.plugin.game.module.bonkers.visual.PleaseKillMeNowTabPopulator
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
@@ -26,7 +32,6 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Blue
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -198,7 +203,10 @@ object BonkersModule : EventModule
         listOf(
             TeamChatCommand,
             TeamCommands,
-            TeamInvitesCommand
+            TeamInvitesCommand,
+            TagMeCommand,
+            BalanceCommand,
+            PayCommand
         ).forEach {
             plugin.flavor().inject(it)
             plugin.commandManager.registerCommand(it)

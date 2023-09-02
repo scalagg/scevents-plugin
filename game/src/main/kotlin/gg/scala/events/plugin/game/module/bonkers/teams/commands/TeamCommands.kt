@@ -18,6 +18,7 @@ import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.events.plugin.game.module.bonkers.teams.joinTeam
 import gg.scala.events.plugin.game.module.bonkers.teams.sendTeamInviteTo
 import gg.scala.events.plugin.game.module.bonkers.teams.team
+import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
 import net.evilblock.cubed.util.CC
 
@@ -45,6 +46,48 @@ object TeamCommands : ScalaCommand()
             )
 
         team.sendTeamInviteTo(target.uniqueId)
+    }
+
+    @Subcommand("focus")
+    @Description("Set your current faction focus.")
+    fun onFocus(player: ScalaPlayer, team: Int)
+    {
+        val found = CgsGameTeamService.teams[team]
+            ?: throw ConditionFailedException(
+                "Team #$team does not exist in this game."
+            )
+
+        val senderTeam = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+
+        val teamData = senderTeam.data()!!
+
+        teamData.teamFocus = found.id
+        player.sendMessage("${CC.GREEN}You have set your team focus to ${teamData.colored()}${CC.GREEN}.")
+    }
+
+    @Subcommand("unfocus")
+    @Description("Wipe your current faction focus.")
+    fun onUnfocus(player: ScalaPlayer)
+    {
+        val senderTeam = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+
+        val data = senderTeam.data()!!
+
+        if (data.teamFocus == null)
+        {
+            throw ConditionFailedException(
+                "Your faction focus is already empty!"
+            )
+        }
+
+        data.teamFocus = null
+        player.sendMessage("${CC.GREEN}You have cleared your current faction focus.")
     }
 
     @Subcommand("deposit|d")
@@ -163,6 +206,13 @@ object TeamCommands : ScalaCommand()
         {
             throw ConditionFailedException(
                 "You are already on team home timer!"
+            )
+        }
+
+        if (CombatTimer.isActive(player.bukkit()))
+        {
+            throw ConditionFailedException(
+                "You must be off of Combat Tag in order to be put on team home timer."
             )
         }
 
