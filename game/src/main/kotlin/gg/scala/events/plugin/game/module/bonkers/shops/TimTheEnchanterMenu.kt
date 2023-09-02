@@ -167,6 +167,16 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             WhiteGirlFitCheck.Dildo
         )
 
+
+        buttons[13 + 9] = buildPurchasable(
+            amount = 125,
+            name = "Feather Falling IV",
+            stack = ItemBuilder.of(Material.FEATHER).build(),
+            enchantment = Enchantment.PROTECTION_FALL,
+            level = 4,
+            WhiteGirlFitCheck.Uggs
+        )
+
         return buttons
     }
 
