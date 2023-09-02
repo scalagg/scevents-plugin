@@ -255,31 +255,9 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 }"
             }
 
-            // TODO: ADD Status for when Conquest Starts
 
+            val centerKoth = BonkersModule.currentCentralKoth
             val conquest = BonkersModule.currentConquest
-            if (conquest != null)
-            {
-                lines += ""
-                lines += "${CC.D_AQUA}Conquest:"
-                lines += " ${conquest.name}"
-                lines += " ${CC.R}Time: ${CC.AQUA}${
-                    conquest.formatRemainingCaptureTime()
-                }"
-                if (conquest.currentHolder != null)
-                {
-                    val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
-                    val team = holdingPlayer.team() ?: return
-
-                    lines += " ${CC.R}Capturer: ${
-                        team.data()!!.colored()
-                    }"
-                } else {
-                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
-                }
-            }
-
-           val centerKoth = BonkersModule.currentCentralKoth
 
             if (centerKoth != null)
             {
@@ -292,6 +270,25 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 if (centerKoth.currentHolder != null)
                 {
                     val holdingPlayer = Bukkit.getPlayer(centerKoth.currentHolder)
+                    val team = holdingPlayer.team() ?: return
+
+                    lines += " ${CC.R}Capturer: ${
+                        team.data()!!.colored()
+                    }"
+                } else {
+                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
+                }
+            } else if (conquest != null)
+            {
+                lines += ""
+                lines += "${CC.D_AQUA}Conquest:"
+                lines += " ${conquest.name}"
+                lines += " ${CC.R}Time: ${CC.AQUA}${
+                    conquest.formatRemainingCaptureTime()
+                }"
+                if (conquest.currentHolder != null)
+                {
+                    val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
                     lines += " ${CC.R}Capturer: ${

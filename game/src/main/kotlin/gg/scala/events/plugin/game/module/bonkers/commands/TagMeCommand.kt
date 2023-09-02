@@ -18,6 +18,11 @@ object TagMeCommand : ScalaCommand()
     @CommandPermission("bunkers.tagme")
     fun onTagMe(player: ScalaPlayer)
     {
+        if (CombatTimer.isActive(player.bukkit()))
+        {
+            CombatTimer.reset(player.bukkit())
+        }
+
         CombatTimer.addOrOverride(player.bukkit())
         player.sendMessage("${CC.RED}You have put yourself onto Combat Tag manually.")
     }

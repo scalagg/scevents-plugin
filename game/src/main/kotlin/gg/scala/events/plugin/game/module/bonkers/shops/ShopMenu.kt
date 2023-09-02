@@ -55,7 +55,7 @@ class ShopMenu : Menu("Shop")
                 grant(player)
             }
 
-            player!!.account().balance -= amount
+            player.account().balance -= amount
 
             player.updateInventory()
             player.sendMessage(

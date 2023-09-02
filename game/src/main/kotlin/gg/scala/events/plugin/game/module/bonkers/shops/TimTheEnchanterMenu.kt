@@ -61,6 +61,15 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 return@toButton
             }
 
+            if (whiteGirlFitCheck == WhiteGirlFitCheck.MascaraWand)
+            {
+                if (item.type != Material.DIAMOND_SWORD)
+                {
+                    player.sendMessage("${CC.RED}You must be holding a sword in order to enchant it!")
+                    return@toButton
+                }
+            }
+
             item.addEnchantment(enchantment, level)
 
             whiteGirlFitCheck.updatePlayerInventory(player.inventory, item)
@@ -113,6 +122,51 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             WhiteGirlFitCheck.Uggs
         )
 
+        buttons[15] = buildPurchasable(
+            amount = 200,
+            name = "Unbreaking III",
+            stack = ItemBuilder.of(Material.GOLD_HELMET).build(),
+            enchantment = Enchantment.DURABILITY,
+            level = 3,
+            WhiteGirlFitCheck.HairInABun
+        )
+
+        buttons[15 + 9] = buildPurchasable(
+            amount = 225,
+            name = "Unbreaking III",
+            stack = ItemBuilder.of(Material.GOLD_CHESTPLATE).build(),
+            enchantment = Enchantment.DURABILITY,
+            level = 3,
+            WhiteGirlFitCheck.LifeguardSweatshirt
+        )
+
+        buttons[15 + 18] = buildPurchasable(
+            amount = 200,
+            name = "Unbreaking III",
+            stack = ItemBuilder.of(Material.GOLD_LEGGINGS).build(),
+            enchantment = Enchantment.DURABILITY,
+            level = 3,
+            WhiteGirlFitCheck.NikeProCompressionShorts
+        )
+
+        buttons[15 + 27] = buildPurchasable(
+            amount = 115,
+            name = "Unbreaking III",
+            stack = ItemBuilder.of(Material.GOLD_BOOTS).build(),
+            enchantment = Enchantment.DURABILITY,
+            level = 3,
+            WhiteGirlFitCheck.Uggs
+        )
+
+        buttons[13] = buildPurchasable(
+            amount = 300,
+            name = "Sharpness I",
+            stack = ItemBuilder.of(Material.DIAMOND_SWORD).build(),
+            enchantment = Enchantment.DAMAGE_ALL,
+            level = 1,
+            WhiteGirlFitCheck.MascaraWand
+        )
+
         return buttons
     }
 
@@ -136,6 +190,10 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
         Uggs(
             PlayerInventory::getBoots,
             PlayerInventory::setBoots
+        ),
+        MascaraWand(
+            PlayerInventory::getItemInHand,
+            PlayerInventory::setItemInHand
         )
     }
 }

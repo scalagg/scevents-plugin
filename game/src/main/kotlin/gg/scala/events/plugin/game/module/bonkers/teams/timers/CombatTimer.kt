@@ -34,11 +34,17 @@ object CombatTimer : PlayerStaticCooldown(
                 if (!isActive(damaged))
                 {
                     damaged.sendMessage("${CC.RED}You have been put on Combat Tag for 30 seconds.")
+                } else
+                {
+                    this.reset(damaged)
                 }
 
                 if (!isActive(damager))
                 {
                     damager.sendMessage("${CC.RED}You have been put on Combat Tag for 30 seconds.")
+                } else
+                {
+                    this.reset(damager)
                 }
 
                 addOrOverride(damaged)
