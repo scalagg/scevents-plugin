@@ -127,6 +127,7 @@ object BonkersModule : EventModule
             loc(642.0, 60.0, 628.0)
         ),
     )
+    var currentConquest: ConquestKothMix? = null
 
     fun startNewConquestEvent(region: Cuboid, name: String)
     {
@@ -146,7 +147,8 @@ object BonkersModule : EventModule
                     }
             },
             update = {
-            }
+            },
+            onTickingSeconds = {}
         )
 
     private fun createSpawnCampInvincibilityRunner() =
@@ -158,7 +160,8 @@ object BonkersModule : EventModule
             },
             update = {
 
-            }
+            },
+            onTickingSeconds = {}
         )
 
     private fun createCentralKothCreationRunner() =
@@ -179,7 +182,8 @@ object BonkersModule : EventModule
             },
             update = {
 
-            }
+            },
+            onTickingSeconds = {}
         )
 
     val claims = mutableMapOf<String, Cuboid>()
