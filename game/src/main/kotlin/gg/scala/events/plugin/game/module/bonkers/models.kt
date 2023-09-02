@@ -259,9 +259,9 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             if (conquest != null)
             {
                 lines += ""
-                lines += "${CC.D_AQUA}Conquest"
-                lines += "${CC.R}Location: ${conquest.name}"
-                lines += "${CC.R}Time: ${CC.AQUA}${
+                lines += "${CC.D_AQUA}Conquest:"
+                lines += " ${conquest.name}"
+                lines += " ${CC.R}Time: ${CC.AQUA}${
                     conquest.formatRemainingCaptureTime()
                 }"
                 if (conquest.currentHolder != null)
@@ -269,11 +269,11 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
-                    lines += "${CC.R}Capturer: ${
+                    lines += " ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
                 } else {
-                    lines += "${CC.R}Capturer: ${CC.GRAY}None"
+                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
                 }
             }
 
