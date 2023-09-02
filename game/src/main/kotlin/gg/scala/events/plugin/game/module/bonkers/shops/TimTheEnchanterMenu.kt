@@ -31,7 +31,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
         stack: ItemStack,
         enchantment: Enchantment,
         level: Int,
-        armorSlot: ArmorSlot,
+        whiteGirlFitCheck: WhiteGirlFitCheck,
     ) = ItemBuilder
         .copyOf(stack)
         .name("${CC.YELLOW}$name")
@@ -51,19 +51,19 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 return@toButton
             }
 
-            val item = armorSlot
+            val item = whiteGirlFitCheck
                 .fromPlayerInventory(player.inventory)
                 ?.clone()
 
             if (item == null || item.type == Material.AIR)
             {
-                player.sendMessage("${CC.RED}You do not have your ${armorSlot.name.lowercase()} equipped!")
+                player.sendMessage("${CC.RED}You do not have your ${whiteGirlFitCheck.name.lowercase()} equipped!")
                 return@toButton
             }
 
             item.addEnchantment(enchantment, level)
 
-            armorSlot.updatePlayerInventory(player.inventory, item)
+            whiteGirlFitCheck.updatePlayerInventory(player.inventory, item)
             player.updateInventory()
 
             player.account().balance -= amount
@@ -83,7 +83,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_HELMET).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.Hat
+            WhiteGirlFitCheck.HairInABun
         )
 
         buttons[11 + 9] = buildPurchasable(
@@ -92,7 +92,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_CHESTPLATE).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.Shirt
+            WhiteGirlFitCheck.LifeguardSweatshirt
         )
 
         buttons[11 + 18] = buildPurchasable(
@@ -101,7 +101,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_LEGGINGS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.Jeans
+            WhiteGirlFitCheck.NikeProCompressionShorts
         )
 
         buttons[11 + 27] = buildPurchasable(
@@ -110,30 +110,30 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_BOOTS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.Shoes
+            WhiteGirlFitCheck.Uggs
         )
 
         return buttons
     }
 
-    enum class ArmorSlot(
+    enum class WhiteGirlFitCheck(
         val fromPlayerInventory: (PlayerInventory) -> ItemStack?,
         val updatePlayerInventory: (PlayerInventory, ItemStack) -> Unit,
     )
     {
-        Hat(
+        HairInABun(
             PlayerInventory::getHelmet,
             PlayerInventory::setHelmet
         ),
-        Shirt(
+        LifeguardSweatshirt(
             PlayerInventory::getChestplate,
             PlayerInventory::setChestplate
         ),
-        Jeans(
+        NikeProCompressionShorts(
             PlayerInventory::getLeggings,
             PlayerInventory::setLeggings
         ),
-        Shoes(
+        Uggs(
             PlayerInventory::getBoots,
             PlayerInventory::setBoots
         )
