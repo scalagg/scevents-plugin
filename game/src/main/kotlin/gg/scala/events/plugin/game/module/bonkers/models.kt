@@ -65,9 +65,8 @@ data class TeamData(
 
 fun createRunner(
     seconds: Int,
-    end: () -> Unit,
-    update: (Int) -> Unit,
-    onTickingSeconds: (Int) -> Unit
+    end: () -> Unit = { },
+    update: (Int) -> Unit = {}
 ) = object : DiminutionRunnable(seconds + 1)
 {
     var tickingSeconds = seconds
@@ -86,7 +85,6 @@ fun createRunner(
     override fun onRun()
     {
         update(this.seconds)
-        onTickingSeconds.invoke(tickingSeconds)
         tickingSeconds--
     }
 }.apply {
@@ -111,65 +109,65 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         }
 
         internal.add(
-                Color.translate(
-                        "&8&lB&6&lU&e&lNKERS"
-                )
+            Color.translate(
+                "&8&lB&6&lU&e&lNKERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBU&6&lN&e&lKERS"
-                )
+            Color.translate(
+                "&8&lBU&6&lN&e&lKERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUN&6&lK&e&lERS"
-                )
+            Color.translate(
+                "&8&lBUN&6&lK&e&lERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUNK&6&lE&e&lRS"
-                )
+            Color.translate(
+                "&8&lBUNK&6&lE&e&lRS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUNKE&6&lR&e&lS"
-                )
+            Color.translate(
+                "&8&lBUNKE&6&lR&e&lS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUNKERS&6&l"
-                )
+            Color.translate(
+                "&8&lBUNKERS&6&l"
+            )
         )
 
         for (i in 0..5)
         {
             internal.add(
-                    Color.translate(
-                            "&8&lBUNKERS"
-                    )
+                Color.translate(
+                    "&8&lBUNKERS"
+                )
             )
         }
 
         for (i in 0..4)
         {
             internal.add(
-                    Color.translate(
-                            "&6&lBUNKERS"
-                    )
+                Color.translate(
+                    "&6&lBUNKERS"
+                )
             )
         }
 
         for (i in 0..5)
         {
             internal.add(
-                    Color.translate(
-                            "&8&lBUNKERS"
-                    )
+                Color.translate(
+                    "&8&lBUNKERS"
+                )
             )
         }
 
@@ -196,7 +194,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         {
             lines += " ${CC.GOLD}Game starts in:"
             lines += " ${
-                StartingStateRunnable.PRE_START_TIME 
+                StartingStateRunnable.PRE_START_TIME
             } seconds"
             lines += ""
             lines += " ${CC.WHITE}Selected team: ${
@@ -250,7 +248,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += " Combat Tag: ${CC.RED}${
                     TimeUtil.formatIntoMMSS(
-                        ((CombatTimer.fetchRemaining(player )) / 1000).toInt()
+                        ((CombatTimer.fetchRemaining(player)) / 1000).toInt()
                     )
                 }"
             }
@@ -264,16 +262,16 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += " ${CC.BD_AQUA}Conquest"
                 lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Location: ${conquest.name}"
                 lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Time: ${CC.YELLOW}${
-                    TimeUtil.formatIntoMMSS(
-                        conquest.durationRemaining
-                    )
+                    conquest.formatRemainingCaptureTime()
                 }"
                 if (conquest.currentHolder != null)
                 {
                     val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
-                    lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${team.data()!!.colored()}"
+                    lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${
+                        team.data()!!.colored()
+                    }"
                 }
             }
 
@@ -369,12 +367,10 @@ fun Player.findClaimContextual(context: String) = BonkersModule.claims.entries
         it.value.contains(this)
     }
 
-
 fun Block.findClaim() = BonkersModule.claims.entries
     .firstOrNull {
         it.value.contains(this)
     }
-
 
 fun Block.findClaimContextual(context: String) = BonkersModule.claims.entries
     .filter { it.key.contains(context) }
@@ -384,7 +380,7 @@ fun Block.findClaimContextual(context: String) = BonkersModule.claims.entries
 
 fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$name"
 
- data class ConquestKothMix(
+data class ConquestKothMix(
     val region: Cuboid,
     val active: Boolean = false,
     val seconds: Int,
@@ -400,21 +396,33 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
 
     val terminable = CompositeTerminable.create()
     var runner: DiminutionRunnable? = null
-    var flaggedForDurationReset: Boolean = false
-    var durationRemaining: Int = seconds
+
+    var expectedEndTime = -1L
+
+    fun formatRemainingCaptureTime() = if (runner == null)
+    {
+        TimeUtil.formatIntoMMSS(seconds)
+    } else
+    {
+        TimeUtil.formatIntoMMSS(
+            (expectedEndTime - System.currentTimeMillis() / 1000L).toInt()
+        )
+    }
 
     fun Location.stringify() = "($x, $y, $z)"
 
     fun createNewRunner() = createRunner(
         seconds = this.seconds,
         end = {
-            if (specialCentral) {
+            if (specialCentral)
+            {
                 Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.YELLOW}${name}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
+                    "$PREFIX_KOTH${CC.YELLOW}${name}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
                 )
-            } else {
+            } else
+            {
                 Bukkit.broadcastMessage(
-                        "$PREFIX_CONQUEST${CC.YELLOW}${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
+                    "$PREFIX_CONQUEST${CC.YELLOW}${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}was completed!"
                 )
             }
 
@@ -426,34 +434,37 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
                 val holder = Bukkit.getPlayer(currentHolder)
                 val holderTeam = holder?.team()?.data()
 
-                if (specialCentral) {
+                if (specialCentral)
+                {
                     Bukkit.broadcastMessage(
-                            "$PREFIX_KOTH${CC.WHITE}${
-                                Bukkit.getPlayer(currentHolder)?.colorfulName()
-                            }${CC.GRAY} captured KoTH for ${
-                                holderTeam?.color
-                            }${
-                                holderTeam?.teamName
-                            }${CC.GRAY}!"
+                        "$PREFIX_KOTH${CC.WHITE}${
+                            Bukkit.getPlayer(currentHolder)?.colorfulName()
+                        }${CC.GRAY} captured KoTH for ${
+                            holderTeam?.color
+                        }${
+                            holderTeam?.teamName
+                        }${CC.GRAY}!"
                     )
-                } else {
+                } else
+                {
                     Bukkit.broadcastMessage(
-                            "$PREFIX_CONQUEST${CC.WHITE}${
-                                Bukkit.getPlayer(currentHolder)?.colorfulName()
-                            }${CC.GRAY} captured Conquest for ${
-                                holderTeam?.color
-                            }${
-                                holderTeam?.teamName
-                            }${CC.GRAY}!"
+                        "$PREFIX_CONQUEST${CC.WHITE}${
+                            Bukkit.getPlayer(currentHolder)?.colorfulName()
+                        }${CC.GRAY} captured Conquest for ${
+                            holderTeam?.color
+                        }${
+                            holderTeam?.teamName
+                        }${CC.GRAY}!"
                     )
                 }
             }
 
             BonkersModule.currentConquest = null
 
-            if (!specialCentral) {
+            if (!specialCentral)
+            {
                 Bukkit.broadcastMessage(
-                        "$PREFIX_CONQUEST${CC.YELLOW}Loot is dropping at the center of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}in 5 seconds!"
+                    "$PREFIX_CONQUEST${CC.YELLOW}Loot is dropping at the center of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}in 5 seconds!"
                 )
             }
 
@@ -485,38 +496,36 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
             terminable.closeAndReportException()
         },
         update = {
-            if (specialCentral) {
-                Bukkit.broadcastMessage(
-                        "$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
-                            DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
-                        }"
-                )
-            } else {
-                Bukkit.broadcastMessage(
-                        "$PREFIX_CONQUEST${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
-                            DurationFormatUtils.formatDurationWords(it * 1000L, true, true ) + " left${CC.YELLOW}."
-                        }"
-                )
-            }
-        },
-        onTickingSeconds = {
-            this.durationRemaining = it
-            if (flaggedForDurationReset)
+            if (specialCentral)
             {
-                this.durationRemaining = seconds
-                flaggedForDurationReset = false
+                Bukkit.broadcastMessage(
+                    "$PREFIX_KOTH${CC.BLUE}${name}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                        DurationFormatUtils.formatDurationWords(it * 1000L, true, true) + " left${CC.YELLOW}."
+                    }"
+                )
+            } else
+            {
+                Bukkit.broadcastMessage(
+                    "$PREFIX_CONQUEST${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()} ${CC.YELLOW}is being controlled. ${CC.RED}${
+                        DurationFormatUtils.formatDurationWords(it * 1000L, true, true) + " left${CC.YELLOW}."
+                    }"
+                )
             }
         }
     ).apply {
         runner?.cancel()
         runner = this
+
+        expectedEndTime = System.currentTimeMillis() + seconds * 1000L
     }
 
     fun configure()
     {
-        if (specialCentral) {
+        if (specialCentral)
+        {
             Bukkit.broadcastMessage("$PREFIX_KOTH${name}${CC.YELLOW}KoTH has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
-        } else {
+        } else
+        {
             BonkersModule.currentConquest = this
             Bukkit.broadcastMessage("$PREFIX_CONQUEST${CC.YELLOW}The ${name}${CC.YELLOW}Conquest ${CC.YELLOW}has started at ${CC.GRAY}${region.lowerNE.stringify()}${CC.YELLOW}!")
         }
@@ -538,13 +547,15 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
 
                     currentHolder = newHolder
 
-                    if (specialCentral) {
+                    if (specialCentral)
+                    {
                         Bukkit.broadcastMessage(
-                                "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${name}${CC.YELLOW}KoTH!"
+                            "$PREFIX_KOTH${CC.YELLOW}Someone is now capping ${CC.BLUE}${name}${CC.YELLOW}KoTH!"
                         )
-                    } else {
+                    } else
+                    {
                         Bukkit.broadcastMessage(
-                                "$PREFIX_CONQUEST${CC.YELLOW}Someone is now capping ${name}${CC.YELLOW}Conquest${CC.YELLOW}!"
+                            "$PREFIX_CONQUEST${CC.YELLOW}Someone is now capping ${name}${CC.YELLOW}Conquest${CC.YELLOW}!"
                         )
                     }
 
@@ -555,7 +566,6 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
                     {
                         runner?.cancel()
                         runner = null
-
 
                         createNewRunner()
                     }
@@ -572,7 +582,8 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
                 futureHolders.remove(it.player.uniqueId)
             }
 
-        fun name() = if (specialCentral) "${name}${CC.GOLD}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()}" else "${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()}"
+        fun name() =
+            if (specialCentral) "${name}${CC.GOLD}${CC.YELLOW}KoTH ${CC.GRAY}${region.lowerNE.stringify()}" else "${name}${CC.YELLOW}Conquest ${CC.GRAY}${region.lowerNE.stringify()}"
 
         fun handleGenericMovementEvent(it: GenericMovementEvent)
         {
@@ -626,20 +637,16 @@ fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$na
                         "${CC.RED}You are no longer capping for your team!"
                     )
 
-                    if (specialCentral) {
+                    if (specialCentral)
+                    {
                         Bukkit.broadcastMessage(
-                                "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${name}${CC.YELLOW}KoTH has been lost!"
+                            "$PREFIX_KOTH${CC.YELLOW}Control of ${CC.BLUE}${name}${CC.YELLOW}KoTH has been lost!"
                         )
-                    } else {
+                    } else
+                    {
                         Bukkit.broadcastMessage(
-                                "$PREFIX_CONQUEST${CC.YELLOW}Control of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}has been lost!"
+                            "$PREFIX_CONQUEST${CC.YELLOW}Control of ${name}${CC.YELLOW}Conquest ${CC.YELLOW}has been lost!"
                         )
-
-                        val conquest =  BonkersModule.currentConquest
-                        if (conquest != null)
-                        {
-                            conquest.flaggedForDurationReset = true
-                        }
                     }
                 }
 

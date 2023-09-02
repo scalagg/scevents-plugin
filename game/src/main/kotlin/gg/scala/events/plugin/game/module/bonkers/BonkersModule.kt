@@ -149,8 +149,7 @@ object BonkersModule : EventModule
                     }
             },
             update = {
-            },
-            onTickingSeconds = {}
+            }
         )
 
     private fun createSpawnCampInvincibilityRunner() =
@@ -162,8 +161,7 @@ object BonkersModule : EventModule
             },
             update = {
 
-            },
-            onTickingSeconds = {}
+            }
         )
 
     private fun createCentralKothCreationRunner() =
@@ -181,11 +179,7 @@ object BonkersModule : EventModule
                     name = "${CC.BLUE}Classic ",
                     specialCentral = true
                 ).configure()
-            },
-            update = {
-
-            },
-            onTickingSeconds = {}
+            }
         )
 
     val claims = mutableMapOf<String, Cuboid>()
