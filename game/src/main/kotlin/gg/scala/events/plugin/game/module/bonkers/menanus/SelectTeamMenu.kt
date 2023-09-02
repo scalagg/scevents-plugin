@@ -1,6 +1,7 @@
-package gg.scala.events.plugin.game.module.bonkers
+package gg.scala.events.plugin.game.module.bonkers.menanus
 
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.events.plugin.game.module.bonkers.BonkersModule
 import gg.scala.events.plugin.game.module.shuffle.WoolShuffleUtilities
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -28,8 +29,7 @@ class SelectTeamMenu : Menu("Select your team")
 
         CgsGameTeamService.teams
             .forEach {
-                val mapping = BonkersModule
-                    .mappings.entries
+                val mapping = BonkersModule.mappings.entries
                     .firstOrNull { t ->
                         t.value.teamId == it.key
                     }

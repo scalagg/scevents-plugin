@@ -11,12 +11,14 @@ import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.bonkers.commands.BalanceCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.PayCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.TagMeCommand
+import gg.scala.events.plugin.game.module.bonkers.menanus.SelectTeamMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.SellOreMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.ShopMenu
 import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamInvitesCommand
+import gg.scala.events.plugin.game.module.bonkers.timers.BonkersRespawnTimer
 import gg.scala.events.plugin.game.module.bonkers.visual.PleaseKillMeNowTabPopulator
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject

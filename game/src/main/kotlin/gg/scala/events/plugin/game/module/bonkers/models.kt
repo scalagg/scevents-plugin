@@ -262,8 +262,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += ""
                 lines += " ${CC.BD_AQUA}Conquest"
-                lines += " Location: ${conquest.name}"
-                lines += " Time: ${CC.YELLOW}${
+                lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Location: ${conquest.name}"
+                lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Time: ${CC.YELLOW}${
                     TimeUtil.formatIntoMMSS(
                         conquest.durationRemaining
                     )
