@@ -192,27 +192,27 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
         if (state == CgsGameState.STARTING)
         {
-            lines += " ${CC.GOLD}Game starts in:"
-            lines += " ${
+            lines += "${CC.GOLD}Game starts in:"
+            lines += "${
                 StartingStateRunnable.PRE_START_TIME
             } seconds"
             lines += ""
-            lines += " ${CC.WHITE}Selected team: ${
+            lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
+            lines += "${CC.WHITE}Players: ${CC.GOLD}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
             }"
         } else if (state.isAfter(CgsGameState.STARTED))
         {
-            lines += " Game Time: ${CC.GOLD}${
+            lines += "Game Time: ${CC.GOLD}${
                 TimeUtil.formatIntoMMSS(
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += " Balance: ${CC.GOLD}$${
+            lines += "Balance: ${CC.GOLD}$${
                 Numbers.format(
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
@@ -230,14 +230,14 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
                     if (focusTeam != null)
                     {
-                        lines += " Faction Focus: ${focusTeam.data()!!.colored()}"
+                        lines += "Faction Focus: ${focusTeam.data()!!.colored()}"
                     }
                 }
             }
 
             if (TeamHomeTimer.isActive(player))
             {
-                lines += " Home Timer: ${CC.BLUE}${
+                lines += "Home Timer: ${CC.BLUE}${
                     TimeUtil.formatIntoMMSS(
                         ((TeamHomeTimer.fetchRemaining(player)) / 1000).toInt()
                     )
@@ -246,7 +246,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
             if (CombatTimer.isActive(player))
             {
-                lines += " Combat Tag: ${CC.RED}${
+                lines += "Combat Tag: ${CC.RED}${
                     TimeUtil.formatIntoMMSS(
                         ((CombatTimer.fetchRemaining(player)) / 1000).toInt()
                     )
@@ -259,9 +259,9 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             if (conquest != null)
             {
                 lines += ""
-                lines += " ${CC.BD_AQUA}Conquest"
-                lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Location: ${conquest.name}"
-                lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} Time: ${CC.YELLOW}${
+                lines += "${CC.D_AQUA}Conquest"
+                lines += "${CC.R}Location: ${conquest.name}"
+                lines += "${CC.R}Time: ${CC.AQUA}${
                     conquest.formatRemainingCaptureTime()
                 }"
                 if (conquest.currentHolder != null)
@@ -269,42 +269,42 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
-                    lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${
+                    lines += "${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
                 } else {
-                    lines += " ${CC.DARK_AQUA}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: None"
+                    lines += "${CC.R}Capturer: ${CC.GRAY}None"
                 }
             }
 
             // TODO: ADD Status for when KoTH Starts
 
 //            lines += ""
-//            lines += " ${CC.B_GOLD}KingOfTheHill"
-//            lines += " Location: ${CC.BLUE}Classic"
-//            lines += " Time: ${CC.YELLOW}${
+//            lines += "${CC.B_GOLD}KingOfTheHill"
+//            lines += "Location: ${CC.BLUE}Classic"
+//            lines += "Time: ${CC.YELLOW}${
 //                TimeUtil.formatIntoMMSS(
 //                        ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
 //                )
 //            }"
-//            lines += " ${CC.GOLD}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${CC.YELLOW}Yellow"
+//            lines += "${CC.GOLD}${Constants.THICK_VERTICAL_LINE} ${CC.R}Capturer: ${CC.YELLOW}Yellow"
 
             // TODO: ADD Next Event Scoreboard Status
 
 //            lines += ""
-//            lines += " ${CC.B_GOLD}Next Event"
-//            lines += " ${CC.I_GRAY}Starting in 5 seconds..."
+//            lines += "${CC.B_GOLD}Next Event"
+//            lines += "${CC.I_GRAY}Starting in 5 seconds..."
         } else if (state == CgsGameState.WAITING)
         {
-            lines += " ${CC.GOLD}Waiting:"
-            lines += " ${
+            lines += "${CC.GOLD}Waiting:"
+            lines += "${
                 Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
             } more players."
-            lines += " "
-            lines += " ${CC.WHITE}Selected team: ${
+            lines += ""
+            lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
+            lines += "${CC.WHITE}Players: ${CC.GOLD}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
@@ -407,7 +407,7 @@ data class ConquestKothMix(
     } else
     {
         TimeUtil.formatIntoMMSS(
-            (expectedEndTime - System.currentTimeMillis() / 1000L).toInt()
+            ((expectedEndTime - System.currentTimeMillis()) / 1000L).toInt()
         )
     }
 
@@ -518,7 +518,7 @@ data class ConquestKothMix(
         runner?.cancel()
         runner = this
 
-        expectedEndTime = System.currentTimeMillis() + seconds * 1000L
+        expectedEndTime = System.currentTimeMillis() + (seconds * 1000L)
     }
 
     fun configure()
