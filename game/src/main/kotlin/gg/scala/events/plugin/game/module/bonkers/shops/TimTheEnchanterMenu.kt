@@ -10,6 +10,7 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 
 /**
  * @author GrowlyX
@@ -50,64 +51,22 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 return@toButton
             }
 
-            when (armorSlot)
+            val item = armorSlot
+                .fromPlayerInventory(player.inventory)
+                ?.clone()
+
+            if (item == null || item.type == Material.AIR)
             {
-                ArmorSlot.HELMET ->
-                {
-                    val helmet = player.inventory.helmet
-
-                    if (helmet == null || helmet.type == Material.AIR)
-                    {
-                        player.sendMessage("${CC.RED}You do not have an armor piece equipped in this slot!")
-                        return@toButton
-                    }
-
-                    helmet.addEnchantment(enchantment, level)
-                }
-
-                ArmorSlot.CHESTPLATE ->
-                {
-                    val chestplate = player.inventory.chestplate
-
-                    if (chestplate == null || chestplate.type == Material.AIR)
-                    {
-                        player.sendMessage("${CC.RED}You do not have an armor piece equipped in this slot!")
-                        return@toButton
-                    }
-
-                    chestplate.addEnchantment(enchantment, level)
-                }
-
-
-                ArmorSlot.LEGGINGS ->
-                {
-                    val leggings = player.inventory.chestplate
-
-                    if (leggings == null || leggings.type == Material.AIR)
-                    {
-                        player.sendMessage("${CC.RED}You do not have an armor piece equipped in this slot!")
-                        return@toButton
-                    }
-
-                    leggings.addEnchantment(enchantment, level)
-                }
-
-                ArmorSlot.BOOTS ->
-                {
-                    val boots = player.inventory.chestplate
-
-                    if (boots == null || boots.type == Material.AIR)
-                    {
-                        player.sendMessage("${CC.RED}You do not have an armor piece equipped in this slot!")
-                        return@toButton
-                    }
-
-                    boots.addEnchantment(enchantment, level)
-                }
+                player.sendMessage("${CC.RED}You do not have your ${armorSlot.name.lowercase()} equipped!")
+                return@toButton
             }
 
-            player.account().balance -= amount
+            item.addEnchantment(enchantment, level)
+
+            armorSlot.updatePlayerInventory(player.inventory, item)
             player.updateInventory()
+
+            player.account().balance -= amount
 
             player.sendMessage(
                 "${CC.GREEN}You purchased the $name enchant for ${CC.WHITE}$$amount${CC.GREEN}!"
@@ -124,7 +83,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_HELMET).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.HELMET
+            ArmorSlot.Hat
         )
 
         buttons[11 + 9] = buildPurchasable(
@@ -133,7 +92,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_CHESTPLATE).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.CHESTPLATE
+            ArmorSlot.Shirt
         )
 
         buttons[11 + 18] = buildPurchasable(
@@ -142,7 +101,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_LEGGINGS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.LEGGINGS
+            ArmorSlot.Jeans
         )
 
         buttons[11 + 27] = buildPurchasable(
@@ -151,14 +110,32 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_BOOTS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            ArmorSlot.BOOTS
+            ArmorSlot.Shoes
         )
 
         return buttons
     }
 
-    enum class ArmorSlot
+    enum class ArmorSlot(
+        val fromPlayerInventory: (PlayerInventory) -> ItemStack?,
+        val updatePlayerInventory: (PlayerInventory, ItemStack) -> Unit,
+    )
     {
-        HELMET, CHESTPLATE, LEGGINGS, BOOTS
+        Hat(
+            PlayerInventory::getHelmet,
+            PlayerInventory::setHelmet
+        ),
+        Shirt(
+            PlayerInventory::getChestplate,
+            PlayerInventory::setChestplate
+        ),
+        Jeans(
+            PlayerInventory::getLeggings,
+            PlayerInventory::setLeggings
+        ),
+        Shoes(
+            PlayerInventory::getBoots,
+            PlayerInventory::setBoots
+        )
     }
 }
