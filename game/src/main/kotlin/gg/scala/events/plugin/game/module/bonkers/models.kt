@@ -224,7 +224,12 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
                 if (data.teamFocus != null)
                 {
-                    lines += " Faction Focus: ${team.data()!!.colored()}"
+                    val focusTeam = CgsGameTeamService.teams[data.teamFocus]
+
+                    if (focusTeam != null)
+                    {
+                        lines += " Faction Focus: ${focusTeam.data()!!.colored()}"
+                    }
                 }
             }
 

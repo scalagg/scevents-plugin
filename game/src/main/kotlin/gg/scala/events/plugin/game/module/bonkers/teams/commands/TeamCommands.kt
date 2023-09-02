@@ -52,10 +52,14 @@ object TeamCommands : ScalaCommand()
     @Description("Set your current faction focus.")
     fun onFocus(player: ScalaPlayer, team: Int)
     {
-        val found = CgsGameTeamService.teams[team]
-            ?: throw ConditionFailedException(
+        if (team > 4)
+        {
+            throw ConditionFailedException(
                 "Team #$team does not exist in this game."
             )
+        }
+
+        val found = CgsGameTeamService.teams[team]!!
 
         val senderTeam = player.bukkit().team
             ?: throw ConditionFailedException(
@@ -65,7 +69,7 @@ object TeamCommands : ScalaCommand()
         val teamData = senderTeam.data()!!
 
         teamData.teamFocus = found.id
-        player.sendMessage("${CC.GREEN}You have set your team focus to ${teamData.colored()}${CC.GREEN}.")
+        player.sendMessage("${CC.GREEN}You have set your team focus to ${found.data()!!.colored()}${CC.GREEN}.")
     }
 
     @Subcommand("unfocus")
@@ -224,11 +228,20 @@ object TeamCommands : ScalaCommand()
     @Description("View details for a particular team.")
     fun onView(player: ScalaPlayer, @Optional team: Int?)
     {
+        //TODO revamp handling of excess team entries
         val teamId = team ?: player.bukkit().team?.id
-        val team = CgsGameTeamService.teams[teamId]
             ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+
+        if (teamId > 4)
+        {
+            throw ConditionFailedException(
                 "Team #$teamId does not exist in this game."
             )
+        }
+
+        val team = CgsGameTeamService.teams[teamId]!!
         val teamData = team.data()!!
 
         player.sendMessage(
