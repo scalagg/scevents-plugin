@@ -61,7 +61,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 return@toButton
             }
 
-            if (whiteGirlFitCheck == WhiteGirlFitCheck.MascaraWand)
+            if (whiteGirlFitCheck == WhiteGirlFitCheck.Dildo)
             {
                 if (item.type != Material.DIAMOND_SWORD)
                 {
@@ -164,7 +164,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_SWORD).build(),
             enchantment = Enchantment.DAMAGE_ALL,
             level = 1,
-            WhiteGirlFitCheck.MascaraWand
+            WhiteGirlFitCheck.Dildo
         )
 
         return buttons
@@ -191,7 +191,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             PlayerInventory::getBoots,
             PlayerInventory::setBoots
         ),
-        MascaraWand(
+        Dildo(
             PlayerInventory::getItemInHand,
             PlayerInventory::setItemInHand
         )
