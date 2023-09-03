@@ -8,7 +8,6 @@ import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.math.Numbers
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 
 class CarpenterMenu : Menu("Carpenter")
 {
@@ -17,7 +16,7 @@ class CarpenterMenu : Menu("Carpenter")
         placeholder = true
     }
 
-    override fun size(buttons: Map<Int, Button>) = 54
+    override fun size(buttons: Map<Int, Button>) = 36
 
     private fun buildPurchasable(
         amount: Int,
@@ -31,9 +30,11 @@ class CarpenterMenu : Menu("Carpenter")
             "${CC.GRAY}Price: ${CC.WHITE}$${
                 Numbers.format(amount)
             }",
+            "${CC.GRAY}Amount: ${CC.WHITE}$stackQuantity",
             "",
             "${CC.GREEN}Click to purchase!"
         )
+        .amount(stackQuantity)
         .toButton { player, _ ->
             val balance = player!!.account().balance
 
@@ -43,7 +44,7 @@ class CarpenterMenu : Menu("Carpenter")
                 return@toButton
             }
 
-            player.inventory.addItem(stack.build())
+            player.inventory.addItem(stack.amount(stackQuantity).build())
             player.account().balance -= amount
 
             player.updateInventory()
@@ -71,7 +72,7 @@ class CarpenterMenu : Menu("Carpenter")
         )
 
         buttons[13] = buildPurchasable(
-            amount = 10,
+            amount = 30,
             name = "Stone Blocks",
             stack = ItemBuilder.of(Material.STONE),
             stackQuantity = 5

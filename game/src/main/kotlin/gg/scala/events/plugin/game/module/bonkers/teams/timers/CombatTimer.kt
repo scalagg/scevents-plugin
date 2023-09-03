@@ -31,6 +31,11 @@ object CombatTimer : PlayerStaticCooldown(
                 val damaged = it.entity as Player
                 val damager = it.damager as Player
 
+                if (damaged.hasMetadata("spectator") || damager.hasMetadata("spectator"))
+                {
+                    return@handler
+                }
+
                 if (!isActive(damaged))
                 {
                     damaged.sendMessage("${CC.RED}You have been put on Combat Tag for 30 seconds.")
