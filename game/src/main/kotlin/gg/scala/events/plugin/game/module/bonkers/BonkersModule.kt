@@ -12,6 +12,7 @@ import gg.scala.events.plugin.game.module.bonkers.commands.BalanceCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.PayCommand
 import gg.scala.events.plugin.game.module.bonkers.commands.TagMeCommand
 import gg.scala.events.plugin.game.module.bonkers.menus.SelectTeamMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.CarpenterMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.SellOreMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.ShopMenu
 import gg.scala.events.plugin.game.module.bonkers.shops.TimTheEnchanterMenu
@@ -601,6 +602,15 @@ object BonkersModule : EventModule
                                 .add(1.0, 0.0, 1.0)
                         ) {
                             TimTheEnchanterMenu().openMenu(it)
+                        }
+
+                        buildActionEntity(
+                            action = "Carpenter",
+                            location = it.value.spawnLocation
+                                .clone()
+                                .add(1.0, 0.0, 0.0)
+                        ) {
+                            CarpenterMenu().openMenu(it)
                         }
 
                         team.participants.forEach { player ->
