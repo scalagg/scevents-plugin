@@ -56,7 +56,8 @@ data class TeamData(
     val region: Cuboid,
     var dtr: Double = 5.0,
     var balance: Int = 0,
-    var teamFocus: Int? = null
+    var teamFocus: Int? = null,
+    var teamRally: Location? = null
 )
 {
     fun colored() = "$color$teamName"

@@ -21,6 +21,7 @@ import gg.scala.events.plugin.game.module.bonkers.teams.team
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
 import net.evilblock.cubed.util.CC
+import org.bukkit.Bukkit
 
 /**
  * @author GrowlyX
@@ -67,6 +68,54 @@ object TeamCommands : ScalaCommand()
 
         teamData.teamFocus = found.id
         player.sendMessage("${CC.GREEN}You have set your team focus to ${found.data()!!.colored()}${CC.GREEN}.")
+    }
+
+    @Subcommand("wiperally|wr")
+    @Description("Wipe your team's current rally point")
+    fun onTeamWipeRally(player: ScalaPlayer)
+    {
+        val senderTeam = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+        val data = senderTeam.data()!!
+
+        if (data.teamRally == null)
+        {
+            throw ConditionFailedException(
+                "Unable to wipe your team's rally point as it was not set."
+            )
+        }
+
+        data.teamRally = null
+        //TODO: handle team rally removal
+
+        player.sendMessage("${CC.GREEN}You have wiped your team's current rally point.")
+    }
+
+    @Subcommand("rally|r")
+    @Description("Set your team's current rally point.")
+    fun onTeamRally(player: ScalaPlayer)
+    {
+        val senderTeam = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+        val data = senderTeam.data()!!
+
+        val bukkitPlayer = player.bukkit()
+        val playerLocation = bukkitPlayer.location
+
+        data.teamRally = playerLocation
+        //TODO: handle team rally waypoint
+
+        senderTeam.participants
+            .mapNotNull {
+                Bukkit.getPlayer(it)
+            }
+            .forEach {
+                it.sendMessage("${CC.GOLD}[Team] ${CC.GOLD}${bukkitPlayer.name}${CC.SEC} has updated your team's rally point!")
+            }
     }
 
     @Subcommand("unfocus")
@@ -226,9 +275,9 @@ object TeamCommands : ScalaCommand()
     fun onView(player: ScalaPlayer, @Optional team: Int?)
     {
         val teamId = team ?: player.bukkit().team?.id
-            ?: throw ConditionFailedException(
-                "You are not currently on a team!"
-            )
+        ?: throw ConditionFailedException(
+            "You are not currently on a team!"
+        )
 
         val team = CgsGameTeamService.teams[teamId]
             ?: throw ConditionFailedException(
