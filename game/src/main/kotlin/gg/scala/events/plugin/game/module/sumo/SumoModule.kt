@@ -157,7 +157,7 @@ object SumoModule : EventModule
             }
 
             lines += ""
-            lines += "${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+            lines += "${CC.GRAY}${LemonConstants.WEB_LINK}  ${CC.GRAY}   ${CC.GRAY}"
         }
     }
 

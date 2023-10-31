@@ -11,6 +11,7 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
@@ -259,7 +260,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += "${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+        lines += "${CC.GRAY}${LemonConstants.WEB_LINK}  ${CC.GRAY}   ${CC.GRAY}"
     }
 }
 
