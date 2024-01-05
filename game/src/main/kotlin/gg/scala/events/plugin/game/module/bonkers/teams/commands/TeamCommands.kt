@@ -49,12 +49,43 @@ object TeamCommands : ScalaCommand()
         team.sendTeamInviteTo(target.uniqueId)
     }
 
+    @Subcommand("kick|votekick|vk")
+    @Description("Vote kick a player from your team.")
+    fun onVoteKick(player: ScalaPlayer, target: LemonPlayer)
+    {
+        if (target.bukkitPlayer == null)
+        {
+            throw ConditionFailedException(
+                "The player ${CC.YELLOW}${target.name} ${CC.RED}is not currently online!"
+            )
+        }
+
+        val targetTeam = target.bukkitPlayer!!.team
+            ?: throw ConditionFailedException(
+                "This player is not currently on a team!"
+            )
+
+        val ourTeam = player.bukkit().team
+            ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+            )
+
+        if (targetTeam.id != ourTeam.id)
+        {
+            throw ConditionFailedException(
+                "This player is not on your team!"
+            )
+        }
+
+        //todo: start vk
+    }
+
     @Subcommand("focus")
     @Description("Set your current faction focus.")
-    fun onFocus(player: ScalaPlayer, team: Int)
+    fun onFocus(player: ScalaPlayer, team: String)
     {
 
-        val found = CgsGameTeamService.teams[team]
+        val found = CgsGameTeamService.teams.values.firstOrNull { it.data()?.teamName?.contains(team) ?: false }
             ?: throw ConditionFailedException(
                 "Team ${CC.YELLOW}#$team ${CC.RED}does not exist in this game."
             )
