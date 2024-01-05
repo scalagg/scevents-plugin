@@ -105,37 +105,42 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
 
         internal.add(
                 Color.translate(
-                        "&8&lB&6&lU&e&lNKERS"
+                        "&8&lB&3&lU&b&lNKERS"
                 )
         )
 
         internal.add(
                 Color.translate(
-                        "&8&lBU&6&lN&e&lKERS"
+                        "&8&lBU&3&lN&b&lKERS"
                 )
         )
 
         internal.add(
                 Color.translate(
-                        "&8&lBUN&6&lK&e&lERS"
+                        "&8&lBUN&3&lK&b&lERS"
                 )
         )
 
         internal.add(
                 Color.translate(
-                        "&8&lBUNK&6&lE&e&lRS"
+                        "&8&lBUNK&3&lE&b&lRS"
                 )
         )
 
         internal.add(
                 Color.translate(
-                        "&8&lBUNKE&6&lR&e&lS"
+                        "&8&lBUNKE&3&lR&b&lS"
+                )
+        )
+        internal.add(
+                Color.translate(
+                        "&8&lBUNKER&3&lS"
                 )
         )
 
         internal.add(
                 Color.translate(
-                        "&8&lBUNKERS&6&l"
+                        "&8&lBUNKERS&3&l"
                 )
         )
 
@@ -143,7 +148,7 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         {
             internal.add(
                     Color.translate(
-                            "&8&lBUNKERS"
+                            "&6&lBUNKERS"
                     )
             )
         }
@@ -152,7 +157,7 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         {
             internal.add(
                     Color.translate(
-                            "&6&lBUNKERS"
+                            "&b&lBUNKERS"
                     )
             )
         }
@@ -187,7 +192,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
         if (state == CgsGameState.STARTING)
         {
-            lines += " ${CC.GOLD}Game starts in:"
+            lines += " ${CC.PRI}Game starts in:"
             lines += " ${
                 StartingStateRunnable.PRE_START_TIME 
             } seconds"
@@ -195,19 +200,19 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             lines += " ${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
             }"
         } else if (state.isAfter(CgsGameState.STARTED))
         {
-            lines += " Game Time: ${CC.GOLD}${
+            lines += " Game Time: ${CC.PRI}${
                 TimeUtil.formatIntoMMSS(
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += " Balance: ${CC.GOLD}$${
+            lines += " Balance: ${CC.PRI}$${
                 Numbers.format(
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
@@ -244,7 +249,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 //            lines += " ${CC.I_GRAY}Starting in 5 seconds..."
         } else if (state == CgsGameState.WAITING)
         {
-            lines += " ${CC.GOLD}Waiting:"
+            lines += " ${CC.PRI}Waiting:"
             lines += " ${
                 Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
             } more players."
@@ -252,7 +257,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             lines += " ${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
