@@ -214,12 +214,12 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             }"
         } else if (state.isAfter(CgsGameState.STARTED))
         {
-            lines += " Game Time: ${CC.PRI}${
+            lines += "Game Time: ${CC.PRI}${
                 TimeUtil.formatIntoMMSS(
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += " Balance: ${CC.PRI}$${
+            lines += "Balance: ${CC.PRI}$${
                 Numbers.format(
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
