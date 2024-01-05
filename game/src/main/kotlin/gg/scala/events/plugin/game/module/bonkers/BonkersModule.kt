@@ -460,13 +460,13 @@ object BonkersModule : EventModule
             if (claim == null && oldClaim != null) {
                 it.player.sendMessage(if (oldClaim.key.equals("central_mine")) "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("_base", "")}")
                 it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
-                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
+//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
             }
 
             if (claim != null && oldClaim == null) {
                 it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
                 it.player.sendMessage(if (claim.key.equals("central_mine")) "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}")
-                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
+//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
             }
         }
 

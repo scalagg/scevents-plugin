@@ -12,6 +12,7 @@ import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
+import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
@@ -110,65 +111,70 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         }
 
         internal.add(
-            Color.translate(
-                "&8&lB&6&lU&e&lNKERS"
-            )
+                Color.translate(
+                        "&8&lB&3&lU&b&lNKERS"
+                )
         )
 
         internal.add(
-            Color.translate(
-                "&8&lBU&6&lN&e&lKERS"
-            )
+                Color.translate(
+                        "&8&lBU&3&lN&b&lKERS"
+                )
         )
 
         internal.add(
-            Color.translate(
-                "&8&lBUN&6&lK&e&lERS"
-            )
+                Color.translate(
+                        "&8&lBUN&3&lK&b&lERS"
+                )
         )
 
         internal.add(
-            Color.translate(
-                "&8&lBUNK&6&lE&e&lRS"
-            )
+                Color.translate(
+                        "&8&lBUNK&3&lE&b&lRS"
+                )
         )
 
         internal.add(
-            Color.translate(
-                "&8&lBUNKE&6&lR&e&lS"
-            )
+                Color.translate(
+                        "&8&lBUNKE&3&lR&b&lS"
+                )
+        )
+        internal.add(
+                Color.translate(
+                        "&8&lBUNKER&3&lS"
+                )
         )
 
         internal.add(
-            Color.translate(
-                "&8&lBUNKERS&6&l"
-            )
+                Color.translate(
+                        "&8&lBUNKERS&3&l"
+                )
         )
 
         for (i in 0..5)
         {
             internal.add(
-                Color.translate(
-                    "&8&lBUNKERS"
-                )
+                    Color.translate(
+                            "&6&lBUNKERS"
+                    )
             )
         }
 
         for (i in 0..4)
         {
             internal.add(
-                Color.translate(
-                    "&6&lBUNKERS"
-                )
+                    Color.translate(
+                            "&b&lBUNKERS"
+                    )
             )
         }
 
         for (i in 0..5)
         {
             internal.add(
-                Color.translate(
-                    "&8&lBUNKERS"
-                )
+                    Color.translate(
+                            "&8&lBUNKERS"
+                    )
             )
         }
 
@@ -193,27 +199,27 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
         if (state == CgsGameState.STARTING)
         {
-            lines += "${CC.GOLD}Game starts in:"
-            lines += "${
-                StartingStateRunnable.PRE_START_TIME
+            lines += " ${CC.PRI}Game starts in:"
+            lines += " ${
+                StartingStateRunnable.PRE_START_TIME 
             } seconds"
             lines += ""
             lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
             }"
         } else if (state.isAfter(CgsGameState.STARTED))
         {
-            lines += "Game Time: ${CC.GOLD}${
+            lines += " Game Time: ${CC.PRI}${
                 TimeUtil.formatIntoMMSS(
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += "Balance: ${CC.GOLD}$${
+            lines += " Balance: ${CC.PRI}$${
                 Numbers.format(
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
@@ -307,15 +313,15 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 //            lines += "${CC.I_GRAY}Starting in 5 seconds..."
         } else if (state == CgsGameState.WAITING)
         {
-            lines += "${CC.GOLD}Waiting:"
-            lines += "${
+            lines += " ${CC.PRI}Waiting:"
+            lines += " ${
                 Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
             } more players."
             lines += ""
             lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += "${CC.WHITE}Players: ${CC.GOLD}${
+            lines += " ${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
@@ -323,7 +329,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += "${CC.GRAY}tropic.gg  ${CC.GRAY}   ${CC.GRAY}"
+        lines += "${CC.GRAY}${LemonConstants.WEB_LINK}  ${CC.GRAY}   ${CC.GRAY}"
     }
 }
 
