@@ -88,7 +88,7 @@ object TeamCommands : ScalaCommand()
         val found = CgsGameTeamService.teams.values.firstOrNull {
             it.data()?.teamName?.equals(team, ignoreCase = true) ?: false
         } ?: throw ConditionFailedException(
-                "Team ${CC.YELLOW}#$team ${CC.RED}does not exist in this game."
+                "Team ${CC.YELLOW}$team ${CC.RED}does not exist in this game."
             )
 
         val senderTeam = player.bukkit().team
