@@ -2,6 +2,7 @@ package gg.scala.events.plugin.game.module.bonkers.teams
 
 import com.google.common.cache.CacheBuilder
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
+import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.bonkers.data
@@ -44,7 +45,7 @@ object GameTeamService
                 .deserialize("${CC.GRAY}[${it.team!!.data()!!.colored()}${CC.GRAY}] ")
         }
 
-        for (id in 1..((Bukkit.getMaxPlayers() / gameType.teamSize) + 1))
+        for (id in 1..4)
         {
             CgsGameTeamService.teams[id] =
                 CgsGameTeamService.engine.createTeam(id)

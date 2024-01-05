@@ -8,10 +8,20 @@ import gg.scala.commons.tablist.TablistService
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
+import gg.scala.events.plugin.game.module.bonkers.commands.BalanceCommand
+import gg.scala.events.plugin.game.module.bonkers.commands.PayCommand
+import gg.scala.events.plugin.game.module.bonkers.commands.TagMeCommand
+import gg.scala.events.plugin.game.module.bonkers.menus.SelectTeamMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.CarpenterMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.SellOreMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.ShopMenu
+import gg.scala.events.plugin.game.module.bonkers.shops.TimTheEnchanterMenu
 import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamInvitesCommand
+import gg.scala.events.plugin.game.module.bonkers.timers.BonkersRespawnTimer
+import gg.scala.events.plugin.game.module.bonkers.visual.PleaseKillMeNowTabPopulator
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
@@ -26,7 +36,6 @@ import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter.Blue
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -51,7 +60,7 @@ object BonkersModule : EventModule
 
     private fun loc(x: Double, y: Double, z: Double) =
         Location(
-            Bukkit.getWorld("Sumo"), x, y, z
+            Bukkit.getWorld("Bunkers"), x, y, z
         )
 
     val mappings = mutableMapOf(
@@ -122,6 +131,8 @@ object BonkersModule : EventModule
             loc(642.0, 60.0, 628.0)
         ),
     )
+    var currentConquest: ConquestKothMix? = null
+    var currentCentralKoth: ConquestKothMix? = null
 
     fun startNewConquestEvent(region: Cuboid, name: String)
     {
@@ -171,9 +182,6 @@ object BonkersModule : EventModule
                     name = "${CC.BLUE}Classic ",
                     specialCentral = true
                 ).configure()
-            },
-            update = {
-
             }
         )
 
@@ -198,7 +206,10 @@ object BonkersModule : EventModule
         listOf(
             TeamChatCommand,
             TeamCommands,
-            TeamInvitesCommand
+            TeamInvitesCommand,
+            TagMeCommand,
+            BalanceCommand,
+            PayCommand
         ).forEach {
             plugin.flavor().inject(it)
             plugin.commandManager.registerCommand(it)
@@ -342,8 +353,11 @@ object BonkersModule : EventModule
                         .build()
                 )
 
+                it.player.sendMessage("${ChatColor.LIGHT_PURPLE}YAS QUEEN! U SLAYED. GO GET UR ${original.name} BESTIEEEE")
+
                 delayed(6 * 20L) {
                     it.block.type = original
+                    it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
                 }
             }
 
@@ -476,6 +490,8 @@ object BonkersModule : EventModule
         Events
             .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
             .handler {
+                it.participant.spigot().respawn()
+
                 it.participant.team()
                     ?.apply {
                         val data = this.data()!!
@@ -496,21 +512,19 @@ object BonkersModule : EventModule
                             }
                         }
 
-                        delayed(1L) {
-                            if (data.raidable() && previouslyRaidable)
-                            {
-                                CgsGameDisqualificationHandler.disqualifyPlayer(
-                                    player = it.participant,
-                                    broadcastNotification = true, setSpectator = true
-                                )
-                                return@delayed
-                            }
-
-                            BonkersRespawnTimer(it.participant)
-                                .runTaskTimer(
-                                    CgsGameEngine.INSTANCE.plugin, 1L, 20L
-                                )
+                        if (data.raidable() && previouslyRaidable)
+                        {
+                            CgsGameDisqualificationHandler.disqualifyPlayer(
+                                player = it.participant,
+                                broadcastNotification = true, setSpectator = true
+                            )
+                            return@apply
                         }
+
+                        BonkersRespawnTimer(it.participant)
+                            .runTaskTimer(
+                                CgsGameEngine.INSTANCE.plugin, 0L, 20L
+                            )
                     }
 
                 it.killer?.apply {
@@ -579,6 +593,24 @@ object BonkersModule : EventModule
                                 .subtract(1.0, 0.0, 1.0)
                         ) {
                             ShopMenu().openMenu(it)
+                        }
+
+                        buildActionEntity(
+                            action = "Tim The Enchanter",
+                            location = it.value.spawnLocation
+                                .clone()
+                                .add(1.0, 0.0, 1.0)
+                        ) {
+                            TimTheEnchanterMenu().openMenu(it)
+                        }
+
+                        buildActionEntity(
+                            action = "Carpenter",
+                            location = it.value.spawnLocation
+                                .clone()
+                                .add(1.0, 0.0, 0.0)
+                        ) {
+                            CarpenterMenu().openMenu(it)
                         }
 
                         team.participants.forEach { player ->

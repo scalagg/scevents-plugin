@@ -1,4 +1,4 @@
-package gg.scala.events.plugin.game.module.bonkers
+package gg.scala.events.plugin.game.module.bonkers.visual
 
 import com.google.common.collect.HashBasedTable
 import gg.scala.cgs.common.CgsGameEngine
@@ -7,7 +7,9 @@ import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.tablist.TablistPopulator
-import gg.scala.flavor.service.Service
+import gg.scala.events.plugin.game.module.bonkers.data
+import gg.scala.events.plugin.game.module.bonkers.findClaimContextual
+import gg.scala.events.plugin.game.module.bonkers.team
 import gg.scala.lemon.util.QuickAccess.username
 import io.github.nosequel.tab.shared.entry.TabElement
 import net.evilblock.cubed.util.time.TimeUtil
@@ -59,7 +61,7 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
                 0,
                 y++,
                 "${ChatColor.GRAY}${player.location.blockX}, ${player.location.blockZ} [${
-                    this.getCardinalDirection(player)
+                    getCardinalDirection(player)
                 }${ChatColor.GRAY}]"
             )
         }
@@ -77,6 +79,7 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
                 y++,
                 "${ChatColor.GRAY}Online: ${ChatColor.WHITE}${player.team()!!.alive.size}/${player.team()!!.participants.size}"
             )
+            layout.add(1, y++, "${ChatColor.GRAY}Balance: $${team.balance}")
         }
 
         y = 3
@@ -162,7 +165,7 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
                     }${ChatColor.GRAY}]"
                 )
 
-                it.participants.forEach { member -> layout.add(x, y++, this.getDisplayName(player, member, it)) }
+                it.participants.forEach { member -> layout.add(x, y++, getDisplayName(player, member, it)) }
 
                 y = 14
                 x = next
@@ -177,7 +180,7 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
             rot += 360.0
         }
 
-        return this.getDirection(rot)
+        return getDirection(rot)
     }
 
     private fun getDirection(rot: Double): String {
@@ -230,14 +233,14 @@ object PleaseKillMeNowTabPopulator : TablistPopulator
 
     }
 
-    val DIRECTIONS = HashBasedTable.create<String,Direction,ChatColor>()
+    val DIRECTIONS = HashBasedTable.create<String, Direction,ChatColor>()
 
     init {
         //TODO LOL
-        DIRECTIONS.put("western",Direction.WEST,ChatColor.BLUE)
-        DIRECTIONS.put("western",Direction.EAST,ChatColor.YELLOW)
-        DIRECTIONS.put("western",Direction.SOUTH,ChatColor.RED)
-        DIRECTIONS.put("western",Direction.NORTH,ChatColor.GREEN)
+        DIRECTIONS.put("western", Direction.WEST,ChatColor.BLUE)
+        DIRECTIONS.put("western", Direction.EAST,ChatColor.YELLOW)
+        DIRECTIONS.put("western", Direction.SOUTH,ChatColor.RED)
+        DIRECTIONS.put("western", Direction.NORTH,ChatColor.GREEN)
     }
 
 }

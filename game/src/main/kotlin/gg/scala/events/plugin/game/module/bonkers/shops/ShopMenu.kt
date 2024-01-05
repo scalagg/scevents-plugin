@@ -1,5 +1,6 @@
-package gg.scala.events.plugin.game.module.bonkers
+package gg.scala.events.plugin.game.module.bonkers.shops
 
+import gg.scala.events.plugin.game.module.bonkers.account
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -54,7 +55,7 @@ class ShopMenu : Menu("Shop")
                 grant(player)
             }
 
-            player!!.account().balance -= amount
+            player.account().balance -= amount
 
             player.updateInventory()
             player.sendMessage(
@@ -131,7 +132,7 @@ class ShopMenu : Menu("Shop")
 
         buttons[15 + 9] = buildPurchasable(
             amount = 5,
-            name = "Health Pot",
+            name = "Health Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
                 .data(16421)
@@ -139,7 +140,7 @@ class ShopMenu : Menu("Shop")
 
         buttons[16 + 9] = buildPurchasable(
             amount = 50,
-            name = "Poison Pot",
+            name = "Poison Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
                 .data(16388)
@@ -147,7 +148,7 @@ class ShopMenu : Menu("Shop")
 
         buttons[16 + 18] = buildPurchasable(
             amount = 50,
-            name = "Slowness Pot",
+            name = "Slowness Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
                 .data(16394)
@@ -155,7 +156,7 @@ class ShopMenu : Menu("Shop")
 
         buttons[15 + 18] = buildPurchasable(
             amount = 1250,
-            name = "Invis Pot",
+            name = "Invisibility Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
                 .data(16398)
@@ -163,7 +164,7 @@ class ShopMenu : Menu("Shop")
 
         buttons[10] = buildPurchasable(
             amount = 10,
-            name = "Speed II",
+            name = "Speed II Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
                 .data(8226)

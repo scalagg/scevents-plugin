@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit
  */
 @Service
 @IgnoreAutoScan
-@EventBind(EventType.Sumo::class)
+//@EventBind(EventType.Sumo::class)
 object SumoModule : EventModule
 {
     @Inject

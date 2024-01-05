@@ -1,8 +1,9 @@
-package gg.scala.events.plugin.game.module.bonkers
+package gg.scala.events.plugin.game.module.bonkers.timers
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
-import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.events.plugin.game.module.bonkers.data
+import gg.scala.events.plugin.game.module.bonkers.team
 import net.evilblock.cubed.util.CC
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.title.Title
@@ -41,7 +42,7 @@ class BonkersRespawnTimer(
         {
             6 ->
             {
-                CgsSpectatorHandler.setSpectator(this.player)
+                CgsSpectatorHandler.setSpectator(this.player, temporary = true)
 
                 this.player.teleport(
                     CgsGameEngine.INSTANCE.gameArena!!.getPreLobbyLocation()
