@@ -85,8 +85,9 @@ object TeamCommands : ScalaCommand()
     fun onFocus(player: ScalaPlayer, team: String)
     {
 
-        val found = CgsGameTeamService.teams.values.firstOrNull { it.data()?.teamName?.contains(team) ?: false }
-            ?: throw ConditionFailedException(
+        val found = CgsGameTeamService.teams.values.firstOrNull {
+            it.data()?.teamName?.lowercase()?.contains(team) ?: false
+        } ?: throw ConditionFailedException(
                 "Team ${CC.YELLOW}#$team ${CC.RED}does not exist in this game."
             )
 
