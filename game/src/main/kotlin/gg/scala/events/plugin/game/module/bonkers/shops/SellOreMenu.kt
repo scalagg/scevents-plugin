@@ -68,27 +68,27 @@ class SellOreMenu : Menu("Sell your ores")
                     {
                         if (totalAmount <= 0)
                         {
-                            player.sendMessage("${CC.RED}You do not have enough of this material to bulk deposit!")
+                            player.sendMessage("${CC.RED}You don't have any $materialName.")
                             return@toButton
                         }
 
                         player.inventory.removeAmount(mapping.key, totalAmount)
                         player.account().balance += mapping.value * totalAmount
 
-                        player.sendMessage("${CC.GREEN}You deposited all of your ${materialName}s and gained $${mapping.value * totalAmount}!")
+                        player.sendMessage("${CC.GREEN}You sold all of your ${materialName}s and gained $${mapping.value * totalAmount}!")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     } else if (type.isLeftClick)
                     {
                         if (totalAmount < 1)
                         {
-                            player.sendMessage("${CC.RED}You do not have enough of this material to deposit!")
+                            player.sendMessage("${CC.RED}You do not have enough of ${materialName} to sell!")
                             return@toButton
                         }
 
                         player.inventory.removeAmount(mapping.key, 1)
                         player.account().balance += mapping.value
 
-                        player.sendMessage("${CC.GREEN}You deposited one $materialName and gained $${mapping.value}!")
+                        player.sendMessage("${CC.GREEN}You sold one $materialName and gained $${mapping.value}!")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     }
                 }

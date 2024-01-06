@@ -147,7 +147,7 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
 
         internal.add(
                 Color.translate(
-                        "&8&lBUNKERS&3&l"
+                        "&b&lBUNKERS&3&l"
                 )
         )
 
@@ -155,7 +155,7 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         {
             internal.add(
                     Color.translate(
-                            "&6&lBUNKERS"
+                            "&8&lBUNKERS"
                     )
             )
         }
@@ -207,7 +207,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.PRI}${
+            lines += "${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
@@ -313,15 +313,15 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 //            lines += "${CC.I_GRAY}Starting in 5 seconds..."
         } else if (state == CgsGameState.WAITING)
         {
-            lines += " ${CC.PRI}Waiting:"
-            lines += " ${
+            lines += "${CC.PRI}Waiting:"
+            lines += "${
                 Bukkit.getMaxPlayers() - Bukkit.getOnlinePlayers().size
             } more players."
             lines += ""
             lines += "${CC.WHITE}Selected team: ${
                 player.team()?.data()?.colored()
             }"
-            lines += " ${CC.WHITE}Players: ${CC.PRI}${
+            lines += "${CC.WHITE}Players: ${CC.PRI}${
                 Bukkit.getOnlinePlayers().size
             }/${
                 Bukkit.getMaxPlayers()
