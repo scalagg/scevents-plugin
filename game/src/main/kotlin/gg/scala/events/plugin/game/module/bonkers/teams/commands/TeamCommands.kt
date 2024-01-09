@@ -3,33 +3,31 @@ package gg.scala.events.plugin.game.module.bonkers.teams.commands
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
-import gg.scala.commons.acf.annotation.CommandAlias
-import gg.scala.commons.acf.annotation.Default
-import gg.scala.commons.acf.annotation.Description
-import gg.scala.commons.acf.annotation.HelpCommand
-import gg.scala.commons.acf.annotation.Optional
-import gg.scala.commons.acf.annotation.Subcommand
+import gg.scala.commons.acf.annotation.*
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.module.bonkers.account
 import gg.scala.events.plugin.game.module.bonkers.data
-import gg.scala.lemon.player.LemonPlayer
-import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.events.plugin.game.module.bonkers.teams.joinTeam
 import gg.scala.events.plugin.game.module.bonkers.teams.sendTeamInviteTo
 import gg.scala.events.plugin.game.module.bonkers.teams.team
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
+import gg.scala.lemon.player.LemonPlayer
+import gg.scala.lemon.util.QuickAccess.username
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
+import java.util.stream.Collectors
+
 
 /**
  * @author GrowlyX
  * @since 4/26/2023
  */
-@CommandAlias("faction|fac|team|team")
+@CommandAlias("faction|fac|team|f|t")
 object TeamCommands : ScalaCommand()
 {
+
     @Default
     @HelpCommand
     fun onHelp(help: CommandHelp)
@@ -302,7 +300,7 @@ object TeamCommands : ScalaCommand()
         player.sendMessage("${CC.GREEN}You have started your team home timer!")
     }
 
-    @Subcommand("view")
+    @Subcommand("view|who|w|is")
     @Description("View details for a particular team.")
     fun onView(player: ScalaPlayer, @Optional team: Int?)
     {
@@ -318,22 +316,32 @@ object TeamCommands : ScalaCommand()
 
         val teamData = team.data()!!
 
+//        player.sendMessage(
+//            "${CC.WHITE}Team ${teamData.colored()}${CC.WHITE}:",
+//            "${CC.WHITE}Location: ${teamData.color}${teamData.spawnLocation.x}, ${teamData.spawnLocation.y}, ${teamData.spawnLocation.z}",
+//            "${CC.WHITE}Balance: ${teamData.color}$${teamData.balance}",
+//            "",
+//            "${CC.GRAY}Participants:"
+//        )
+
         player.sendMessage(
-            "${CC.WHITE}Team ${teamData.colored()}${CC.WHITE}:",
-            "${CC.WHITE}Location: ${teamData.color}${teamData.spawnLocation.x}, ${teamData.spawnLocation.y}, ${teamData.spawnLocation.z}",
-            "${CC.WHITE}Balance: ${teamData.color}$${teamData.balance}",
-            "",
-            "${CC.GRAY}Participants:"
+                "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------",
+                "${teamData.colored()} ${CC.GRAY}[${team.participants.size}/5] ${CC.WHITE}- ${CC.YELLOW}HQ: ${CC.AQUA}${teamData.spawnLocation.x}, ${teamData.spawnLocation.z}",
+                // TODO: LIST MEMBERS ACCORDINGLY
+                "${CC.YELLOW}Members: ${CC.WHITE}N/A",
+                "${CC.YELLOW}Balance: ${CC.GREEN}$${teamData.balance}",
+                "${CC.YELLOW}Deaths until Raidable: ${CC.AQUA}${teamData.dtr} ",
+                "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------"
         )
 
-        if (team.participants.isEmpty())
-        {
-            player.sendMessage("${CC.RED}No participants!")
-        } else
-        {
-            team.participants.forEach {
-                player.sendMessage("${CC.WHITE}- ${it.username()}")
-            }
-        }
+//        if (team.participants.isEmpty())
+//        {
+//            player.sendMessage("${CC.RED}No participants!")
+//        } else
+//        {
+//            team.participants.forEach {
+//                player.sendMessage("${CC.WHITE}- ${it.username()}")
+//            }
+//        }
     }
 }
