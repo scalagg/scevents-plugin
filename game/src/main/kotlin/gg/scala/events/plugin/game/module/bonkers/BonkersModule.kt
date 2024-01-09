@@ -740,3 +740,4 @@ object BonkersModule : EventModule
                     .register("selectteam")
             }
     }
+}
