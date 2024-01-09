@@ -22,7 +22,6 @@ import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.Color
-import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -34,7 +33,6 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.block.Block
-import org.bukkit.block.DoubleChest
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -113,70 +111,70 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
         }
 
         internal.add(
-                Color.translate(
-                        "&8&lB&3&lU&b&lNKERS"
-                )
+            Color.translate(
+                "&8&lB&3&lU&b&lNKERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBU&3&lN&b&lKERS"
-                )
+            Color.translate(
+                "&8&lBU&3&lN&b&lKERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUN&3&lK&b&lERS"
-                )
+            Color.translate(
+                "&8&lBUN&3&lK&b&lERS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUNK&3&lE&b&lRS"
-                )
+            Color.translate(
+                "&8&lBUNK&3&lE&b&lRS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&8&lBUNKE&3&lR&b&lS"
-                )
+            Color.translate(
+                "&8&lBUNKE&3&lR&b&lS"
+            )
         )
         internal.add(
-                Color.translate(
-                        "&8&lBUNKER&3&lS"
-                )
+            Color.translate(
+                "&8&lBUNKER&3&lS"
+            )
         )
 
         internal.add(
-                Color.translate(
-                        "&b&lBUNKERS&3&l"
-                )
+            Color.translate(
+                "&b&lBUNKERS&3&l"
+            )
         )
 
         for (i in 0..5)
         {
             internal.add(
-                    Color.translate(
-                            "&8&lBUNKERS"
-                    )
+                Color.translate(
+                    "&8&lBUNKERS"
+                )
             )
         }
 
         for (i in 0..4)
         {
             internal.add(
-                    Color.translate(
-                            "&b&lBUNKERS"
-                    )
+                Color.translate(
+                    "&b&lBUNKERS"
+                )
             )
         }
 
         for (i in 0..5)
         {
             internal.add(
-                    Color.translate(
-                            "&8&lBUNKERS"
-                    )
+                Color.translate(
+                    "&8&lBUNKERS"
+                )
             )
         }
 
@@ -203,7 +201,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         {
             lines += " ${CC.PRI}Game starts in:"
             lines += " ${
-                StartingStateRunnable.PRE_START_TIME 
+                StartingStateRunnable.PRE_START_TIME
             } seconds"
             lines += ""
             lines += "${CC.WHITE}Selected team: ${
@@ -284,7 +282,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     lines += " ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
-                } else {
+                } else
+                {
                     lines += " ${CC.R}Capturer: ${CC.GRAY}None"
                 }
             } else if (conquest != null)
@@ -303,7 +302,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     lines += " ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
-                } else {
+                } else
+                {
                     lines += " ${CC.R}Capturer: ${CC.GRAY}None"
                 }
             }
