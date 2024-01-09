@@ -176,7 +176,7 @@ object BonkersModule : EventModule
 
     private fun createCentralKothCreationRunner() =
         createRunner(
-            seconds = 60 * 12,
+            seconds = 60 * 10,
             end = {
                 ConquestKothMix(
                     Cuboid(
@@ -184,7 +184,7 @@ object BonkersModule : EventModule
                         loc(505.0, 60.0, 505.0),
                     ),
                     active = true,
-                    60 * 5,
+                    60 * 8,
                     startNewOneAfter = false,
                     name = "${CC.BLUE}Classic ",
                     specialCentral = true
