@@ -294,18 +294,32 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     ((System.currentTimeMillis() - CgsGameEngine.INSTANCE.gameStart) / 1000).toInt()
                 )
             }"
-            lines += "Balance: ${CC.PRI}$${
-                Numbers.format(
-                    BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
-                )
-            }"
-            lines += "Kills: ${CC.PRI}${
-                runCatching {
-                    CgsGameEngine.INSTANCE
-                            .getStatistics(CgsPlayerHandler.find(player)!!)
-                            .gameKills.value
-                }.getOrNull() ?: 0
-            }"
+
+            if (!player.hasMetadata("spectator"))
+            {
+                lines += "Balance: ${CC.PRI}$${
+                    Numbers.format(
+                            BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
+                    )
+                }"
+                lines += "Kills: ${CC.PRI}$${
+                    runCatching {
+                        CgsGameEngine.INSTANCE
+                                .getStatistics(CgsPlayerHandler.find(player)!!)
+                                .gameKills.value
+                    }.getOrNull() ?: 0
+                }"
+            }
+
+            if (player.hasMetadata("spectator"))
+            {
+                lines += " "
+                lines += "${CC.PRI}Team Info: "
+                lines += " ${CgsGameTeamService.teams[1]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[1]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[1]?.data()!!.dtr} ◉"
+                lines += " ${CgsGameTeamService.teams[2]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[2]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[2]?.data()!!.dtr} ◉"
+                lines += " ${CgsGameTeamService.teams[3]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[3]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[3]?.data()!!.dtr} ◉"
+                lines += " ${CgsGameTeamService.teams[4]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[4]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[4]?.data()!!.dtr} ◉"
+            }
 
             val team = player.team()
 
