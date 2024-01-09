@@ -34,6 +34,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.block.Block
+import org.bukkit.block.DoubleChest
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -58,7 +59,8 @@ data class TeamData(
     var dtr: Double = 5.0,
     var balance: Int = 0,
     var teamFocus: Int? = null,
-    var teamRally: Location? = null
+    var teamRally: Location? = null,
+    val ownedChests: MutableList<Location> = mutableListOf()
 )
 {
     fun colored() = "$color$teamName"

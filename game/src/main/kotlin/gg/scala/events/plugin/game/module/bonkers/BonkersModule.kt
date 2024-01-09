@@ -38,12 +38,15 @@ import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.evilblock.cubed.util.bukkit.Tasks.delayed
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import org.bukkit.*
+import org.bukkit.block.Chest
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
+import org.bukkit.inventory.DoubleChestInventory
 import org.bukkit.inventory.ItemStack
 import java.util.*
 
@@ -437,9 +440,61 @@ object BonkersModule : EventModule
                         it.player.sendMessage("${CC.RED}You cannot do this in ${claim.key.split("_")[0]} territory!")
                     }
 
+                if (it.clickedBlock.type.name.contains("CHEST"))
+                {
+                    if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
+                    {
+                        it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    val teamData = it.player.team()?.data() ?: return@handler
+                    val blockState = it.clickedBlock.state
+
+                    if (blockState is Chest)
+                    {
+                        val chestInventory = blockState.blockInventory
+
+                        if (chestInventory is DoubleChestInventory)
+                        {
+                            val doubleChest = chestInventory.holder
+
+                            if (it.player.isSneaking && it.action == Action.RIGHT_CLICK_BLOCK)
+                            {
+                                val balance = it.player.account().balance
+
+                                if (balance < 400)
+                                {
+                                    it.player.sendMessage("${CC.RED}You do not have enough to purchase this chest! You need ${CC.YELLOW}$${400 - balance} ${CC.RED}more!")
+                                    it.isCancelled = true
+                                    return@handler
+                                }
+
+                                it.player.account().balance -= 400
+                                it.player.sendMessage("${CC.GREEN}You have just purchased this chest for your team!")
+
+                                teamData.ownedChests.add(doubleChest.location)
+                                it.isCancelled = true
+                            } else
+                            {
+                                if (!teamData.ownedChests.contains(doubleChest.location))
+                                {
+                                    it.player.sendMessage("${CC.RED}Your team has not unlocked this chest! ${CC.YELLOW}Shift-Right-Click ${CC.RED}in order to unlock it.")
+                                    it.isCancelled = true
+                                    return@handler
+                                } else
+                                {
+                                    it.isCancelled = false
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (it.clickedBlock.type.name.contains("FENCE") || it.clickedBlock.type.name.contains("DOOR") || it.clickedBlock.type.name.contains(
                         "PLATE"
-                    ) || it.clickedBlock.type.name.contains("CHEST")
+                    )
                 )
                 {
                     if (it.player.team()?.id != mapping.teamId && !mapping.raidable())
@@ -451,216 +506,237 @@ object BonkersModule : EventModule
                 }
 
                 it.isCancelled = false
-            }
 
-        fun handleGenericMovementEvent(it: GenericMovementEvent) {
-            val claim = it.to.block.findClaim()
-            val oldClaim = it.from.block.findClaim()
-
-            if (oldClaim == null && claim == null) {
-                return
-            }
-
-            if (claim == null && oldClaim != null) {
-                it.player.sendMessage(if (oldClaim.key.equals("central_mine")) "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("_base", "")}")
-                it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
-//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
-            }
-
-            if (claim != null && oldClaim == null) {
-                it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
-                it.player.sendMessage(if (claim.key.equals("central_mine")) "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("central_mine", "Classic")}" else "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}")
-//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
-            }
-        }
-
-        Events
-            .subscribe(PlayerMoveEvent::class.java)
-            .filter(EventUtils::hasPlayerMoved)
-            .handler {
-                handleGenericMovementEvent(
-                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
-                )
-            }
-
-        Events
-            .subscribe(PlayerTeleportEvent::class.java)
-            .handler {
-                handleGenericMovementEvent(
-                    GenericMovementEvent(player = it.player, to = it.to, from = it.from)
-                )
-            }
-
-        Events
-            .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
-            .handler {
-                it.participant.spigot().respawn()
-
-                it.participant.team()
-                    ?.apply {
-                        val data = this.data()!!
-                        val oldDtr = data.dtr
-
-                        val previouslyRaidable = data.raidable()
-                        data.dtr -= 1.0
-
-                        this.participants.forEach { id ->
-                            Bukkit.getPlayer(id)?.apply {
-                                sendMessage("${CC.RED}Teammate Death: ${CC.WHITE}${it.participant.name}")
-                                sendMessage("${CC.YELLOW}DTR: ${CC.WHITE}$oldDtr -> ${data.dtr}")
-
-                                if (data.raidable() && !previouslyRaidable)
-                                {
-                                    playSound(location, Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f)
-                                }
-                            }
-                        }
-
-                        if (data.raidable() && previouslyRaidable)
-                        {
-                            CgsGameDisqualificationHandler.disqualifyPlayer(
-                                player = it.participant,
-                                broadcastNotification = true, setSpectator = true
-                            )
-                            return@apply
-                        }
-
-                        if (!data.raidable())
-                        {
-                            BonkersRespawnTimer(it.participant)
-                                .runTaskTimer(
-                                    CgsGameEngine.INSTANCE.plugin, 0L, 20L
-                                )
-                        }
-
-                        if (CombatTimer.isActive(it.participant))
-                        {
-                            CombatTimer.reset(it.participant)
-                        }
-                    }
-
-                it.killer?.apply {
-                    account().balance += 250
-                    sendMessage(
-                        "${CC.GOLD}You earned $250 for killing ${it.participant.colorfulName()}${CC.GOLD}!"
-                    )
-                }
-            }
-
-        Events
-            .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
-            .handler {
-                createGracePeriodRunner()
-                createSpawnCampInvincibilityRunner()
-                createCentralKothCreationRunner()
-
-                CgsGameTeamService.teams
-                    .forEach { (_, team) ->
-                        val it = this.mappings.entries
-                            .firstOrNull {
-                                it.value.teamId == team.id
-                            }
-                            ?: return@forEach
-
-                        fun buildActionEntity(
-                            action: String,
-                            location: Location,
-                            actionLambda: (Player) -> Unit
-                        )
-                        {
-                            val entity = object : NpcEntity(
-                                lines = listOf(
-                                    "${CC.GREEN}$action",
-                                    "${CC.GRAY}Click to open menu!"
-                                ),
-                                location = location
-                            )
-                            {
-                                override fun onRightClick(player: Player)
-                                {
-                                    if (player.hasMetadata("spectator"))
-                                    {
-                                        return
-                                    }
-
-                                    actionLambda(player)
-                                }
-                            }
-                            entity.initializeData()
-
-                            EntityHandler.trackEntity(entity)
-                        }
-
-                        buildActionEntity(
-                            action = "Sell your ore",
-                            location = it.value.spawnLocation
-                        ) {
-                            SellOreMenu().openMenu(it)
-                        }
-
-                        buildActionEntity(
-                            action = "Shop",
-                            location = it.value.spawnLocation
-                                .clone()
-                                .subtract(1.0, 0.0, 1.0)
-                        ) {
-                            ShopMenu().openMenu(it)
-                        }
-
-                        buildActionEntity(
-                            action = "Tim The Enchanter",
-                            location = it.value.spawnLocation
-                                .clone()
-                                .add(1.0, 0.0, 1.0)
-                        ) {
-                            TimTheEnchanterMenu().openMenu(it)
-                        }
-
-                        buildActionEntity(
-                            action = "Carpenter",
-                            location = it.value.spawnLocation
-                                .clone()
-                                .add(1.0, 0.0, 0.0)
-                        ) {
-                            CarpenterMenu().openMenu(it)
-                        }
-
-                        team.participants.forEach { player ->
-                            val bukkitPlayer = Bukkit.getPlayer(player)
-                                ?: return@forEach
-
-                            bukkitPlayer
-                                .teleport(it.value.spawnLocation)
-
-                            bukkitPlayer.inventory
-                                .addItem(
-                                    ItemStack(Material.STONE_PICKAXE),
-                                    ItemStack(Material.STONE_AXE)
-                                )
-                        }
-                    }
-
-                Schedulers.async()
-                    .runRepeating({ _ ->
-                        playerAccounts
-                            .forEach { (_, account) ->
-                                account.balance += 3
-                            }
-                    }, 0L, 60L)
-            }
-
-        Commands
-            .create()
-            .assertPlayer()
-            .handler {
-                if (CgsGameEngine.INSTANCE.gameState.isAfter(CgsGameState.STARTED))
+                fun handleGenericMovementEvent(it: GenericMovementEvent)
                 {
-                    it.sender().sendMessage("${CC.RED}You cannot switch teams right now!")
-                    return@handler
+                    val claim = it.to.block.findClaim()
+                    val oldClaim = it.from.block.findClaim()
+
+                    if (oldClaim == null && claim == null)
+                    {
+                        return
+                    }
+
+                    if (claim == null && oldClaim != null)
+                    {
+                        it.player.sendMessage(
+                            if (oldClaim.key.equals("central_mine")) "${CC.YELLOW}You exited: ${CC.GREEN}${
+                                oldClaim.key.replace(
+                                    "central_mine",
+                                    "Classic"
+                                )
+                            }" else "${CC.YELLOW}You exited: ${CC.GREEN}${oldClaim.key.replace("_base", "")}"
+                        )
+                        it.player.sendMessage("${CC.YELLOW}You entered: ${CC.RED}Warzone")
+//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 0.3f)
+                    }
+
+                    if (claim != null && oldClaim == null)
+                    {
+                        it.player.sendMessage("${CC.YELLOW}You exited: ${CC.RED}Warzone")
+                        it.player.sendMessage(
+                            if (claim.key.equals("central_mine")) "${CC.YELLOW}You entered: ${CC.GREEN}${
+                                claim.key.replace(
+                                    "central_mine",
+                                    "Classic"
+                                )
+                            }" else "${CC.YELLOW}You entered: ${CC.GREEN}${claim.key.replace("_base", "")}"
+                        )
+//                it.player.playSound(it.player.location, Sound.NOTE_PLING, 0.5f, 1.2f)
+                    }
                 }
 
-                SelectTeamMenu().openMenu(it.sender())
+                Events
+                    .subscribe(PlayerMoveEvent::class.java)
+                    .filter(EventUtils::hasPlayerMoved)
+                    .handler {
+                        handleGenericMovementEvent(
+                            GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                        )
+                    }
+
+                Events
+                    .subscribe(PlayerTeleportEvent::class.java)
+                    .handler {
+                        handleGenericMovementEvent(
+                            GenericMovementEvent(player = it.player, to = it.to, from = it.from)
+                        )
+                    }
+
+                Events
+                    .subscribe(CgsGameEngine.CgsGameParticipantDeathEvent::class.java)
+                    .handler {
+                        it.participant.spigot().respawn()
+
+                        it.participant.team()
+                            ?.apply {
+                                val data = this.data()!!
+                                val oldDtr = data.dtr
+
+                                val previouslyRaidable = data.raidable()
+                                data.dtr -= 1.0
+
+                                this.participants.forEach { id ->
+                                    Bukkit.getPlayer(id)?.apply {
+                                        sendMessage("${CC.RED}Teammate Death: ${CC.WHITE}${it.participant.name}")
+                                        sendMessage("${CC.YELLOW}DTR: ${CC.WHITE}$oldDtr -> ${data.dtr}")
+
+                                        if (data.raidable() && !previouslyRaidable)
+                                        {
+                                            playSound(location, Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f)
+                                        }
+                                    }
+                                }
+
+                                if (data.raidable() && previouslyRaidable)
+                                {
+                                    CgsGameDisqualificationHandler.disqualifyPlayer(
+                                        player = it.participant,
+                                        broadcastNotification = true, setSpectator = true
+                                    )
+                                    return@apply
+                                }
+
+                                if (!data.raidable())
+                                {
+                                    BonkersRespawnTimer(it.participant)
+                                        .runTaskTimer(
+                                            CgsGameEngine.INSTANCE.plugin, 0L, 20L
+                                        )
+                                }
+
+                                if (CombatTimer.isActive(it.participant))
+                                {
+                                    CombatTimer.reset(it.participant)
+                                }
+
+                                val deathLocation = it.deathLocation
+
+                                deathLocation.world.strikeLightningEffect(deathLocation)
+                            }
+
+                        it.killer?.apply {
+                            account().balance += 250
+                            sendMessage(
+                                "${CC.GOLD}You earned $250 for killing ${it.participant.colorfulName()}${CC.GOLD}!"
+                            )
+                        }
+                    }
+
+                Events
+                    .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
+                    .handler {
+                        createGracePeriodRunner()
+                        createSpawnCampInvincibilityRunner()
+                        createCentralKothCreationRunner()
+
+                        CgsGameTeamService.teams
+                            .forEach { (_, team) ->
+                                val it = this.mappings.entries
+                                    .firstOrNull {
+                                        it.value.teamId == team.id
+                                    }
+                                    ?: return@forEach
+
+                                fun buildActionEntity(
+                                    action: String,
+                                    location: Location,
+                                    actionLambda: (Player) -> Unit
+                                )
+                                {
+                                    val entity = object : NpcEntity(
+                                        lines = listOf(
+                                            "${CC.GREEN}$action",
+                                            "${CC.GRAY}Click to open menu!"
+                                        ),
+                                        location = location
+                                    )
+                                    {
+                                        override fun onRightClick(player: Player)
+                                        {
+                                            if (player.hasMetadata("spectator"))
+                                            {
+                                                return
+                                            }
+
+                                            actionLambda(player)
+                                        }
+                                    }
+                                    entity.initializeData()
+
+                                    EntityHandler.trackEntity(entity)
+                                }
+
+                                buildActionEntity(
+                                    action = "Sell your ore",
+                                    location = it.value.spawnLocation
+                                ) {
+                                    SellOreMenu().openMenu(it)
+                                }
+
+                                buildActionEntity(
+                                    action = "Shop",
+                                    location = it.value.spawnLocation
+                                        .clone()
+                                        .subtract(1.0, 0.0, 1.0)
+                                ) {
+                                    ShopMenu().openMenu(it)
+                                }
+
+                                buildActionEntity(
+                                    action = "Tim The Enchanter",
+                                    location = it.value.spawnLocation
+                                        .clone()
+                                        .add(1.0, 0.0, 1.0)
+                                ) {
+                                    TimTheEnchanterMenu().openMenu(it)
+                                }
+
+                                buildActionEntity(
+                                    action = "Carpenter",
+                                    location = it.value.spawnLocation
+                                        .clone()
+                                        .add(1.0, 0.0, 0.0)
+                                ) {
+                                    CarpenterMenu().openMenu(it)
+                                }
+
+                                team.participants.forEach { player ->
+                                    val bukkitPlayer = Bukkit.getPlayer(player)
+                                        ?: return@forEach
+
+                                    bukkitPlayer
+                                        .teleport(it.value.spawnLocation)
+
+                                    bukkitPlayer.inventory
+                                        .addItem(
+                                            ItemStack(Material.STONE_PICKAXE),
+                                            ItemStack(Material.STONE_AXE)
+                                        )
+                                }
+                            }
+
+                        Schedulers.async()
+                            .runRepeating({ _ ->
+                                playerAccounts
+                                    .forEach { (_, account) ->
+                                        account.balance += 3
+                                    }
+                            }, 0L, 60L)
+                    }
+
+                Commands
+                    .create()
+                    .assertPlayer()
+                    .handler {
+                        if (CgsGameEngine.INSTANCE.gameState.isAfter(CgsGameState.STARTED))
+                        {
+                            it.sender().sendMessage("${CC.RED}You cannot switch teams right now!")
+                            return@handler
+                        }
+
+                        SelectTeamMenu().openMenu(it.sender())
+                    }
+                    .register("selectteam")
             }
-            .register("selectteam")
     }
-}
