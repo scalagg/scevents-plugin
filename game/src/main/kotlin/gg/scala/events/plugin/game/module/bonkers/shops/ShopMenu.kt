@@ -56,8 +56,8 @@ class ShopMenu : Menu("Shop")
             "${CC.GREEN}Left-Click to purchase!"
         )
         .toButton { player, clickType ->
-            val balance = player!!.account().balance
-            var finalAmount = amount * stackQuantity
+            var balance = player!!.account().balance
+            val finalAmount = amount * stackQuantity
 
             if (balance < finalAmount)
             {
@@ -70,24 +70,26 @@ class ShopMenu : Menu("Shop")
                 if (fillInventory)
                 {
                     var inventoryIndex = 0
-                    var amountPurchased = 0
+                    var amountPurchased = 1
 
-                    while (balance >= finalAmount)
+                    while (balance >= (finalAmount * amountPurchased) && inventoryIndex < 36)
                     {
-                        val item = player.inventory.contents[inventoryIndex++]
+                        val item = player.inventory.contents[inventoryIndex]
 
                         if (item == null || item.type == Material.AIR)
                         {
                             amountPurchased++
-                            finalAmount *= amountPurchased
-                        }
-                    }
+                            balance -= amount
 
-                    player.account().balance -= finalAmount
+                            player.inventory.setItem(inventoryIndex, stack.build())
+                        }
+
+                        inventoryIndex++
+                    }
 
                     player.updateInventory()
                     player.sendMessage(
-                        "${CC.GREEN}You purchased ${amountPurchased}x $name for ${CC.WHITE}$${finalAmount}${CC.GREEN}!"
+                        "${CC.GREEN}You purchased ${amountPurchased}x $name for ${CC.WHITE}$${finalAmount * amountPurchased}${CC.GREEN}!"
                     )
 
                     return@toButton
@@ -109,6 +111,13 @@ class ShopMenu : Menu("Shop")
                     grant(player)
                 }
             }
+
+            player.account().balance -= finalAmount
+
+            player.updateInventory()
+            player.sendMessage(
+                "${CC.GREEN}You purchased ${stackQuantity}x $name for ${CC.WHITE}$${finalAmount}${CC.GREEN}!"
+            )
         }
 
     override fun getButtons(player: Player): Map<Int, Button>

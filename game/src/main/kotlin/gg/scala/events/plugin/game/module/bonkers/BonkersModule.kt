@@ -454,7 +454,7 @@ object BonkersModule : EventModule
 
                     if (blockState is Chest)
                     {
-                        val chestInventory = blockState.blockInventory
+                        val chestInventory = blockState.inventory
 
                         if (chestInventory is DoubleChestInventory)
                         {
@@ -471,11 +471,19 @@ object BonkersModule : EventModule
                                     return@handler
                                 }
 
+                                if (teamData.ownedChests.contains(doubleChest.location))
+                                {
+                                    it.player.sendMessage("${CC.RED}You have already purchased this chest!")
+                                    it.isCancelled = true
+                                    return@handler
+                                }
+
                                 it.player.account().balance -= 400
                                 it.player.sendMessage("${CC.GREEN}You have just purchased this chest for your team!")
 
                                 teamData.ownedChests.add(doubleChest.location)
                                 it.isCancelled = true
+                                return@handler
                             } else
                             {
                                 if (!teamData.ownedChests.contains(doubleChest.location))
