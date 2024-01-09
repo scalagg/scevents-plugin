@@ -48,7 +48,9 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.DoubleChestInventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
 /**
@@ -565,6 +567,8 @@ object BonkersModule : EventModule
                 )
             }
 
+
+
         Events
             .subscribe(PlayerItemConsumeEvent::class.java)
             .handler { event ->
@@ -582,24 +586,41 @@ object BonkersModule : EventModule
                     val preventedEffectTypes = listOf(
                         PotionEffectType.POISON,
                         PotionEffectType.SLOW
-                    ).onEach {
+                    )
+
+                    preventedEffectTypes.forEach {
                         if (player.hasPotionEffect(it))
                         {
                             player.removePotionEffect(it)
                         }
                     }
 
+                    player.setMetadata("antidote", FixedMetadataValue(plugin, true)).apply {
+                        object : BukkitRunnable()
+                        {
+                            override fun run()
+                            {
+
+                                if (!player.hasMetadata("antidote"))
+                                {
+                                    cancel()
+                                } else
+                                {
+                                    preventedEffectTypes.forEach {
+                                        if (player.hasPotionEffect(it))
+                                        {
+                                            player.removePotionEffect(it)
+                                        }
+                                    }
+                                }
+                            }
+                        }.runTaskTimer(plugin, 0L, 20L)
+                    }
+
                     createRunner(8,
                         end = {
                             player.sendMessage("${CC.YELLOW}Your ${CC.GREEN}Antidote ${CC.YELLOW}has expired!")
-                        },
-                        update = {
-                            preventedEffectTypes.forEach {
-                                if (player.hasPotionEffect(it))
-                                {
-                                    player.removePotionEffect(it)
-                                }
-                            }
+                            player.removeMetadata("antidote", plugin)
                         })
 
                     player.sendMessage("${CC.YELLOW}You have just consumed an ${CC.GREEN}Antidote${CC.YELLOW}.")

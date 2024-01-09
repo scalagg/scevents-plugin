@@ -233,7 +233,7 @@ class ShopMenu : Menu("Shop")
             fillInventory = true
         )
 
-        buttons[22] = buildPurchasable(
+        buttons[23] = buildPurchasable(
             amount = 100,
             name = "Antidote",
             stack = ItemBuilder
