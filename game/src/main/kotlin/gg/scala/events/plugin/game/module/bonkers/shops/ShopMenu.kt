@@ -104,6 +104,15 @@ class ShopMenu : Menu("Shop")
             name = "Diamond Set",
             stack = ItemBuilder.of(Material.DIAMOND)
         ) {
+            for ((i, piece) in it.inventory.armorContents.withIndex())
+            {
+                if (piece != null && piece.type != Material.AIR)
+                {
+                    it.inventory.armorContents[i] = null
+                    it.inventory.addItem(piece)
+                }
+            }
+
             it.inventory.helmet = ItemStack(Material.DIAMOND_HELMET)
             it.inventory.chestplate = ItemStack(Material.DIAMOND_CHESTPLATE)
             it.inventory.leggings = ItemStack(Material.DIAMOND_LEGGINGS)
