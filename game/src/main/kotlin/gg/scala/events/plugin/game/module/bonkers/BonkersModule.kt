@@ -20,6 +20,7 @@ import gg.scala.events.plugin.game.module.bonkers.teams.GameTeamService
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamChatCommand
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
 import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamInvitesCommand
+import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.timers.BonkersRespawnTimer
 import gg.scala.events.plugin.game.module.bonkers.visual.PleaseKillMeNowTabPopulator
 import gg.scala.events.shared.type.EventType
@@ -141,15 +142,18 @@ object BonkersModule : EventModule
 
     private var spawnCampInvincibility = false
 
-    private fun createGracePeriodRunner() =
+    private fun createGracePeriodRunner(duels: Boolean = true) =
         createRunner(
             // TODO: change back to 60
             seconds = 5 * 4,
             end = {
-                conquests.entries.random()
-                    .apply {
-                        startNewConquestEvent(value, key)
-                    }
+                if (!duels)
+                {
+                    conquests.entries.random()
+                        .apply {
+                            startNewConquestEvent(value, key)
+                        }
+                }
             },
             update = {
             }
@@ -521,10 +525,18 @@ object BonkersModule : EventModule
                             return@apply
                         }
 
-                        BonkersRespawnTimer(it.participant)
-                            .runTaskTimer(
-                                CgsGameEngine.INSTANCE.plugin, 0L, 20L
-                            )
+                        if (!data.raidable())
+                        {
+                            BonkersRespawnTimer(it.participant)
+                                .runTaskTimer(
+                                    CgsGameEngine.INSTANCE.plugin, 0L, 20L
+                                )
+                        }
+
+                        if (CombatTimer.isActive(it.participant))
+                        {
+                            CombatTimer.reset(it.participant)
+                        }
                     }
 
                 it.killer?.apply {

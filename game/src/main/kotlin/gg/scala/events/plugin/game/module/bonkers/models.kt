@@ -430,7 +430,7 @@ data class ConquestKothMix(
 
     fun Location.stringify() = "($x, $y, $z)"
 
-    fun createNewRunner() = createRunner(
+    fun createNewRunner(duels: Boolean = true) = createRunner(
         seconds = this.seconds,
         end = {
             if (specialCentral)
@@ -497,10 +497,13 @@ data class ConquestKothMix(
             {
                 Schedulers.sync()
                     .runLater({
-                        BonkersModule.conquests.entries.random()
-                            .apply {
-                                BonkersModule.startNewConquestEvent(value, key)
-                            }
+                        if (!duels)
+                        {
+                            BonkersModule.conquests.entries.random()
+                                .apply {
+                                    BonkersModule.startNewConquestEvent(value, key)
+                                }
+                        }
                     }, 30 * 20)
             }
 
