@@ -27,6 +27,9 @@ class ShopMenu : Menu("Shop")
         amount: Int,
         name: String,
         stack: ItemBuilder,
+        purchaseStack: Boolean = false,
+        stackQuantity: Int = 1,
+        fillInventory: Boolean = false,
         grant: ((Player) -> Unit)? = null
     ) = ItemBuilder
         .copyOf(stack)
@@ -35,32 +38,77 @@ class ShopMenu : Menu("Shop")
             "${CC.GRAY}Price: ${CC.WHITE}$${
                 Numbers.format(amount)
             }",
-            "",
-            "${CC.GREEN}Click to purchase!"
+            ""
         )
-        .toButton { player, _ ->
+        .apply {
+            if (purchaseStack)
+            {
+                this.addToLore(
+                    "${CC.YELLOW}Right-Click to purchase ${stackQuantity}x"
+                )
+            } else if (fillInventory)
+            {
+                this.addToLore(
+                    "${CC.YELLOW}Right-Click to fill your inventory!"
+                )
+            }
+        }.addToLore(
+            "${CC.GREEN}Left-Click to purchase!"
+        )
+        .toButton { player, clickType ->
             val balance = player!!.account().balance
+            var finalAmount = amount * stackQuantity
 
-            if (balance < amount)
+            if (balance < finalAmount)
             {
                 player.sendMessage("${CC.RED}You don't have enough money for this!")
                 return@toButton
             }
 
-            if (grant == null)
+            if (clickType!!.isRightClick)
             {
-                player.inventory.addItem(stack.build())
+                if (fillInventory)
+                {
+                    var inventoryIndex = 0
+                    var amountPurchased = 0
+
+                    while (balance >= finalAmount)
+                    {
+                        val item = player.inventory.contents[inventoryIndex++]
+
+                        if (item == null || item.type == Material.AIR)
+                        {
+                            amountPurchased++
+                            finalAmount *= amountPurchased
+                        }
+                    }
+
+                    player.account().balance -= finalAmount
+
+                    player.updateInventory()
+                    player.sendMessage(
+                        "${CC.GREEN}You purchased ${amountPurchased}x $name for ${CC.WHITE}$${finalAmount}${CC.GREEN}!"
+                    )
+
+                    return@toButton
+                } else
+                {
+                    player.inventory.addItem(
+                        ItemBuilder.copyOf(stack.build())
+                            .amount(stackQuantity)
+                            .build()
+                    )
+                }
             } else
             {
-                grant(player)
+                if (grant == null)
+                {
+                    player.inventory.addItem(stack.build())
+                } else
+                {
+                    grant(player)
+                }
             }
-
-            player.account().balance -= amount
-
-            player.updateInventory()
-            player.sendMessage(
-                "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$$amount${CC.GREEN}!"
-            )
         }
 
     override fun getButtons(player: Player): Map<Int, Button>
@@ -122,7 +170,9 @@ class ShopMenu : Menu("Shop")
         buttons[12 + 9] = buildPurchasable(
             amount = 25,
             name = "Enderpearl",
-            stack = ItemBuilder.of(Material.ENDER_PEARL)
+            stack = ItemBuilder.of(Material.ENDER_PEARL),
+            stackQuantity = 16,
+            purchaseStack = true
         )
 
         buttons[10 + 9] = buildPurchasable(
@@ -136,7 +186,9 @@ class ShopMenu : Menu("Shop")
             name = "Steak",
             stack = ItemBuilder
                 .of(Material.COOKED_BEEF)
-                .amount(16)
+                .amount(16),
+            stackQuantity = 64,
+            purchaseStack = true
         )
 
         buttons[15 + 9] = buildPurchasable(
@@ -152,7 +204,8 @@ class ShopMenu : Menu("Shop")
             name = "Poison Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
-                .data(16388)
+                .data(16388),
+            fillInventory = true
         )
 
         buttons[16 + 18] = buildPurchasable(
