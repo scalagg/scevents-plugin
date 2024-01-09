@@ -233,6 +233,15 @@ class ShopMenu : Menu("Shop")
             fillInventory = true
         )
 
+        buttons[22] = buildPurchasable(
+            amount = 100,
+            name = "Antidote",
+            stack = ItemBuilder
+                .of(Material.POTION)
+                .name("${CC.GREEN}Antidote")
+                .data(8196)
+        )
+
         buttons[16 + 18] = buildPurchasable(
             amount = 50,
             name = "Slowness Potion",

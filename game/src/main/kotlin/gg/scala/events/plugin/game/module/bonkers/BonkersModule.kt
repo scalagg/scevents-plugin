@@ -48,6 +48,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.inventory.DoubleChestInventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffectType
 import java.util.*
 
 /**
@@ -562,6 +563,47 @@ object BonkersModule : EventModule
                 handleGenericMovementEvent(
                     GenericMovementEvent(player = it.player, to = it.to, from = it.from)
                 )
+            }
+
+        Events
+            .subscribe(PlayerItemConsumeEvent::class.java)
+            .handler { event ->
+                val player = event.player
+
+                val item = event.item
+                val antidote = ItemBuilder
+                    .of(Material.POTION)
+                    .name("${CC.GREEN}Antidote")
+                    .data(8196)
+                    .build()
+
+                if (item.isSimilar(antidote))
+                {
+                    val preventedEffectTypes = listOf(
+                        PotionEffectType.POISON,
+                        PotionEffectType.SLOW
+                    ).onEach {
+                        if (player.hasPotionEffect(it))
+                        {
+                            player.removePotionEffect(it)
+                        }
+                    }
+
+                    createRunner(8,
+                        end = {
+                            player.sendMessage("${CC.YELLOW}Your ${CC.GREEN}Antidote ${CC.YELLOW}has expired!")
+                        },
+                        update = {
+                            preventedEffectTypes.forEach {
+                                if (player.hasPotionEffect(it))
+                                {
+                                    player.removePotionEffect(it)
+                                }
+                            }
+                        })
+
+                    player.sendMessage("${CC.YELLOW}You have just consumed an ${CC.GREEN}Antidote${CC.YELLOW}.")
+                }
             }
 
         Events
