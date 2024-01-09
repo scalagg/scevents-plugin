@@ -19,17 +19,6 @@ object TeamChatCommand : ScalaCommand()
     @Inject
     lateinit var plugin: ScalaEventsGamePlugin
 
-    @PreCommand
-    fun onPreCommand(player: ScalaPlayer)
-    {
-        if (player.bukkit().hasMetadata("spectator"))
-        {
-            throw ConditionFailedException(
-                "You may not use team commands as a spectator!"
-            )
-        }
-    }
-
     @CommandAlias("teamchat|tc|factionchat|fc")
     fun onTeamChat(player: ScalaPlayer)
     {
