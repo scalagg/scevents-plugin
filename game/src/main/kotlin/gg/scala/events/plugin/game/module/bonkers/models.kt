@@ -225,7 +225,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
             }"
-            lines += "Kills: ${CC.PRI}$${
+            lines += "Kills: ${CC.PRI}${
                 runCatching {
                     CgsGameEngine.INSTANCE
                             .getStatistics(CgsPlayerHandler.find(player)!!)
@@ -238,8 +238,9 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             if (team != null)
             {
                 val data = team.data()!!
-
-                lines += "${CC.WHITE}Team: ${data.colored()}"
+                lines += ""
+                lines += "${CC.PRI}Faction:"
+                lines += "${CC.WHITE}Member: ${data.colored()}"
 
                 if (data.teamFocus != null)
                 {
@@ -247,7 +248,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
                     if (focusTeam != null)
                     {
-                        lines += "Faction Focus: ${focusTeam.data()!!.colored()}"
+                        lines += "Focus: ${focusTeam.data()!!.colored()}"
                     }
                 }
             }
