@@ -1,0 +1,22 @@
+Subject: [PATCH] feat: more yassification
+---
+Index: game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt
+--- a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt	(revision 4734e15c030e81a4e97a7b8a6bb7a7caea98f7d2)
++++ b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt	(revision 2bc057009272117515c32b6316be56fb7d1de3b1)
+@@ -290,8 +290,11 @@
+                         .build()
+                 )
+ 
++                it.player.sendMessage("${ChatColor.LIGHT_PURPLE}YAS QUEEN! U SLAYED. GO GET UR ${original.name} BESTIEEEE")
++
+                 delayed(6 * 20L) {
+                     it.block.type = original
++                    it.player.sendMessage("${ChatColor.GRAY}.... c'mere bestie i got more for uuu ")
+                 }
+             }
+ 

@@ -1,0 +1,72 @@
+Subject: [PATCH] chore: yassified the code
+---
+Index: game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt
+--- a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt	(revision ba59c2478da1e5218e3916f2f3e1621cf6fee482)
++++ b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/BonkersModule.kt	(revision c835e45f81b5e5e53920b5e613bff6be5cd38581)
+@@ -147,7 +147,7 @@
+             seconds = 15,
+             end = {
+                 spawnCampInvincibility = true
+-                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage.")
++                Bukkit.broadcastMessage("${CC.GRAY}You can now take damage. SLAY QUEEN")
+             },
+             update = {
+ 
+Index: game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/ShopMenu.kt
+===================================================================
+diff --git a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/ShopMenu.kt b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/ShopMenu.kt
+--- a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/ShopMenu.kt	(revision ba59c2478da1e5218e3916f2f3e1621cf6fee482)
++++ b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/ShopMenu.kt	(revision c835e45f81b5e5e53920b5e613bff6be5cd38581)
+@@ -42,7 +42,7 @@
+ 
+             if (balance < amount)
+             {
+-                player.sendMessage("${CC.RED}You don't have enough money!")
++                player.sendMessage("${CC.RED}You don't have enough money bestie!")
+                 return@toButton
+             }
+ 
+Index: game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/models.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/models.kt b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/models.kt
+--- a/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/models.kt	(revision ba59c2478da1e5218e3916f2f3e1621cf6fee482)
++++ b/game/src/main/kotlin/gg/scala/events/plugin/game/module/bonkers/models.kt	(revision c835e45f81b5e5e53920b5e613bff6be5cd38581)
+@@ -394,7 +394,7 @@
+                     if (!futureHolders.contains(it.player.uniqueId))
+                     {
+                         futureHolders.push(it.player.uniqueId)
+-                        it.player.sendMessage("${CC.YELLOW}You entered: ${name()}")
++                        it.player.sendMessage("${CC.AQUA}HEYY GIRLBOSS. ${CC.YELLOW}You entered: ${name()}")
+ 
+                         if (currentHolder != null)
+                         {
+@@ -432,18 +432,18 @@
+                         runner = null
+                     }
+ 
+-                    it.player.sendMessage("${CC.YELLOW}You exited: ${name()}")
++                    it.player.sendMessage("${CC.BLACK}bestie why u leaving :(, it's giving.... DIVORCE. ${CC.YELLOW}You exited: ${name()}")
+                     it.player.sendMessage(
+                         "${CC.RED}You are no longer capping for your team!"
+                     )
+ 
+                     if (nextCaptureSameTeam)
+                     {
+-                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though.")
++                        it.player.sendMessage("${CC.WHITE}Your team still holds the Koth though SLAY.")
+                     }
+ 
+                     Bukkit.broadcastMessage(
+-                        "$PREFIX_KOTH${CC.RED}${
++                        "$PREFIX_KOTH${CC.RED}HELLO???? ${
+                             it.player.team()?.data()?.colored()
+                         }${CC.RED} is no longer controling ${special()}Koth!"
+                     )
