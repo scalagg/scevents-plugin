@@ -4,7 +4,9 @@ import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.*
+import gg.scala.commons.annotations.commands.customizer.CommandManagerCustomizer
 import gg.scala.commons.command.ScalaCommand
+import gg.scala.commons.command.ScalaCommandManager
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.module.bonkers.account
 import gg.scala.events.plugin.game.module.bonkers.data

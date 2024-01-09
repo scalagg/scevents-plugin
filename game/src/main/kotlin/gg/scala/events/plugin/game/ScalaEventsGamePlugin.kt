@@ -1,13 +1,16 @@
 package gg.scala.events.plugin.game
 
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.annotations.commands.ManualRegister
 import gg.scala.commons.annotations.container.ContainerDisable
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.annotations.container.ContainerPreEnable
 import gg.scala.commons.annotations.custom.CustomAnnotationProcessors
+import gg.scala.commons.command.ScalaCommandManager
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
+import gg.scala.events.plugin.game.module.bonkers.teams.commands.TeamCommands
 import gg.scala.events.shared.ScalaEventsChannel
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
@@ -22,6 +25,7 @@ import me.lucko.helper.plugin.ap.PluginDependency
         PluginDependency("scala-commons"),
         PluginDependency("store-spigot"),
         PluginDependency("Lemon"),
+        PluginDependency("Friends"),
         PluginDependency("ScGameFramework"),
         PluginDependency("SlimeWorldManager"),
         PluginDependency("cloudsync", soft = true)
@@ -44,6 +48,12 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
                     it as EventModule
                 )
             }
+    }
+
+    @ManualRegister
+    fun manualRegister(manager: ScalaCommandManager)
+    {
+        manager.registerCommand(TeamCommands, true)
     }
 
     @ContainerEnable

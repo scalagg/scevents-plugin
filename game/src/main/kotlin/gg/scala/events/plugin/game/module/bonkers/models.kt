@@ -200,8 +200,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
 
         if (state == CgsGameState.STARTING)
         {
-            lines += " ${CC.PRI}Game starts in:"
-            lines += " ${
+            lines += "${CC.PRI}Game starts in:"
+            lines += "${
                 StartingStateRunnable.PRE_START_TIME
             } seconds"
             lines += ""
