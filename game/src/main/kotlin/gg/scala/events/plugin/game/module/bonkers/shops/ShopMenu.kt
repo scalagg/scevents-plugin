@@ -56,10 +56,9 @@ class ShopMenu : Menu("Shop")
             "${CC.GREEN}Left-Click to purchase!"
         )
         .toButton { player, clickType ->
-            var balance = player!!.account().balance
-            val finalAmount = amount * stackQuantity
+            val balance = player!!.account().balance
 
-            if (balance < finalAmount)
+            if (balance < amount)
             {
                 player.sendMessage("${CC.RED}You don't have enough money for this!")
                 return@toButton
@@ -72,14 +71,14 @@ class ShopMenu : Menu("Shop")
                     var inventoryIndex = 0
                     var amountPurchased = 1
 
-                    while (balance >= (finalAmount * amountPurchased) && inventoryIndex < 36)
+                    while (balance >= (amount * amountPurchased) && inventoryIndex < 36)
                     {
                         val item = player.inventory.contents[inventoryIndex]
 
                         if (item == null || item.type == Material.AIR)
                         {
                             amountPurchased++
-                            balance -= amount
+                            player.account().balance -= amount
 
                             player.inventory.setItem(inventoryIndex, stack.build())
                         }
@@ -89,17 +88,33 @@ class ShopMenu : Menu("Shop")
 
                     player.updateInventory()
                     player.sendMessage(
-                        "${CC.GREEN}You purchased ${amountPurchased}x $name for ${CC.WHITE}$${finalAmount * amountPurchased}${CC.GREEN}!"
+                        "${CC.GREEN}You purchased ${amountPurchased-1}x $name for ${CC.WHITE}$${amount * (amountPurchased - 1)}${CC.GREEN}!"
                     )
 
                     return@toButton
                 } else
                 {
+                    val newAmount = (amount * stackQuantity)
+
+                    if (balance < newAmount)
+                    {
+                        player.sendMessage("${CC.RED}You don't have enough money for this!")
+                        return@toButton
+                    }
+
                     player.inventory.addItem(
                         ItemBuilder.copyOf(stack.build())
                             .amount(stackQuantity)
                             .build()
                     )
+                    player.account().balance -= newAmount
+
+                    player.updateInventory()
+                    player.sendMessage(
+                        "${CC.GREEN}You purchased ${stackQuantity}x $name for ${CC.WHITE}$${newAmount}${CC.GREEN}!"
+                    )
+
+                    return@toButton
                 }
             } else
             {
@@ -112,11 +127,11 @@ class ShopMenu : Menu("Shop")
                 }
             }
 
-            player.account().balance -= finalAmount
+            player.account().balance -= amount
 
             player.updateInventory()
             player.sendMessage(
-                "${CC.GREEN}You purchased ${stackQuantity}x $name for ${CC.WHITE}$${finalAmount}${CC.GREEN}!"
+                "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$${amount}${CC.GREEN}!"
             )
         }
 
