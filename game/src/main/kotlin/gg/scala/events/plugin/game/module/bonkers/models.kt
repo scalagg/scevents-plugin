@@ -2,6 +2,7 @@ package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
+import gg.scala.cgs.common.player.handler.CgsGameDisqualificationHandler
 import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
@@ -33,6 +34,7 @@ import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
@@ -59,11 +61,83 @@ data class TeamData(
     var balance: Int = 0,
     var teamFocus: Int? = null,
     var teamRally: Location? = null,
-    val ownedChests: MutableList<Location> = mutableListOf()
+    val ownedChests: MutableList<Location> = mutableListOf(),
+    var voteKickTarget: Player? = null,
+    var voteKickVotes: MutableMap<UUID, Boolean> = mutableMapOf()
 )
 {
     fun colored() = "$color$teamName"
     fun raidable() = dtr <= 0.0
+
+    fun startVoteKick()
+    {
+        createRunner(
+            60,
+            end = {
+                val team = CgsGameTeamService.teams[teamId]
+                    ?: return@createRunner
+
+                if (voteKickTarget == null)
+                {
+                    team.participants
+                        .mapNotNull {
+                            Bukkit.getPlayer(it)
+                        }
+                        .forEach {
+                            it.sendMessage("${CC.GOLD}[Team] ${CC.GOLD}Votekick has been cancelled because the target has disconnected!")
+                        }
+
+                    return@createRunner
+                }
+
+                val inFavor = voteKickVotes.values.count { it }
+                val requiredFavoredVotes = if (team.participants.size % 2 == 0)
+                {
+                    (team.participants.size / 2) + 1
+                } else
+                {
+                    (team.participants.size + 1) / 2
+                }
+
+                if (inFavor >= requiredFavoredVotes)
+                {
+                    val oldDtr = dtr
+
+                    val previouslyRaidable = raidable()
+                    dtr -= 1.0
+
+                    team.participants.forEach { id ->
+                        Bukkit.getPlayer(id)?.apply {
+                            sendMessage("${CC.RED}Teammate Voted Off: ${CC.WHITE}${voteKickTarget!!.name}")
+                            sendMessage("${CC.YELLOW}DTR: ${CC.WHITE}$oldDtr -> $dtr")
+
+                            if (raidable() && !previouslyRaidable)
+                            {
+                                playSound(location, Sound.ENDERDRAGON_GROWL, 1.0f, 1.0f)
+                            }
+                        }
+                    }
+
+                    CgsGameDisqualificationHandler.disqualifyPlayer(
+                        player = voteKickTarget!!,
+                        broadcastNotification = true, setSpectator = true
+                    )
+                } else
+                {
+                    team.participants
+                        .mapNotNull {
+                            Bukkit.getPlayer(it)
+                        }
+                        .forEach {
+                            it.sendMessage("${CC.GOLD}[Team] ${CC.GOLD}${voteKickTarget!!.displayName}${CC.SEC} has ${CC.RED}not ${CC.GOLD}been voted off!")
+                        }
+                }
+
+                voteKickVotes.clear()
+                voteKickTarget = null
+            },
+        )
+    }
 }
 
 fun createRunner(

@@ -79,6 +79,13 @@ object TeamCommands : ScalaCommand()
                 "You are not currently on a team!"
             )
 
+        if (target.uniqueId == player.uniqueId)
+        {
+            throw ConditionFailedException(
+                "You cannot kick yourself from your own team!"
+            )
+        }
+
         if (targetTeam.id != ourTeam.id)
         {
             throw ConditionFailedException(
@@ -86,7 +93,33 @@ object TeamCommands : ScalaCommand()
             )
         }
 
-        //todo: start vk
+
+        val data = ourTeam.data()!!
+
+        if (data.voteKickTarget == null)
+        {
+            ourTeam.participants
+                .mapNotNull {
+                    Bukkit.getPlayer(it)
+                }
+                .forEach {
+                    it.sendMessage("${CC.GOLD}[Team] ${CC.GOLD}${target.name}${CC.SEC} is being voted off! Type /team kick ${target.name} to vote!")
+                }
+
+            data.voteKickTarget = target.bukkitPlayer
+            data.startVoteKick()
+        } else
+        {
+            if (data.voteKickVotes.containsKey(player.uniqueId) && data.voteKickVotes[player.uniqueId]!!)
+            {
+                data.voteKickVotes[player.uniqueId] = false
+                player.sendMessage("${CC.YELLOW}You have voted ${CC.RED}'No' ${CC.YELLOW}to kicking the player ${CC.WHITE}${target.name} ${CC.YELLOW}from your team!")
+            } else
+            {
+                data.voteKickVotes[player.uniqueId] = true
+                player.sendMessage("${CC.YELLOW}You have voted ${CC.GREEN}'Yes' ${CC.YELLOW}to kicking the player ${CC.WHITE}${target.name} ${CC.YELLOW}from your team!")
+            }
+        }
     }
 
     @Subcommand("focus")
