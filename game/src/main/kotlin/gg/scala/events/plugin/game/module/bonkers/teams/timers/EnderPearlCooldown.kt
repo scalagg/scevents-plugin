@@ -78,7 +78,7 @@ object EnderPearlCooldown : PlayerStaticCooldown(
 
                 val game = CgsGameEngine.INSTANCE
 
-                if (game.gameState == CgsGameState.STARTED)
+                if (game.gameState != CgsGameState.STARTED)
                 {
                     it.isCancelled = true
                     player.updateInventory()
