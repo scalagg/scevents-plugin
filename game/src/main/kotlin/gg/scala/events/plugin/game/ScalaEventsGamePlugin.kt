@@ -50,12 +50,6 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
             }
     }
 
-    @ManualRegister
-    fun manualRegister(manager: ScalaCommandManager)
-    {
-        manager.registerCommand(TeamCommands, true)
-    }
-
     @ContainerEnable
     fun containerEnable()
     {

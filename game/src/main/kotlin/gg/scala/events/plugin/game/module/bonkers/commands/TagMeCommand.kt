@@ -16,6 +16,17 @@ object TagMeCommand : ScalaCommand()
     @Inject
     lateinit var plugin: ScalaEventsGamePlugin
 
+    @PreCommand
+    fun onPreCommand(player: ScalaPlayer)
+    {
+        if (player.bukkit().hasMetadata("spectator"))
+        {
+            throw ConditionFailedException(
+                "You may not use team commands as a spectator!"
+            )
+        }
+    }
+
     @CommandAlias("tagme")
     @CommandPermission("bunkers.tagme")
     fun onTagMe(player: ScalaPlayer)
