@@ -196,7 +196,8 @@ class ShopMenu : Menu("Shop")
             name = "Health Potion",
             stack = ItemBuilder
                 .of(Material.POTION)
-                .data(16421)
+                .data(16421),
+            fillInventory = true
         )
 
         buttons[16 + 9] = buildPurchasable(
