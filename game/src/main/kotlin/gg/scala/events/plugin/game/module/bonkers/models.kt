@@ -2,6 +2,7 @@ package gg.scala.events.plugin.game.module.bonkers
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
+import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
@@ -224,6 +225,13 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                 )
             }"
+            lines += "Kills: ${CC.PRI}$${
+                runCatching {
+                    CgsGameEngine.INSTANCE
+                            .getStatistics(CgsPlayerHandler.find(player)!!)
+                            .gameKills.value
+                }.getOrNull() ?: 0
+            }"
 
             val team = player.team()
 
@@ -269,7 +277,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             if (centerKoth != null)
             {
                 lines += ""
-                lines += "${CC.B_GOLD}KingOfTheHill"
+                lines += "${CC.GOLD}KingOfTheHill"
                 lines += " Location: ${CC.BLUE}Classic"
                 lines += " Time: ${CC.YELLOW}${
                     centerKoth.formatRemainingCaptureTime()
