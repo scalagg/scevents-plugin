@@ -19,7 +19,6 @@ import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import java.util.stream.Collectors
 
-
 /**
  * @author GrowlyX
  * @since 4/26/2023
@@ -27,6 +26,16 @@ import java.util.stream.Collectors
 @CommandAlias("faction|fac|team|f|t")
 object TeamCommands : ScalaCommand()
 {
+    @PreCommand
+    fun onPreCommand(player: ScalaPlayer)
+    {
+        if (player.bukkit().hasMetadata("spectator"))
+        {
+            throw ConditionFailedException(
+                "You may not use team commands as a spectator!"
+            )
+        }
+    }
 
     @Default
     @HelpCommand
