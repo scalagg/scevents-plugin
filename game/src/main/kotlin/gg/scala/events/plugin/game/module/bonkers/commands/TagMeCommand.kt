@@ -1,7 +1,9 @@
 package gg.scala.events.plugin.game.module.bonkers.commands
 
+import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
+import gg.scala.commons.acf.annotation.PreCommand
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -13,6 +15,17 @@ object TagMeCommand : ScalaCommand()
 {
     @Inject
     lateinit var plugin: ScalaEventsGamePlugin
+
+    @PreCommand
+    fun onPreCommand(player: ScalaPlayer)
+    {
+        if (player.bukkit().hasMetadata("spectator"))
+        {
+            throw ConditionFailedException(
+                "You may not use team commands as a spectator!"
+            )
+        }
+    }
 
     @CommandAlias("tagme")
     @CommandPermission("bunkers.tagme")
