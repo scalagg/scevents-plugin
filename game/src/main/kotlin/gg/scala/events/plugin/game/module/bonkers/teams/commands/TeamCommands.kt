@@ -355,9 +355,9 @@ object TeamCommands : ScalaCommand()
         player.sendMessage("${CC.GREEN}You have started your team home timer!")
     }
 
-    @Subcommand("view|who|w|is")
+    @Subcommand("list|who|w|is|view")
     @Description("View details for a particular team.")
-    fun onView(player: ScalaPlayer, @Optional team: Int?)
+    fun onList(player: ScalaPlayer, @Optional team: Int?)
     {
         val teamId = team ?: player.bukkit().team?.id
         ?: throw ConditionFailedException(
