@@ -329,7 +329,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 lines += ""
                 lines += "${CC.PRI}Faction:"
                 lines += "${CC.WHITE}Member: ${data.colored()}"
-                lines += "${CC.WHITE}DTR: ${data.dtr}"
+                lines += "${CC.WHITE}DTR: ${CC.GREEN}${data.dtr}"
 
                 if (data.teamFocus != null)
                 {
