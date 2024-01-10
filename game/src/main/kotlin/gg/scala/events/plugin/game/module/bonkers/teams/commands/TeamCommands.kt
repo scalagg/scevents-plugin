@@ -1,5 +1,6 @@
 package gg.scala.events.plugin.game.module.bonkers.teams.commands
 
+import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
@@ -27,18 +28,24 @@ import java.util.stream.Collectors
  * @author GrowlyX
  * @since 4/26/2023
  */
-@CommandAlias("faction|fac|team|f|t")
 @HighPriority
+@CommandAlias("faction|fac|team|f|t")
 @AutoRegister
 object TeamCommands : ScalaCommand()
 {
     @PreCommand
-    fun onPreCommand(player: ScalaPlayer)
+    fun onPreCommand(player: ScalaPlayer, @Optional state: CgsGameState)
     {
         if (player.bukkit().hasMetadata("spectator"))
         {
             throw ConditionFailedException(
                 "You may not use team commands as a spectator!"
+            )
+        }
+
+        if (state.isBefore(CgsGameState.STARTED)) {
+            throw ConditionFailedException(
+                    "Your game hasn't started yet."
             )
         }
     }
