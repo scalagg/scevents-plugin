@@ -15,6 +15,7 @@ import org.bukkit.metadata.FixedMetadataValue
  * @author GrowlyX
  * @since 4/27/2023
  */
+@AutoRegister
 object TeamInvitesCommand : ScalaCommand()
 {
     @Inject

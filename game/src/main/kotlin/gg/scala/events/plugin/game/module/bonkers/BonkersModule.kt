@@ -213,17 +213,17 @@ object BonkersModule : EventModule
             loc(441.500, 144.0, 441.500)
         )
 
-        listOf(
-            TeamChatCommand,
-            TeamCommands,
-            TeamInvitesCommand,
-            TagMeCommand,
-            BalanceCommand,
-            PayCommand
-        ).forEach {
-            plugin.flavor().inject(it)
-            plugin.commandManager.registerCommand(it)
-        }
+//        listOf(
+//            TeamChatCommand,
+//            TeamCommands,
+//            TeamInvitesCommand,
+//            TagMeCommand,
+//            BalanceCommand,
+//            PayCommand
+//        ).forEach {
+//            plugin.flavor().inject(it)
+//            plugin.commandManager.registerCommand(it)
+//        }
 
         plugin.flavor().inject(GameTeamService)
         GameTeamService.configureTeamResources()

@@ -4,6 +4,7 @@ import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.*
+import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.annotations.commands.HighPriority
 import gg.scala.commons.annotations.commands.customizer.CommandManagerCustomizer
 import gg.scala.commons.command.ScalaCommand
@@ -28,6 +29,7 @@ import java.util.stream.Collectors
  */
 @CommandAlias("faction|fac|team|f|t")
 @HighPriority
+@AutoRegister
 object TeamCommands : ScalaCommand()
 {
     @PreCommand

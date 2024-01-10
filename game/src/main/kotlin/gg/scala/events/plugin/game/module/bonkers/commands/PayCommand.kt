@@ -4,6 +4,7 @@ import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
 import gg.scala.commons.acf.annotation.PreCommand
+import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -14,6 +15,7 @@ import gg.scala.lemon.player.LemonPlayer
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 
+@AutoRegister
 object PayCommand : ScalaCommand()
 {
     @Inject

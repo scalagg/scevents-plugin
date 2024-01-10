@@ -4,6 +4,7 @@ import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
 import gg.scala.commons.acf.annotation.PreCommand
+import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -12,6 +13,7 @@ import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.flavor.inject.Inject
 import net.evilblock.cubed.util.CC
 
+@AutoRegister
 object BalanceCommand : ScalaCommand()
 {
     @Inject

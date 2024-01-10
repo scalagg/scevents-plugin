@@ -3,6 +3,7 @@ package gg.scala.events.plugin.game.module.bonkers.teams.commands
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.PreCommand
+import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
@@ -14,6 +15,7 @@ import org.bukkit.metadata.FixedMetadataValue
  * @author GrowlyX
  * @since 4/27/2023
  */
+@AutoRegister
 object TeamChatCommand : ScalaCommand()
 {
     @Inject
