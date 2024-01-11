@@ -369,8 +369,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += ""
                 lines += "${CC.GOLD}KingOfTheHill"
-                lines += " Location: ${CC.BLUE}Classic"
-                lines += " Time: ${CC.YELLOW}${
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} Location: ${CC.BLUE}Classic"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} Time: ${CC.YELLOW}${
                     centerKoth.formatRemainingCaptureTime()
                 }"
                 if (centerKoth.currentHolder != null)
@@ -378,19 +378,19 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     val holdingPlayer = Bukkit.getPlayer(centerKoth.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
-                    lines += " ${CC.R}Capturer: ${
+                    lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
                 } else
                 {
-                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
+                    lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.R}Capturer: ${CC.GRAY}None"
                 }
             } else if (conquest != null)
             {
                 lines += ""
                 lines += "${CC.D_AQUA}Conquest:"
-                lines += " ${conquest.name}"
-                lines += " ${CC.R}Time: ${CC.AQUA}${
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${conquest.name}"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.R}Time: ${CC.AQUA}${
                     conquest.formatRemainingCaptureTime()
                 }"
                 if (conquest.currentHolder != null)
@@ -398,12 +398,12 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                     val holdingPlayer = Bukkit.getPlayer(conquest.currentHolder)
                     val team = holdingPlayer.team() ?: return
 
-                    lines += " ${CC.R}Capturer: ${
+                    lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.R}Capturer: ${
                         team.data()!!.colored()
                     }"
                 } else
                 {
-                    lines += " ${CC.R}Capturer: ${CC.GRAY}None"
+                    lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.R}Capturer: ${CC.GRAY}None"
                 }
             }
 
@@ -430,7 +430,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += CC.GRAY + LemonConstants.WEB_LINK + "          " + CC.GRAY + "    " + CC.GRAY + "  " + CC.GRAY
+        lines += CC.GRAY + LemonConstants.WEB_LINK + "        " + CC.GRAY + "  " + CC.GRAY + "  " + CC.GRAY
     }
 }
 
