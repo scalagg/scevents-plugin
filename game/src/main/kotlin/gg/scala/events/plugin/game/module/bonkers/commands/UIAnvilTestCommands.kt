@@ -10,12 +10,15 @@ import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.bonkers.account
 import gg.scala.flavor.inject.Inject
 import net.evilblock.cubed.menu.Button
+import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import net.wesjd.anvilgui.AnvilGUI
 import net.wesjd.anvilgui.AnvilGUI.ResponseAction
 import org.bukkit.Material
 import org.bukkit.entity.Damageable
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryType
 
 /**
  * @author GrowlyX
@@ -32,8 +35,32 @@ object UIAnvilTestCommands : ScalaCommand()
     @Default
     fun default(player: ScalaPlayer)
     {
-        AnvilGUI.Builder()
-            .onClick { slot: Int, stateSnapshot: AnvilGUI.StateSnapshot ->
+        object : Menu("test")
+        {
+            override fun size(buttons: Map<Int, Button>) = 3
+
+            init
+            {
+                inventoryType = InventoryType.ANVIL
+            }
+
+            override fun getButtons(player: Player) = mapOf(
+                AnvilGUI.Slot.OUTPUT to ItemBuilder
+                    .of(Material.EMERALD)
+                    .name("${CC.GREEN}Click to repair!")
+                    .addToLore(
+                        "${CC.GRAY}Clicking this item will",
+                        "${CC.GRAY}repair your item back to",
+                        "${CC.GRAY}full durability.",
+                        "",
+                        "${CC.GREEN}Price: ${CC.WHITE}$500"
+                    )
+                    .toButton()
+            )
+        }.openMenu(player.bukkit())
+
+        /*AnvilGUI.Builder()
+            .onClick { slot, stateSnapshot ->
                 if (slot != AnvilGUI.Slot.OUTPUT)
                 {
                     return@onClick emptyList<ResponseAction>()
@@ -67,6 +94,19 @@ object UIAnvilTestCommands : ScalaCommand()
                     Button.playSuccess(stateSnapshot.player)
                 })
             }
+            .itemLeft(
+                ItemBuilder
+                    .of(Material.AIR)
+                    .name("${CC.GREEN}Click to repair!")
+                    .addToLore(
+                        "${CC.GRAY}Clicking this item will",
+                        "${CC.GRAY}repair your item back to",
+                        "${CC.GRAY}full durability.",
+                        "",
+                        "${CC.GREEN}Price: ${CC.WHITE}$500"
+                    )
+                    .build()
+            )
             .itemOutput(
                 ItemBuilder
                     .of(Material.EMERALD)
@@ -80,8 +120,7 @@ object UIAnvilTestCommands : ScalaCommand()
                     )
                     .build()
             )
-            .text("Enter an item")
             .plugin(plugin)
-            .open(player.bukkit())
+            .open(player.bukkit())*/
     }
 }

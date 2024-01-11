@@ -12,8 +12,13 @@ import gg.scala.cgs.common.snapshot.CgsGameSnapshot
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeam
 import gg.scala.cgs.common.teams.CgsGameTeamService
+import gg.scala.commons.scoreboard.TextAnimator
+import gg.scala.commons.scoreboard.animations.TextFadeAnimation
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.CombatTimer
 import gg.scala.events.plugin.game.module.bonkers.teams.timers.TeamHomeTimer
+import gg.scala.flavor.service.Close
+import gg.scala.flavor.service.Configure
+import gg.scala.flavor.service.Service
 import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.animated.AnimatedScoreboardTitle
 import gg.scala.lemon.util.task.DiminutionRunnable
@@ -31,6 +36,7 @@ import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.math.Numbers
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.apache.commons.lang.time.DurationFormatUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -41,7 +47,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -263,11 +268,35 @@ object AnimatedBunkersTitle : AnimatedScoreboardTitle()
     }
 }
 
+@Service
 object ScoreboardRenderer : CgsGameScoreboardRenderer
 {
-    private val format = SimpleDateFormat()
+    private val titleAnimator = TextAnimator.of(
+        TextFadeAnimation(
+            "${CC.BOLD}Bunkers",
+            ChatColor.AQUA,
+            ChatColor.DARK_AQUA,
+            ChatColor.WHITE
+        )
+    )
 
-    override fun getTitle() = AnimatedBunkersTitle.current.toString()
+    @Configure
+    fun configure()
+    {
+        titleAnimator.schedule()
+    }
+
+    @Close
+    fun close()
+    {
+        titleAnimator.dispose()
+    }
+
+    override fun getTitle() = LegacyComponentSerializer
+        .legacySection()
+        .serialize(
+            titleAnimator.currentIntoTextComponent()
+        )
 
     override fun render(lines: LinkedList<String>, player: Player, state: CgsGameState)
     {
