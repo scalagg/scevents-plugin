@@ -37,4 +37,12 @@ object BalanceCommand : ScalaCommand()
 
         player.sendMessage("${CC.WHITE}Your balance: ${CC.GOLD}$${account.balance}")
     }
+
+    @CommandAlias("addbal")
+    @CommandPermission("op")
+    fun onAddBalance(player: ScalaPlayer, amount: Int)
+    {
+        player.bukkit().account().balance += amount
+        player.sendMessage("done")
+    }
 }
