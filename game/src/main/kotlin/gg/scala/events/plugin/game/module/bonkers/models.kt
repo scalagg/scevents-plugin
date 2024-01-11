@@ -345,10 +345,12 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += " "
                 lines += "${CC.PRI}Team Info: "
-                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[1]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[1]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[1]?.data()!!.dtr} ◉"
-                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[2]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[2]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[2]?.data()!!.dtr} ◉"
-                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[3]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[3]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[3]?.data()!!.dtr} ◉"
-                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[4]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[4]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[4]?.data()!!.dtr} ◉"
+                for (i in 1..4)
+                {
+                    lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[i]?.data()!!.colored()} ${CC.GRAY}[${
+                        CgsGameTeamService.teams[i]?.participants?.size
+                    }/5]: ${CC.WHITE}${CgsGameTeamService.teams[i]?.data()!!.dtr} ◉"
+                }
             }
 
             val team = player.team()
