@@ -430,7 +430,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
         }
 
         lines += ""
-        lines += CC.GRAY + LemonConstants.WEB_LINK + "          " + CC.GRAY + "      " + CC.GRAY + "  " + CC.GRAY
+        lines += CC.GRAY + LemonConstants.WEB_LINK + "          " + CC.GRAY + "    " + CC.GRAY + "  " + CC.GRAY
     }
 }
 
