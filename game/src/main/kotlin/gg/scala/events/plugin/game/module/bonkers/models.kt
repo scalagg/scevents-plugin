@@ -24,6 +24,7 @@ import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.Color
+import net.evilblock.cubed.util.bukkit.Constants
 import net.evilblock.cubed.util.bukkit.EventUtils
 import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
@@ -315,10 +316,10 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             {
                 lines += " "
                 lines += "${CC.PRI}Team Info: "
-                lines += " ${CgsGameTeamService.teams[1]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[1]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[1]?.data()!!.dtr} ◉"
-                lines += " ${CgsGameTeamService.teams[2]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[2]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[2]?.data()!!.dtr} ◉"
-                lines += " ${CgsGameTeamService.teams[3]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[3]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[3]?.data()!!.dtr} ◉"
-                lines += " ${CgsGameTeamService.teams[4]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[4]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[4]?.data()!!.dtr} ◉"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[1]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[1]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[1]?.data()!!.dtr} ◉"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[2]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[2]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[2]?.data()!!.dtr} ◉"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[3]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[3]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[3]?.data()!!.dtr} ◉"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CgsGameTeamService.teams[4]?.data()!!.colored()} ${CC.GRAY}[${CgsGameTeamService.teams[4]?.participants?.size}/5]: ${CC.WHITE}${CgsGameTeamService.teams[4]?.data()!!.dtr} ◉"
             }
 
             val team = player.team()
@@ -328,8 +329,8 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                 val data = team.data()!!
                 lines += ""
                 lines += "${CC.PRI}Faction:"
-                lines += "${CC.WHITE}Member: ${data.colored()}"
-                lines += "${CC.WHITE}DTR: ${CC.GREEN}${data.dtr}"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.WHITE}Member: ${data.colored()}"
+                lines += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.WHITE}DTR: ${CC.GREEN}${data.dtr}"
 
                 if (data.teamFocus != null)
                 {
