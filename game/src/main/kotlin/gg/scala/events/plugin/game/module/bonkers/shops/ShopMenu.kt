@@ -185,6 +185,7 @@ class ShopMenu : Menu("Shop")
                 }
             }
 
+            it.inventory.addItem(ItemBuilder.of(Material.DIAMOND_SWORD).build())
             it.inventory.helmet = ItemStack(Material.DIAMOND_HELMET)
             it.inventory.chestplate = ItemStack(Material.DIAMOND_CHESTPLATE)
             it.inventory.leggings = ItemStack(Material.DIAMOND_LEGGINGS)
