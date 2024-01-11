@@ -294,35 +294,6 @@ object BonkersModule : EventModule
             }
 
         Events
-            .subscribe(BlockPlaceEvent::class.java, EventPriority.HIGH)
-            .filter {
-                !it.player.hasMetadata("spectator")
-            }
-            .handler {
-                val claim = it.block.findClaim()
-
-                if (claim == null)
-                {
-                    it.isCancelled = true
-                    return@handler
-                }
-
-                val central = it.block
-                    .findClaimContextual("central")
-
-                if (central == null)
-                {
-                    it.isCancelled = true
-                    return@handler
-                }
-
-                if (it.player.location.y > 42)
-                {
-                    it.isCancelled = true
-                }
-            }
-
-        Events
             .subscribe(BlockBreakEvent::class.java, EventPriority.HIGHEST)
             .filter {
                 it.player.location.y < 42 && !it.player.hasMetadata("spectator")
@@ -410,7 +381,20 @@ object BonkersModule : EventModule
 
                 if (claim == null)
                 {
-                    it.player.sendMessage("${CC.RED}You cannot do this in the mine!")
+                    val central = it.block
+                        .findClaimContextual("central")
+
+                    if (central == null)
+                    {
+                        it.isCancelled = true
+                        return@handler
+                    }
+
+                    if (it.player.location.y < 42)
+                    {
+                        it.player.sendMessage("${CC.RED}You cannot do this in the mine!")
+                    }
+
                     it.isCancelled = true
                     return@handler
                 }
@@ -423,8 +407,9 @@ object BonkersModule : EventModule
                     {
                         it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                         it.isCancelled = true
-                        return@handler
                     }
+
+                    return@handler
                 }
             }
 

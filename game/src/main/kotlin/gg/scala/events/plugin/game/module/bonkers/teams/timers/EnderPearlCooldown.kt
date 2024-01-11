@@ -16,6 +16,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.EnderPearl
 import org.bukkit.entity.Player
+import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import java.util.concurrent.TimeUnit
@@ -67,7 +68,7 @@ object EnderPearlCooldown : PlayerStaticCooldown(
             }, 0L, 1L)
 
         Events
-            .subscribe(PlayerInteractEvent::class.java)
+            .subscribe(PlayerInteractEvent::class.java, EventPriority.HIGHEST)
             .filter {
                 it.hasItem() &&
                     it.action.name.contains("RIGHT") &&
@@ -87,7 +88,7 @@ object EnderPearlCooldown : PlayerStaticCooldown(
                     return@handler
                 }
 
-                if (!notifyAndContinueNoBypass(this.javaClass, player, "throwing an pearl"))
+                if (!notifyAndContinueNoBypass(this.javaClass, player, "throwing a pearl"))
                 {
                     it.isCancelled = true
                     player.updateInventory()
