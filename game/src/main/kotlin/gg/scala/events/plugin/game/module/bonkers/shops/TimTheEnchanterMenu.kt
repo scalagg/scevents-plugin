@@ -202,8 +202,18 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             PlayerInventory::setBoots
         ),
         Dildo(
-            PlayerInventory::getItemInHand,
-            PlayerInventory::setItemInHand
+            {
+                it.contents.firstOrNull { stack -> stack != null && stack.type.name.contains("SWORD") }
+            },
+            { inventory, stack ->
+                inventory.setItem(
+                    inventory.contents
+                        .indexOfFirst { other ->
+                            other != null && other.type.name.contains("SWORD")
+                        },
+                    stack
+                )
+            }
         )
     }
 }
