@@ -69,6 +69,7 @@ class SellOreMenu : Menu("Sell your ores")
                         if (totalAmount <= 0)
                         {
                             player.sendMessage("${CC.RED}You don't have any $materialName.")
+                            Button.playFail(player)
                             return@toButton
                         }
 
@@ -82,6 +83,7 @@ class SellOreMenu : Menu("Sell your ores")
                         if (totalAmount < 1)
                         {
                             player.sendMessage("${CC.RED}You do not have enough of ${materialName} to sell!")
+                            Button.playFail(player)
                             return@toButton
                         }
 
@@ -91,6 +93,8 @@ class SellOreMenu : Menu("Sell your ores")
                         player.sendMessage("${CC.GREEN}You sold one $materialName and gained $${mapping.value}!")
                         player.playSound(player.location, Sound.NOTE_PLING, 0.5f, 0.2f)
                     }
+
+                    Button.playSuccess(player)
                 }
         }
 

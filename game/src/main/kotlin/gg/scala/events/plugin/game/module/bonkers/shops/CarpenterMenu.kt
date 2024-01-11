@@ -41,6 +41,7 @@ class CarpenterMenu : Menu("Carpenter")
             if (balance < amount)
             {
                 player.sendMessage("${CC.RED}You don't have enough money for this!")
+                Button.playFail(player)
                 return@toButton
             }
 
@@ -51,6 +52,8 @@ class CarpenterMenu : Menu("Carpenter")
             player.sendMessage(
                 "${CC.GREEN}You purchased ${stackQuantity}x $name for ${CC.WHITE}$$amount${CC.GREEN}!"
             )
+
+            Button.playSuccess(player)
         }
 
     override fun getButtons(player: Player): Map<Int, Button>

@@ -90,6 +90,7 @@ class ShopMenu : Menu("Shop")
                     player.sendMessage(
                         "${CC.GREEN}You purchased ${amountPurchased-1}x $name for ${CC.WHITE}$${amount * (amountPurchased - 1)}${CC.GREEN}!"
                     )
+                    Button.playSuccess(player)
 
                     return@toButton
                 } else
@@ -99,6 +100,7 @@ class ShopMenu : Menu("Shop")
                     if (balance < newAmount)
                     {
                         player.sendMessage("${CC.RED}You don't have enough money for this!")
+                        Button.playFail(player)
                         return@toButton
                     }
 
@@ -113,6 +115,7 @@ class ShopMenu : Menu("Shop")
                     player.sendMessage(
                         "${CC.GREEN}You purchased ${stackQuantity}x $name for ${CC.WHITE}$${newAmount}${CC.GREEN}!"
                     )
+                    Button.playSuccess(player)
 
                     return@toButton
                 }
@@ -133,6 +136,7 @@ class ShopMenu : Menu("Shop")
             player.sendMessage(
                 "${CC.GREEN}You purchased 1x $name for ${CC.WHITE}$${amount}${CC.GREEN}!"
             )
+            Button.playSuccess(player)
         }
 
     override fun getButtons(player: Player): Map<Int, Button>

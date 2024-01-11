@@ -63,12 +63,14 @@ class SelectTeamMenu : Menu("Select your team")
                         if (player.uniqueId in it.value.participants)
                         {
                             player.sendMessage("${CC.RED}Already on this team!")
+                            Button.playFail(player)
                             return@toButton
                         }
 
                         if (it.value.participants.size >= 4)
                         {
                             player.sendMessage("${CC.RED}This team is full, sorry!")
+                            Button.playFail(player)
                             return@toButton
                         }
 
@@ -79,6 +81,7 @@ class SelectTeamMenu : Menu("Select your team")
                         player.sendMessage("${CC.GREEN}You joined team ${mapping.value.color}${CC.BOLD}${mapping.key}${CC.GREEN}.")
 
                         NametagHandler.reloadPlayer(player)
+                        Button.playNeutral(player)
 
                         openMenu(player)
                     }

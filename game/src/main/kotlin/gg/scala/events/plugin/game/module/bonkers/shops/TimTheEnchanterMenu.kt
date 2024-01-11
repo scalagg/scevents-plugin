@@ -48,6 +48,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             if (balance < amount)
             {
                 player.sendMessage("${CC.RED}You don't have enough money for this!")
+                Button.playFail(player)
                 return@toButton
             }
 
@@ -58,12 +59,14 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             if (item == null || item.type == Material.AIR)
             {
                 player.sendMessage("${CC.RED}You do not have your ${whiteGirlFitCheck.name.lowercase()} equipped!")
+                Button.playFail(player)
                 return@toButton
             }
 
             if (item.containsEnchantment(enchantment))
             {
                 player.sendMessage("${CC.RED}You already have this enchantment equipped on your ${whiteGirlFitCheck.name.lowercase()}!")
+                Button.playFail(player)
                 return@toButton
             }
 
@@ -72,6 +75,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 if (item.type != Material.DIAMOND_SWORD)
                 {
                     player.sendMessage("${CC.RED}You must be holding a sword in order to enchant it!")
+                    Button.playFail(player)
                     return@toButton
                 }
             }
@@ -86,6 +90,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             player.sendMessage(
                 "${CC.GREEN}You purchased the $name enchant for ${CC.WHITE}$$amount${CC.GREEN}!"
             )
+            Button.playSuccess(player)
         }
 
     override fun getButtons(player: Player): Map<Int, Button>
