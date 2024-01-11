@@ -61,7 +61,13 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
                 return@toButton
             }
 
-            if (whiteGirlFitCheck == WhiteGirlFitCheck.Dildo)
+            if (item.containsEnchantment(enchantment))
+            {
+                player.sendMessage("${CC.RED}You already have this enchantment equipped on your ${whiteGirlFitCheck.name.lowercase()}!")
+                return@toButton
+            }
+
+            if (whiteGirlFitCheck == WhiteGirlFitCheck.Sword)
             {
                 if (item.type != Material.DIAMOND_SWORD)
                 {
@@ -92,7 +98,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_HELMET).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            WhiteGirlFitCheck.HairInABun
+            WhiteGirlFitCheck.Helmet
         )
 
         buttons[11 + 9] = buildPurchasable(
@@ -101,7 +107,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_CHESTPLATE).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            WhiteGirlFitCheck.LifeguardSweatshirt
+            WhiteGirlFitCheck.Chestplate
         )
 
         buttons[11 + 18] = buildPurchasable(
@@ -110,7 +116,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_LEGGINGS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            WhiteGirlFitCheck.NikeProCompressionShorts
+            WhiteGirlFitCheck.Leggings
         )
 
         buttons[11 + 27] = buildPurchasable(
@@ -119,7 +125,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_BOOTS).build(),
             enchantment = Enchantment.PROTECTION_ENVIRONMENTAL,
             level = 1,
-            WhiteGirlFitCheck.Uggs
+            WhiteGirlFitCheck.Boots
         )
 
         buttons[15] = buildPurchasable(
@@ -128,7 +134,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.GOLD_HELMET).build(),
             enchantment = Enchantment.DURABILITY,
             level = 3,
-            WhiteGirlFitCheck.HairInABun
+            WhiteGirlFitCheck.Helmet
         )
 
         buttons[15 + 9] = buildPurchasable(
@@ -137,7 +143,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.GOLD_CHESTPLATE).build(),
             enchantment = Enchantment.DURABILITY,
             level = 3,
-            WhiteGirlFitCheck.LifeguardSweatshirt
+            WhiteGirlFitCheck.Chestplate
         )
 
         buttons[15 + 18] = buildPurchasable(
@@ -146,7 +152,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.GOLD_LEGGINGS).build(),
             enchantment = Enchantment.DURABILITY,
             level = 3,
-            WhiteGirlFitCheck.NikeProCompressionShorts
+            WhiteGirlFitCheck.Leggings
         )
 
         buttons[15 + 27] = buildPurchasable(
@@ -155,7 +161,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.GOLD_BOOTS).build(),
             enchantment = Enchantment.DURABILITY,
             level = 3,
-            WhiteGirlFitCheck.Uggs
+            WhiteGirlFitCheck.Boots
         )
 
         buttons[13] = buildPurchasable(
@@ -164,7 +170,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.DIAMOND_SWORD).build(),
             enchantment = Enchantment.DAMAGE_ALL,
             level = 1,
-            WhiteGirlFitCheck.Dildo
+            WhiteGirlFitCheck.Sword
         )
 
 
@@ -174,7 +180,7 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
             stack = ItemBuilder.of(Material.FEATHER).build(),
             enchantment = Enchantment.PROTECTION_FALL,
             level = 4,
-            WhiteGirlFitCheck.Uggs
+            WhiteGirlFitCheck.Boots
         )
 
         return buttons
@@ -185,23 +191,23 @@ class TimTheEnchanterMenu : Menu("Tim the Enchanter")
         val updatePlayerInventory: (PlayerInventory, ItemStack) -> Unit,
     )
     {
-        HairInABun(
+        Helmet(
             PlayerInventory::getHelmet,
             PlayerInventory::setHelmet
         ),
-        LifeguardSweatshirt(
+        Chestplate(
             PlayerInventory::getChestplate,
             PlayerInventory::setChestplate
         ),
-        NikeProCompressionShorts(
+        Leggings(
             PlayerInventory::getLeggings,
             PlayerInventory::setLeggings
         ),
-        Uggs(
+        Boots(
             PlayerInventory::getBoots,
             PlayerInventory::setBoots
         ),
-        Dildo(
+        Sword(
             {
                 it.contents.firstOrNull { stack -> stack != null && stack.type.name.contains("SWORD") }
             },
