@@ -415,8 +415,8 @@ object BonkersModule : EventModule
 
 
         Events
-            .subscribe(PlayerInteractEvent::class.java, EventPriority.HIGHEST)
-            .filter { it.clickedBlock != null && !it.player.hasMetadata("spectator") }
+            .subscribe(PlayerInteractEvent::class.java, EventPriority.MONITOR)
+            .filter { it.clickedBlock != null && (it.item == null || it.item.type != Material.ENDER_PEARL) && !it.player.hasMetadata("spectator") }
             .handler {
                 val claim = it.clickedBlock
                     .findClaimContextual("base")
@@ -468,6 +468,11 @@ object BonkersModule : EventModule
 
                                 it.player.account().balance -= 400
                                 it.player.sendMessage("${CC.GREEN}You have just purchased this chest for your team!")
+                                it.player.playSound(
+                                    it.player.location,
+                                    Sound.CHEST_OPEN,
+                                    1.0f, 1.0f
+                                )
 
                                 teamData.ownedChests.add(doubleChest.location)
                                 it.isCancelled = true
