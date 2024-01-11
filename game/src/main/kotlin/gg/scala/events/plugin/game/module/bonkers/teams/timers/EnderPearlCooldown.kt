@@ -76,7 +76,6 @@ object EnderPearlCooldown : PlayerStaticCooldown(
             }
             .handler {
                 val player = it.player
-                it.player.sendMessage("???")
 
                 val game = CgsGameEngine.INSTANCE
 
