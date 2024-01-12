@@ -455,16 +455,16 @@ object BonkersModule : EventModule
                             {
                                 val balance = it.player.account().balance
 
-                                if (balance < 400)
+                                if (teamData.ownedChests.contains(doubleChest.location))
                                 {
-                                    it.player.sendMessage("${CC.RED}You do not have enough to purchase this chest! You need ${CC.YELLOW}$${400 - balance} ${CC.RED}more!")
+                                    it.player.sendMessage("${CC.RED}You have already purchased this chest!")
                                     it.isCancelled = true
                                     return@handler
                                 }
 
-                                if (teamData.ownedChests.contains(doubleChest.location))
+                                if (balance < 400)
                                 {
-                                    it.player.sendMessage("${CC.RED}You have already purchased this chest!")
+                                    it.player.sendMessage("${CC.RED}You do not have enough to purchase this chest! You need ${CC.YELLOW}$${400 - balance} ${CC.RED}more!")
                                     it.isCancelled = true
                                     return@handler
                                 }
