@@ -410,6 +410,26 @@ object BonkersModule : EventModule
                     {
                         it.player.sendMessage("${CC.RED}You cannot do this in enemy territory!")
                         it.isCancelled = true
+                    } else
+                    {
+                        if (it.player.location.y < 42 && it.blockPlaced.type.name.contains("FENCE"))
+                        {
+                            val teamData = it.player.team()?.data()
+                                ?: return@handler
+
+                            teamData.activeHolograms.entries
+                                .firstOrNull { entry -> entry.value.withinDestroyDistance(it.blockPlaced.location) }
+                                .apply {
+                                    if (this != null)
+                                    {
+                                        teamData.activeHolograms.remove(this.key)
+                                        it.isCancelled = false
+
+                                        EntityHandler.forgetEntity(this.value)
+                                        EntityHandler.close()
+                                    }
+                                }
+                        }
                     }
 
                     return@handler
