@@ -378,19 +378,21 @@ object TeamCommands : ScalaCommand()
         player.sendMessage(
                 "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------",
                 "${teamData.colored()} ${CC.GRAY}[${found.participants.size}/5] ${CC.WHITE}- ${CC.YELLOW}HQ: ${CC.AQUA}${teamData.spawnLocation.x}, ${teamData.spawnLocation.z}",
-                "${CC.YELLOW}Members: ${CC.GREEN}${
-                    found.participants.joinToString(", ") 
-                {
-                    val player2 = it
-                    val kills =
-                            runCatching {
-                                CgsGameEngine.INSTANCE
-                                        .getStatistics(CgsPlayerHandler.find(player2)!!)
-                                        .gameKills.value
-                            }.getOrNull() ?: 0
-                    
-                    it.username() + "${CC.YELLOW}[${CC.GREEN}${kills}${CC.YELLOW}]${CC.GREEN}"
-                }
+                "${CC.YELLOW}Members: ${
+                    if (found.participants.isEmpty()) "${CC.RED}None." 
+                    else
+                        found.participants.joinToString(", ")
+                        {
+                            val player2 = it
+                            val kills =
+                                    runCatching {
+                                        CgsGameEngine.INSTANCE
+                                                .getStatistics(CgsPlayerHandler.find(player2)!!)
+                                                .gameKills.value
+                                    }.getOrNull() ?: 0
+
+                            CC.GREEN + it.username() + "${CC.YELLOW}[${CC.GREEN}${kills}${CC.YELLOW}]${CC.GREEN}"
+                        }
                 }",
                 "${CC.YELLOW}Balance: ${CC.GREEN}$${teamData.balance}",
                 "${CC.YELLOW}Deaths until Raidable: ${CC.AQUA}${teamData.dtr} ",
