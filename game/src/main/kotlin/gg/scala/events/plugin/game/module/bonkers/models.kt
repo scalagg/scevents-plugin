@@ -279,7 +279,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
             "${CC.BOLD}Bunkers",
             ChatColor.AQUA,
             ChatColor.DARK_AQUA,
-            ChatColor.WHITE
+            ChatColor.DARK_GRAY
         )
     )
 
