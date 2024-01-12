@@ -13,6 +13,7 @@ import gg.scala.commons.command.ScalaCommandManager
 import gg.scala.commons.issuer.ScalaPlayer
 import gg.scala.events.plugin.game.module.bonkers.account
 import gg.scala.events.plugin.game.module.bonkers.data
+import gg.scala.events.plugin.game.module.bonkers.team
 import gg.scala.events.plugin.game.module.bonkers.teams.joinTeam
 import gg.scala.events.plugin.game.module.bonkers.teams.sendTeamInviteTo
 import gg.scala.events.plugin.game.module.bonkers.teams.team
@@ -357,33 +358,26 @@ object TeamCommands : ScalaCommand()
 
     @Subcommand("list|who|w|is|view")
     @Description("View details for a particular team.")
-    fun onList(player: ScalaPlayer, @Optional team: Int?)
+    fun onList(player: ScalaPlayer, @Optional team: String)
     {
-        val teamId = team ?: player.bukkit().team?.id
-        ?: throw ConditionFailedException(
-            "You are not currently on a team!"
+        val senderTeam = team ?: player.bukkit().team()
+                ?: throw ConditionFailedException(
+                        "You are not currently on a team!"
+                )
+
+        val found = CgsGameTeamService.teams.values.firstOrNull {
+            it.data()?.teamName?.equals(senderTeam.toString(), ignoreCase = true) ?: false
+        } ?: throw ConditionFailedException(
+                "Team ${CC.YELLOW}$team ${CC.RED}does not exist in this game."
         )
 
-        val team = CgsGameTeamService.teams[teamId]
-            ?: throw ConditionFailedException(
-                "The team ${CC.YELLOW}#$teamId ${CC.RED}does not exist!"
-            )
-
-        val teamData = team.data()!!
-
-//        player.sendMessage(
-//            "${CC.WHITE}Team ${teamData.colored()}${CC.WHITE}:",
-//            "${CC.WHITE}Location: ${teamData.color}${teamData.spawnLocation.x}, ${teamData.spawnLocation.y}, ${teamData.spawnLocation.z}",
-//            "${CC.WHITE}Balance: ${teamData.color}$${teamData.balance}",
-//            "",
-//            "${CC.GRAY}Participants:"
-//        )
+        val teamData = found.data()!!
 
         player.sendMessage(
                 "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------",
-                "${teamData.colored()} ${CC.GRAY}[${team.participants.size}/5] ${CC.WHITE}- ${CC.YELLOW}HQ: ${CC.AQUA}${teamData.spawnLocation.x}, ${teamData.spawnLocation.z}",
+                "${teamData.colored()} ${CC.GRAY}[${found.participants.size}/5] ${CC.WHITE}- ${CC.YELLOW}HQ: ${CC.AQUA}${teamData.spawnLocation.x}, ${teamData.spawnLocation.z}",
                 "${CC.YELLOW}Members: ${CC.GREEN}${
-                team.participants.joinToString(", ") 
+                    found.participants.joinToString(", ") 
                 {
                     it.username()
                 }
@@ -392,15 +386,5 @@ object TeamCommands : ScalaCommand()
                 "${CC.YELLOW}Deaths until Raidable: ${CC.AQUA}${teamData.dtr} ",
                 "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------"
         )
-
-//        if (team.participants.isEmpty())
-//        {
-//            player.sendMessage("${CC.RED}No participants!")
-//        } else
-//        {
-//            team.participants.forEach {
-//                player.sendMessage("${CC.WHITE}- ${it.username()}")
-//            }
-//        }
     }
 }
