@@ -1,5 +1,7 @@
 package gg.scala.events.plugin.game.module.bonkers.teams.commands
 
+import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.cgs.common.player.handler.CgsPlayerHandler
 import gg.scala.cgs.common.states.CgsGameState
 import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.commons.acf.CommandHelp
@@ -358,15 +360,15 @@ object TeamCommands : ScalaCommand()
 
     @Subcommand("list|who|w|is|view")
     @Description("View details for a particular team.")
-    fun onList(player: ScalaPlayer, @Optional team: String)
+    fun onList(player: ScalaPlayer, @Optional team: String?)
     {
-        val senderTeam = team ?: player.bukkit().team()
-                ?: throw ConditionFailedException(
-                        "You are not currently on a team!"
-                )
+        val teamName = team ?: player.bukkit().team?.data()?.teamName
+        ?: throw ConditionFailedException(
+                "You are not currently on a team!"
+        )
 
         val found = CgsGameTeamService.teams.values.firstOrNull {
-            it.data()?.teamName?.equals(senderTeam.toString(), ignoreCase = true) ?: false
+            it.data()?.teamName?.equals(teamName, ignoreCase = true) ?: false
         } ?: throw ConditionFailedException(
                 "Team ${CC.YELLOW}$team ${CC.RED}does not exist in this game."
         )
@@ -379,7 +381,15 @@ object TeamCommands : ScalaCommand()
                 "${CC.YELLOW}Members: ${CC.GREEN}${
                     found.participants.joinToString(", ") 
                 {
-                    it.username()
+                    val player2 = it
+                    val kills =
+                            runCatching {
+                                CgsGameEngine.INSTANCE
+                                        .getStatistics(CgsPlayerHandler.find(player2)!!)
+                                        .gameKills.value
+                            }.getOrNull() ?: 0
+                    
+                    it.username() + "${CC.YELLOW}[${CC.GREEN}${kills}${CC.YELLOW}]${CC.GREEN}"
                 }
                 }",
                 "${CC.YELLOW}Balance: ${CC.GREEN}$${teamData.balance}",
