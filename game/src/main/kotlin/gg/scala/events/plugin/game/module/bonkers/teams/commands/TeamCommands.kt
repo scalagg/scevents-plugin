@@ -382,8 +382,12 @@ object TeamCommands : ScalaCommand()
         player.sendMessage(
                 "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------",
                 "${teamData.colored()} ${CC.GRAY}[${team.participants.size}/5] ${CC.WHITE}- ${CC.YELLOW}HQ: ${CC.AQUA}${teamData.spawnLocation.x}, ${teamData.spawnLocation.z}",
-                // TODO: LIST MEMBERS ACCORDINGLY
-                "${CC.YELLOW}Members: ${CC.WHITE}N/A",
+                "${CC.YELLOW}Members: ${CC.GREEN}${
+                team.participants.joinToString(", ") 
+                {
+                    it.username()
+                }
+                }",
                 "${CC.YELLOW}Balance: ${CC.GREEN}$${teamData.balance}",
                 "${CC.YELLOW}Deaths until Raidable: ${CC.AQUA}${teamData.dtr} ",
                 "${CC.GRAY}${CC.STRIKE_THROUGH}----------------------"

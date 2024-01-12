@@ -335,7 +335,7 @@ object ScoreboardRenderer : CgsGameScoreboardRenderer
                             BonkersModule.playerAccounts[player.uniqueId]?.balance ?: 0
                     )
                 }"
-                lines += "Kills: ${CC.PRI}$${
+                lines += "Kills: ${CC.PRI}${
                     runCatching {
                         CgsGameEngine.INSTANCE
                                 .getStatistics(CgsPlayerHandler.find(player)!!)
