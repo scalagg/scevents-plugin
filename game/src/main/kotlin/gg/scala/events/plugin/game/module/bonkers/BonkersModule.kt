@@ -31,6 +31,9 @@ import me.lucko.helper.Commands
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import net.evilblock.cubed.entity.EntityHandler
+import net.evilblock.cubed.entity.hologram.HologramEntity
+import net.evilblock.cubed.entity.hologram.HologramHandler
+import net.evilblock.cubed.entity.hologram.command.HologramCommand
 import net.evilblock.cubed.entity.npc.NpcEntity
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.EventUtils
@@ -761,6 +764,27 @@ object BonkersModule : EventModule
                                 .add(1.0, 0.0, 0.0)
                         ) {
                             CarpenterMenu().openMenu(it)
+                        }
+
+                        listOf(
+                            HologramEntity(
+                                text = "&e&lWARNING! &cBlock Up Area",
+                                location = it.value.spawnLocation
+                                    .clone()
+                                    .subtract(13.0, 24.0, -46.0)
+                            ),
+                            HologramEntity(
+                                text = "&e&lWARNING! &cBlock Up Area",
+                                location = it.value.spawnLocation
+                                    .clone()
+                                    .subtract(13.0, 24.0, 46.0)
+                            )
+                        ).forEach { hologram ->
+                            hologram.initializeData()
+                            it.value.activeHolograms[hologram.location] = hologram
+
+                            EntityHandler.trackEntity(hologram)
+                            EntityHandler.close()
                         }
 
                         team.participants.forEach { player ->

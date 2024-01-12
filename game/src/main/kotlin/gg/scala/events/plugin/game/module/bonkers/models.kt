@@ -25,6 +25,7 @@ import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.composite.CompositeTerminable
+import net.evilblock.cubed.entity.hologram.HologramEntity
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
 import net.evilblock.cubed.util.CC
@@ -48,6 +49,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import java.util.*
+import kotlin.math.abs
 
 /**
  * @author GrowlyX
@@ -69,7 +71,8 @@ data class TeamData(
     var teamRally: Location? = null,
     val ownedChests: MutableList<Location> = mutableListOf(),
     var voteKickTarget: Player? = null,
-    var voteKickVotes: MutableMap<UUID, Boolean> = mutableMapOf()
+    var voteKickVotes: MutableMap<UUID, Boolean> = mutableMapOf(),
+    val activeHolograms: MutableMap<Location, HologramEntity> = mutableMapOf()
 )
 {
     fun colored() = "$color$teamName"
@@ -528,6 +531,10 @@ fun Block.findClaimContextual(context: String) = BonkersModule.claims.entries
     .firstOrNull {
         it.value.contains(this)
     }
+
+fun HologramEntity.withinDestroyDistance(location: Location) =
+    (location.blockZ == this.location.blockZ || location.blockX == this.location.blockX)
+            && (abs(location.blockX - this.location.blockX) <= 3 && abs(location.blockZ - this.location.blockZ) <= 3)
 
 fun Player.colorfulName() = "${this.team()?.data()?.color ?: ChatColor.WHITE}$name"
 

@@ -12,6 +12,7 @@ dependencies {
 
     compileOnly("gg.scala.cgs:game:1.4.2")
     compileOnly("gg.scala.lemon:bukkit:1.6.2")
+    compileOnly("gg.tropic.game.extensions:core-game-extensions:1.2.8")
 }
 
 shadowJar {
