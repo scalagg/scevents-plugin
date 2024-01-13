@@ -165,75 +165,8 @@ sealed interface EventType
         }
     }
 
-    object Bonkers : EventType
-    {
-        override val icon = ItemBuilder
-            .of(XMaterial.CHEST)
-            .build()
-
-        override val description =
-            "4-team, HCF-style minigame."
-
-        override val mode = object : CgsGameMode
-        {
-            override fun getArenas() = listOf(
-                object : CgsGameArena
-                {
-                    override fun getBukkitWorldName() = "Bunkers"
-                    override fun getDescription() = ""
-
-                    override fun getDirectory(): Path? = null
-                    override fun getId() = "Bunkers"
-
-                    override fun getMaterial() = Material.CHEST to 1
-                    override fun getName() = "bonkers"
-
-                    override fun getPreLobbyLocation() = Location(
-                        Bukkit.getWorld("Bunkers"),
-                        0.500, 60.000, 0.500
-                    )
-
-                    override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld("Bunkers"),
-                        500.500, 60.000, 500.500
-                    )
-                }
-            )
-            override fun getDescription() = ""
-
-            override fun getId() = "bonkers"
-
-            override fun getMaterial() = Material.WOOL to 1
-
-            override fun getMaxTeams() = 4
-            override fun getTeamSize() = 5
-
-            override fun getName() = "${CC.DARK_AQUA}Bunkers"
-        }
-
-        override val info = CgsGameGeneralInfo(
-            fancyNameRender = "Bunkers",
-            gameVersion = 1.0F,
-            minimumPlayers = 2,
-            startingCountdownSec = 6,
-            awards = CgsGameAwardInfo(
-                true, 300..400, 50..100
-            ),
-            preStartVoting = false,
-            disqualifyOnLogout = false,
-            spectateOnDeath = false,
-            showTabHearts = false,
-            showNameHearts = false,
-            usesCustomArenaWorld = true,
-            gameModes = listOf(mode)
-        ).apply {
-            this.configureSpectatorChat = true
-
-        }
-    }
-
     companion object
     {
-        val TYPES = mutableListOf(Sumo, /*WoolShuffle,*/ Bonkers)
+        val TYPES = mutableListOf(Sumo, /*WoolShuffle,*/ /*Bonkers*/)
     }
 }
