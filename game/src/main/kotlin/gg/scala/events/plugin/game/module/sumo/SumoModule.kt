@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit
  */
 @Service
 @IgnoreAutoScan
-//@EventBind(EventType.Sumo::class)
+@EventBind(EventType.Sumo::class)
 object SumoModule : EventModule
 {
     @Inject
@@ -87,7 +87,7 @@ object SumoModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_PRI}SUMO"
+        override fun getTitle() = "${CC.B_PRI}Sumo"
 
         override fun render(
             lines: LinkedList<String>,
@@ -101,7 +101,7 @@ object SumoModule : EventModule
                 CgsGameState.STARTING ->
                 {
                     lines += "${CC.WHITE}Event starting soon..."
-                    lines += "${CC.PRI}${Players.all().size}/30"
+                    lines += "${CC.PRI}${Players.all().size}/25"
                     lines += ""
                     lines += "${CC.WHITE}Starts in: ${CC.PRI}${
                         TimeUtil.formatIntoMMSS(StartingStateRunnable.PRE_START_TIME)
@@ -143,7 +143,7 @@ object SumoModule : EventModule
                     }
 
                     lines += ""
-                    lines += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}/30"
+                    lines += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}/25"
                 }
                 CgsGameState.ENDED ->
                 {
@@ -152,7 +152,7 @@ object SumoModule : EventModule
                 }
                 CgsGameState.WAITING -> {
                     lines += "${CC.WHITE}Waiting for players..."
-                    lines += "${CC.PRI}${Players.all().size}/30"
+                    lines += "${CC.PRI}${Players.all().size}/25"
                 }
             }
 
@@ -194,8 +194,8 @@ object SumoModule : EventModule
     override fun configure()
     {
         val lobby = Location(
-            Bukkit.getWorld("Sumo"),
-            -15.5, 48.000, 34.5, -180.0F, 0.0F
+            Bukkit.getWorld("sumo"),
+            14.0, 91.000, -49.500, 0.0f, 0.0f
         )
 
         Events
@@ -207,10 +207,6 @@ object SumoModule : EventModule
                 it.player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(53)}")
 
                 it.player.removeMetadata("frozenaf", plugin)
-
-                Tasks.delayed(1L) {
-                    VisibilityHandler.update(it.player)
-                }
 
                 if (engine.gameState == CgsGameState.STARTING)
                 {
@@ -257,12 +253,12 @@ object SumoModule : EventModule
 
         val a = Location(
             Bukkit.getWorld("Sumo"),
-            -22.5, 47.0, 5.5, -90f, 0.0f
+            13.500, 88.000, -18.500, 180.000f, 0.0f
         )
 
         val b = Location(
             Bukkit.getWorld("Sumo"),
-            -8.5, 47.0, 5.5, 90f, 0.0f
+            13.500, 88.000, -30.500, 0.00f, 0.0f
         )
 
         val locations = listOf(a, b)

@@ -28,7 +28,7 @@ sealed interface EventType
     object Sumo : EventType
     {
         override val icon = ItemBuilder
-            .of(XMaterial.SLIME_BALL)
+            .of(Material.LEASH)
             .build()
 
         override val description =
@@ -50,12 +50,12 @@ sealed interface EventType
 
                     override fun getPreLobbyLocation() = Location(
                         Bukkit.getWorld("sumo"),
-                        -15.5, 48.000, 34.5, -180.0F, 0.0F
+                        14.0, 91.000, -49.500, 0.0f, 0.0f
                     )
 
                     override fun getSpectatorLocation() = Location(
                         Bukkit.getWorld("sumo"),
-                        -15.5, 48.000, 34.5, -180.0F, 0.0F
+                        14.0, 91.000, -49.500, 0.0f, 0.0f
                     )
                 }
             )
@@ -65,7 +65,7 @@ sealed interface EventType
 
             override fun getMaterial() = Material.LEASH to 1
 
-            override fun getMaxTeams() = 30
+            override fun getMaxTeams() = 25
             override fun getTeamSize() = 1
 
             override fun getName() = "Sumo"
@@ -74,10 +74,10 @@ sealed interface EventType
         override val info = CgsGameGeneralInfo(
             fancyNameRender = "Sumo",
             gameVersion = 1.0F,
-            minimumPlayers = 2,
+            minimumPlayers = 4,
             startingCountdownSec = 5,
             awards = CgsGameAwardInfo(
-                true, 300..400, 50..100
+                true, 100..125, 20..35
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,

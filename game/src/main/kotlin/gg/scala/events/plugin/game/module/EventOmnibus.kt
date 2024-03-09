@@ -91,7 +91,7 @@ object EventOmnibus
             .subscribe(PlayerJoinEvent::class.java)
             .expireIf { hasFirstPlayerJoined }
             .handler {
-                /*val message = AwareMessage
+                val message = AwareMessage
                     .of(
                         "event-alert",
                         ScalaEventsChannel.channel(),
@@ -100,7 +100,8 @@ object EventOmnibus
                         "server" to ServerSync.local.id
                     )
 
-                hasFirstPlayerJoined = true*/
+                message.publish()
+                hasFirstPlayerJoined = true
             }
     }
 }

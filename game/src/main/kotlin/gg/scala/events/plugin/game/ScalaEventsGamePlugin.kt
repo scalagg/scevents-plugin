@@ -9,6 +9,7 @@ import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
 import gg.scala.events.shared.ScalaEventsChannel
+import gg.tropic.game.extensions.cosmetics.CosmeticLocalConfig
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
@@ -52,6 +53,8 @@ class ScalaEventsGamePlugin : ExtendedScalaPlugin()
     {
         val engine = ScalaEventsGameEngine(this)
         engine.initialLoad()
+
+        CosmeticLocalConfig.enableCosmeticResources = false
 
         flavor().bind<ScalaEventsGameEngine>() to engine
     }
