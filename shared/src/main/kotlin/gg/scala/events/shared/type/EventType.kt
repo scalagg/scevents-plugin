@@ -75,7 +75,7 @@ sealed interface EventType
             fancyNameRender = "Sumo",
             gameVersion = 1.0F,
             minimumPlayers = 4,
-            startingCountdownSec = 5,
+            startingCountdownSec = 60,
             awards = CgsGameAwardInfo(
                 true, 100..125, 20..35
             ),
