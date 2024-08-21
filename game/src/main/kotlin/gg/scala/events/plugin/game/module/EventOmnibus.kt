@@ -61,7 +61,7 @@ object EventOmnibus
         CgsGameArenaHandler.configure(module.type.mode)
         engine.gameArena = CgsGameArenaHandler.arena
 
-        module.configure()
+        module.configure(ModuleSize.ONE_VS_ONE)
 
         configureJoinEventHandlers()
 

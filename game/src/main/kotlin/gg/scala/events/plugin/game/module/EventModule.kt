@@ -23,5 +23,5 @@ interface EventModule
 
     val gameSnapshot: CgsGameSnapshot
 
-    fun configure()
+    fun configure(moduleSize: ModuleSize)
 }
