@@ -144,8 +144,7 @@ sealed interface EventType
             gameVersion = 1.0F,
             minimumPlayers = 2,
             startingCountdownSec = 61,
-            awards = CgsGameAwardInfo(
-                true, 150..200, 10..25
+            awards = CgsGameAwardInfo(true, 150..200, 10..25
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,

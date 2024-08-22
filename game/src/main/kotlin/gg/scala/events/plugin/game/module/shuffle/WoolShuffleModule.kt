@@ -1,5 +1,7 @@
 package gg.scala.events.plugin.game.module.shuffle
 
+import com.xxmicloxx.NoteBlockAPI.songplayer.EntitySongPlayer
+import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
@@ -21,6 +23,7 @@ import gg.scala.lemon.LemonConstants
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
+import me.lucko.helper.terminable.composite.CompositeTerminable
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.util.CC
@@ -29,11 +32,7 @@ import net.evilblock.cubed.util.bukkit.Tasks
 import net.evilblock.cubed.util.bukkit.cuboid.Cuboid
 import net.evilblock.cubed.util.time.TimeUtil
 import net.evilblock.cubed.visibility.VisibilityAction
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -43,8 +42,10 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
+import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -372,6 +373,34 @@ object WoolShuffleModule : EventModule
                     }
                 }
             }.runTaskTimer(plugin, 0L, 20L)
+        }
+
+        val notLikeUs = runCatching { NBSDecoder.parse(File("notlikeus.nbs")) }.getOrNull()
+        if (notLikeUs != null)
+        {
+            val notLikeUsTerminables = mutableMapOf<UUID, CompositeTerminable>()
+            Events
+                .subscribe(PlayerJoinEvent::class.java)
+                .handler {
+                    val terminable = CompositeTerminable.create()
+                    val entitySongPlayer = EntitySongPlayer(notLikeUs)
+                    entitySongPlayer.entity = it.player
+                    entitySongPlayer.distance = 16
+                    entitySongPlayer.isLoop = true
+                    entitySongPlayer.addPlayer(it.player)
+                    entitySongPlayer.isPlaying = true
+
+                    terminable.with {
+                        entitySongPlayer.destroy()
+                    }
+
+                    notLikeUsTerminables[it.player.uniqueId] = terminable
+                }
+
+            Events.subscribe(PlayerQuitEvent::class.java)
+                .handler {
+                    notLikeUsTerminables.remove(it.player.uniqueId)?.closeAndReportException()
+                }
         }
 
         fun playerLoses(loser: Player)
