@@ -264,7 +264,9 @@ object SumoModule : EventModule
             }
 
             val first = active.take(moduleSize.playersEachTeam)
+            active.removeIf { first.contains(it) }
             val second = active.take(moduleSize.playersEachTeam)
+            active.removeIf { second.contains(it) }
 
             val firstPlayers = first.joinToString(", ") { it.name }
             val secondPlayers = second.joinToString(", ") { it.name }
@@ -403,8 +405,7 @@ object SumoModule : EventModule
                 currentlyPlaying != null && contains(it.player.uniqueId)
             }
             .handler {
-                if (Bukkit.getOnlinePlayers().size - 1 > 1)
-                {
+                if (contains(it.player.uniqueId)) {
                     teamLose(getTeam(it.player.uniqueId))
                     return@handler
                 }
