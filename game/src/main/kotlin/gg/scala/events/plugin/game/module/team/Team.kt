@@ -7,7 +7,5 @@ import java.util.UUID
  * @date 8/22/2024
  */
 class Team(
-    var players: ArrayList<UUID>
-) {
-
-}
+    var players: List<UUID>
+)

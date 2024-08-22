@@ -19,6 +19,7 @@ import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
 import gg.scala.lemon.LemonConstants
+import gg.scala.lemon.util.QuickAccess.username
 import gg.scala.lemon.util.task.DiminutionRunnable
 import me.lucko.helper.Events
 import me.lucko.helper.Schedulers
@@ -56,7 +57,8 @@ import java.util.concurrent.TimeUnit
 @Service
 @IgnoreAutoScan
 @EventBind(EventType.Sumo::class)
-object SumoModule : EventModule {
+object SumoModule : EventModule
+{
     @Inject
     lateinit var engine: ScalaEventsGameEngine
 
@@ -65,17 +67,21 @@ object SumoModule : EventModule {
 
     var currentlyPlaying: Pair<Team, Team>? = null
 
-    object ScoreboardRenderer : CgsGameScoreboardRenderer {
+    object ScoreboardRenderer : CgsGameScoreboardRenderer
+    {
         override fun getTitle() = "${CC.B_PRI}Sumo"
 
         override fun render(
             lines: LinkedList<String>,
             player: Player, state: CgsGameState
-        ) {
+        )
+        {
             lines += ""
 
-            when (state) {
-                CgsGameState.STARTING -> {
+            when (state)
+            {
+                CgsGameState.STARTING ->
+                {
                     lines += "${CC.WHITE}Event starting soon..."
                     lines += "${CC.PRI}${Players.all().size}/25"
                     lines += ""
@@ -84,30 +90,26 @@ object SumoModule : EventModule {
                     }"
                 }
 
-                CgsGameState.STARTED -> {
+                CgsGameState.STARTED ->
+                {
                     lines += "${CC.WHITE}Currently playing:"
 
-                    if (currentlyPlaying == null) {
+                    if (currentlyPlaying == null)
+                    {
                         lines += "${CC.PRI}N/A"
-                    } else {
-                        val first = arrayListOf<Player>().apply {
-                            currentlyPlaying!!.first.players.forEach {
-                                add(Bukkit.getPlayer(it))
-                            }
-                        }
+                    } else
+                    {
+                        val first = currentlyPlaying!!.first.players
+                        val second = currentlyPlaying!!.second.players
 
-                        val second = arrayListOf<Player>().apply {
-                            currentlyPlaying!!.second.players.forEach {
-                                add(Bukkit.getPlayer(it))
-                            }
-                        }
+                        fun formatIntoLine(player: UUID): String
+                        {
+                            val bukkitPlayer = Bukkit.getPlayer(player)
+                                ?: return "${CC.PRI}${CC.STRIKE_THROUGH}${player.username()} ${CC.GRAY}(0ms)"
 
-                        fun formatIntoLine(player: Player?): String {
-                            if (player == null) {
-                                return "${CC.PRI}N/A ${CC.GRAY}(0ms)"
-                            }
-
-                            return "${CC.PRI}${player.name} ${CC.GRAY}(${MinecraftReflection.getPing(player)}ms)"
+                            return "${CC.PRI}${bukkitPlayer.name} ${CC.GRAY}(${
+                                MinecraftReflection.getPing(bukkitPlayer)
+                            }ms)"
                         }
 
                         first.forEach {
@@ -123,12 +125,14 @@ object SumoModule : EventModule {
                     lines += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}/25"
                 }
 
-                CgsGameState.ENDED -> {
+                CgsGameState.ENDED ->
+                {
                     lines += "Thanks for playing!"
                     lines += "${CC.PRI}${findAliveParticipants().firstOrNull()?.name ?: "N/A"} won!"
                 }
 
-                CgsGameState.WAITING -> {
+                CgsGameState.WAITING ->
+                {
                     lines += "${CC.WHITE}Waiting for players..."
                     lines += "${CC.PRI}${Players.all().size}/25"
                 }
@@ -139,23 +143,27 @@ object SumoModule : EventModule {
         }
     }
 
-    object VisibilityAdapter : CgsGameVisibilityAdapter {
+    object VisibilityAdapter : CgsGameVisibilityAdapter
+    {
         override fun computeVisibility(
             viewer: CgsGamePlayer,
             target: CgsGamePlayer
         ) = VisibilityAction.NEUTRAL
     }
 
-    object NametagAdapter : CgsGameNametagAdapter {
+    object NametagAdapter : CgsGameNametagAdapter
+    {
         override fun computeNametag(
             viewer: CgsGamePlayer,
             target: CgsGamePlayer
-        ): NametagInfo? {
+        ): NametagInfo?
+        {
             return null
         }
     }
 
-    object GameSnapshot : CgsGameSnapshot {
+    object GameSnapshot : CgsGameSnapshot
+    {
         override fun getExtraInformation() = listOf<String>()
     }
 
@@ -164,7 +172,7 @@ object SumoModule : EventModule {
             !it.hasMetadata("spectator")
         }
 
-    var winner : String? = null
+    var winner: String? = null
 
     override val gameSnapshot = GameSnapshot
     override val nametagProvider = NametagAdapter
@@ -172,7 +180,8 @@ object SumoModule : EventModule {
     override val scoreboardFormatter = ScoreboardRenderer
     override val visibilityAdapter = VisibilityAdapter
 
-    override fun configure(moduleSize: ModuleSize) {
+    override fun configure(moduleSize: ModuleSize)
+    {
         val lobby = Location(
             Bukkit.getWorld("sumo"),
             14.0, 91.000, -49.500, 0.0f, 0.0f
@@ -188,7 +197,8 @@ object SumoModule : EventModule {
 
                 it.player.removeMetadata("frozenaf", plugin)
 
-                if (engine.gameState == CgsGameState.STARTING) {
+                if (engine.gameState == CgsGameState.STARTING)
+                {
                     it.player.teleport(lobby)
                 }
             }
@@ -210,13 +220,16 @@ object SumoModule : EventModule {
         Events
             .subscribe(EntityDamageByEntityEvent::class.java)
             .handler {
-                if (this.currentlyPlaying == null) {
+                if (this.currentlyPlaying == null)
+                {
                     it.isCancelled = true
                     return@handler
                 }
 
-                if (it.damager != null) {
-                    if (!contains(it.damager.uniqueId)) {
+                if (it.damager != null)
+                {
+                    if (!contains(it.damager.uniqueId))
+                    {
                         it.isCancelled = true
                         return@handler
                     }
@@ -241,57 +254,32 @@ object SumoModule : EventModule {
 
         fun startNewRound()
         {
-            val active = findAliveParticipants()
+            val active = findAliveParticipants().toMutableList()
+            active.shuffle()
 
-            if (active.size <= 1)
+            if (active.size <= moduleSize.playersEachTeam)
             {
                 winner = active.firstOrNull()?.name
                 return
             }
 
-            val first = arrayListOf<UUID>().apply {
-                for (i in 1..moduleSize.playersEachTeam) {
-                    active.filter { !contains(it.uniqueId) }.random()
-                }
-            }
+            val first = active.take(moduleSize.playersEachTeam)
+            val second = active.take(moduleSize.playersEachTeam)
 
-            val second = arrayListOf<UUID>().apply {
-                for (i in 1..moduleSize.playersEachTeam) {
-                    active.filter { !contains(it.uniqueId) && first.contains(it.uniqueId) }.random()
-                }
-            }
-
-            val firstPlayers = StringBuilder()
-                .apply {
-                    for (i in 0..<first.size) {
-                        append(Bukkit.getPlayer(first[i]).displayName)
-                        if (i + 1 < first.size) {
-                            append(",")
-                        }
-                    }
-                }
-
-            val secondPlayers = StringBuilder()
-                .apply {
-                    for (i in 0..<first.size) {
-                        append(Bukkit.getPlayer(first[i]).displayName)
-                        if (i + 1 < first.size) {
-                            append(",")
-                        }
-                    }
-                }
-
+            val firstPlayers = first.joinToString(", ") { it.name }
+            val secondPlayers = second.joinToString(", ") { it.name }
 
             Bukkit.broadcastMessage(
                 "${CC.B_GOLD}✮ ${CC.YELLOW}Round #${currentRound++}: ${CC.GREEN}${firstPlayers} ${CC.WHITE}vs. ${CC.RED}${secondPlayers}"
             )
 
-            currentlyPlaying = Team(first) to Team(second)
+            currentlyPlaying = Team(first.map(Player::getUniqueId)) to Team(second.map(Player::getUniqueId))
 
             var index = 0
 
             currentlyPlaying!!.forEach {
-                for (player in it.players) {
+                for (player in it.players)
+                {
                     val bukkit = Bukkit.getPlayer(player)
                     bukkit.setMetadata(
                         "frozenaf",
@@ -314,7 +302,8 @@ object SumoModule : EventModule {
                 override fun onEnd()
                 {
                     currentlyPlaying!!.forEach {
-                        for (player in it.players) {
+                        for (player in it.players)
+                        {
                             val bukkit = Bukkit.getPlayer(player)
                             bukkit.removeMetadata("frozenaf", plugin)
                             bukkit.playSound(bukkit.location, Sound.ORB_PICKUP, 1.0F, 1.0F)
@@ -327,7 +316,8 @@ object SumoModule : EventModule {
                 override fun onRun()
                 {
                     currentlyPlaying!!.forEach {
-                        for (player in it.players) {
+                        for (player in it.players)
+                        {
                             val bukkit = Bukkit.getPlayer(player)
                             bukkit.playSound(bukkit.location, Sound.NOTE_STICKS, 1.0F, 1.0F)
                         }
@@ -349,13 +339,15 @@ object SumoModule : EventModule {
                 .runLater({
                     val opposite = getWinner(loser)
 
-                    for (player in opposite.players) {
+                    for (player in opposite.players)
+                    {
                         val bukkit = Bukkit.getPlayer(player)
                         bukkit.teleport(lobby)
                     }
 
                     loser.players.forEach {
-                        Bukkit.getPlayer(it).sendMessage("${CC.D_RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.") // Instead of message command give the player an item if there team is to ve
+                        Bukkit.getPlayer(it)
+                            .sendMessage("${CC.D_RED}✘ ${CC.RED}Use ${CC.WHITE}/hub${CC.RED} to return to the lobby.") // Instead of message command give the player an item if there team is to ve
                     }
 
                     Schedulers
@@ -408,7 +400,7 @@ object SumoModule : EventModule {
         Events
             .subscribe(PlayerQuitEvent::class.java)
             .filter {
-                currentlyPlaying != null &&  contains(it.player.uniqueId)
+                currentlyPlaying != null && contains(it.player.uniqueId)
             }
             .handler {
                 if (Bukkit.getOnlinePlayers().size - 1 > 1)
@@ -425,16 +417,19 @@ object SumoModule : EventModule {
             }
     }
 
-    fun getWinner(team: Team) : Team {
+    fun getWinner(team: Team): Team
+    {
         return if (currentlyPlaying!!.first == team) currentlyPlaying!!.second else currentlyPlaying!!.first
     }
 
-    fun <A> Pair<A, A>.forEach(function: (A) -> Unit) {
+    fun <A> Pair<A, A>.forEach(function: (A) -> Unit)
+    {
         first.apply(function)
         second.apply(function)
     }
 
-    fun contains(uuid: UUID): Boolean {
+    fun contains(uuid: UUID): Boolean
+    {
         if (currentlyPlaying == null) return false
         var result = false
         currentlyPlaying!!.forEach {
@@ -444,11 +439,13 @@ object SumoModule : EventModule {
         return result
     }
 
-    fun getTeam(uuid: UUID): Team {
+    fun getTeam(uuid: UUID): Team
+    {
         return if (currentlyPlaying!!.first.players.contains(uuid)) currentlyPlaying!!.first else currentlyPlaying!!.second
     }
 
-    fun bothDead(team: Team) : Boolean {
+    fun bothDead(team: Team): Boolean
+    {
         return currentlyPlaying!!.first.players.any {
             val bukkit = Bukkit.getPlayer(it)
             bukkit.hasMetadata("spectator")

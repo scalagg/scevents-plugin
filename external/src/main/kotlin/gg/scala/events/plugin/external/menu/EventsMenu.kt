@@ -107,7 +107,7 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
             .addToLore(
                 "${CC.GRAY}Select an event to host.",
                 "",
-                "${CC.GOLD}Prime${CC.GRAY} rank is",
+                "${CC.D_AQUA}VIP${CC.GRAY} rank is",
                 "${CC.GRAY}required to host events.",
                 "",
                 if (player.hasPermission("scevents.host-events"))
@@ -125,7 +125,7 @@ class EventsMenu : Menu("Events ${Constants.DOUBLE_ARROW_RIGHT} Main")
                         "${CC.RED}You don't have permission to host events!"
                     )
                     player.sendMessage(
-                        "${CC.RED}Purchase the ${CC.GOLD}Prime${CC.RED} rank on ${CC.YELLOW}store.${LemonConstants.WEB_LINK}${CC.RED} to host events!"
+                        "${CC.RED}Purchase the ${CC.D_AQUA}VIP${CC.RED} rank on ${CC.YELLOW}store.${LemonConstants.WEB_LINK}${CC.RED} to host events!"
                     )
                     return@toButton
                 }
