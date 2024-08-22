@@ -2,7 +2,6 @@ package gg.scala.events.plugin.game.module.shuffle
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.player.CgsGamePlayer
-import gg.scala.cgs.common.player.handler.CgsSpectatorHandler
 import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
@@ -13,6 +12,7 @@ import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
+import gg.scala.events.plugin.game.module.ModuleSize
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
@@ -38,7 +38,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -74,14 +73,14 @@ object WoolShuffleModule : EventModule
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
-        override fun getTitle() = "${CC.B_PRI}Events ${CC.GRAY}(BETA)"
+        override fun getTitle() = "${CC.B_PRI}Wool Shuffle ${CC.GRAY}(BETA)"
 
         override fun render(
             lines: LinkedList<String>,
             player: Player, state: CgsGameState
         )
         {
-            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
+            lines += " "
 
             when (state)
             {
@@ -119,8 +118,7 @@ object WoolShuffleModule : EventModule
             }
 
             lines += ""
-            lines += "${CC.PRI}${LemonConstants.WEB_LINK}"
-            lines += "${CC.GRAY}${CC.STRIKE_THROUGH}------------------"
+            lines += "${CC.GRAY}${LemonConstants.WEB_LINK}  ${CC.GRAY}   ${CC.GRAY}"
         }
     }
 
@@ -150,35 +148,43 @@ object WoolShuffleModule : EventModule
 
     override val gameSnapshot = GameSnapshot
     override val nametagProvider = NametagAdapter
-    override val type = EventType.Sumo
+    override val type = EventType.WoolShuffle
     override val scoreboardFormatter = ScoreboardRenderer
     override val visibilityAdapter = VisibilityAdapter
 
-    val middleOfArena = Location(
-        Bukkit.getWorld("Sumo"),
-        294116.500, 73.000, 49050.500
+    private val lobby = Location(
+        Bukkit.getWorld("MapHike"),
+        32.5, 54.5, 62.5, -90.0f, 0.0f
     )
 
-    override fun configure()
-    {
-        val lobby = Location(
-            Bukkit.getWorld("Sumo"),
-            294143.5, 75.000, 49050.5, 90.0F, 0.0F
-        )
+    private val middleOfMap = Location(
+        Bukkit.getWorld("MapHike"),
+        61.5, 50.0, 59.0, 0f, 0f
+    )
 
+    override fun configure(moduleSize: ModuleSize)
+    {
         val platform = Cuboid(
             Location(
-                Bukkit.getWorld("Sumo"),
-                294104.000, 72.000, 49039.000
+                Bukkit.getWorld("MapHike"),
+                82.5, 48.0, 34.5
             ),
             Location(
-                Bukkit.getWorld("Sumo"),
-                294129.000, 72.000, 49060.000
+                Bukkit.getWorld("MapHike"),
+                38.5, 48.0, 83.5
             )
         )
 
         fun resetPlatform()
         {
+            platform.getChunks().forEach {
+                for (tileEntity in it.tileEntities)
+                {
+                    tileEntity.type = Material.AIR
+                    tileEntity.update()
+                }
+            }
+
             Tasks.sync {
                 platform.forEach { block ->
                     block.data = 0
@@ -279,7 +285,7 @@ object WoolShuffleModule : EventModule
                 }
 
             Bukkit.broadcastMessage(
-                "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.RED}Players not on $color${color?.better()}${CC.WHITE} were eliminated!"
+                "${CC.B_GOLD}✮ ${CC.YELLOW}Round #$currentRound: ${CC.RED}Players not on $color${color?.better()}${CC.RED} were eliminated!"
             )
         }
 
@@ -304,7 +310,7 @@ object WoolShuffleModule : EventModule
 
             findAliveParticipants()
                 .forEach {
-                    it.teleport(middleOfArena)
+                    it.teleport(middleOfMap)
                     it.inventory.clear()
                 }
 
@@ -328,7 +334,7 @@ object WoolShuffleModule : EventModule
                         it.playSound(it.location, Sound.NOTE_PLING, 1.0F, 1.0f)
                     }
 
-                    object : DiminutionRunnable(4)
+                    object : DiminutionRunnable((10 - currentRound / 2).coerceIn(2..10))
                     {
                         override fun getSeconds() = listOf(
                             18000, 14400, 10800, 7200, 3600, 2700, 1800,
@@ -343,7 +349,7 @@ object WoolShuffleModule : EventModule
                             Schedulers.sync()
                                 .runLater({
                                           startNewRound()
-                                }, 40L)
+                                }, 60L)
                         }
 
                         override fun onRun()
@@ -420,6 +426,10 @@ object WoolShuffleModule : EventModule
         Events
             .subscribe(CgsGameEngine.CgsGameStartEvent::class.java)
             .handler {
+                for (player in Players.all())
+                {
+                    player.teleport(middleOfMap)
+                }
                 startNewRound()
             }
     }

@@ -109,24 +109,22 @@ sealed interface EventType
             override fun getArenas() = listOf(
                 object : CgsGameArena
                 {
-                    override fun getBukkitWorldName() = "Sumo"
+                    override fun getBukkitWorldName() = "MapHike"
                     override fun getDescription() = ""
 
                     override fun getDirectory(): Path? = null
-                    override fun getId() = "Sumo"
+                    override fun getId() = "MapHike"
 
                     override fun getMaterial() = Material.ARROW to 1
                     override fun getName() = "wool_shuffle"
 
-                    override fun getPreLobbyLocation() = Location(
-                        Bukkit.getWorld("Sumo"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
+                    private val lobby = Location(
+                        Bukkit.getWorld("MapHike"),
+                        32.5, 54.5, 62.5, -90.0f, 0.0f
                     )
 
-                    override fun getSpectatorLocation() = Location(
-                        Bukkit.getWorld("Sumo"),
-                        294143.5, 74.000, 49050.5, 90.0F, 0.0F
-                    )
+                    override fun getPreLobbyLocation() = lobby
+                    override fun getSpectatorLocation() = lobby
                 }
             )
             override fun getDescription() = ""
@@ -147,7 +145,7 @@ sealed interface EventType
             minimumPlayers = 2,
             startingCountdownSec = 61,
             awards = CgsGameAwardInfo(
-                true, 300..400, 50..100
+                true, 150..200, 10..25
             ),
             preStartVoting = false,
             disqualifyOnLogout = true,
@@ -167,6 +165,6 @@ sealed interface EventType
 
     companion object
     {
-        val TYPES = mutableListOf(Sumo, /*WoolShuffle,*/ /*Bonkers*/)
+        val TYPES: List<EventType> = mutableListOf(Sumo, WoolShuffle /*Bonkers*/)
     }
 }
