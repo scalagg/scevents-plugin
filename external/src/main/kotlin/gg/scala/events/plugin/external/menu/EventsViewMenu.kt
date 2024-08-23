@@ -49,7 +49,7 @@ class EventsViewMenu : Menu(
         val buttons = mutableMapOf<Int, Button>()
         val status = EventStatusFeature.status()
 
-        for (type in EventType.TYPES.keys)
+        for (type in EventType.TYPES)
         {
             buttons[10 + buttons.size] =
                 ItemBuilder
@@ -90,7 +90,8 @@ class EventsViewMenu : Menu(
                             return@toButton
                         }
 
-                        if (EventType.TYPES[type]!!.size < 2) {
+                        if (type.effectiveSizes.size == 1)
+                        {
                             player.sendMessage("${CC.D_GREEN}Preparing an event for you...")
                             player.closeInventory()
 
@@ -100,12 +101,13 @@ class EventsViewMenu : Menu(
                                     ScalaEventsChannel.channel(),
                                     "uniqueId" to player.uniqueId,
                                     "eventType" to type.javaClass.name,
-                                    "eventSize" to EventType.TYPES[type]!![0].name
+                                    "eventSize" to type.effectiveSizes.first()
                                 )
                                 .publish(
                                     AwareThreadContext.SYNC
                                 )
-                        } else {
+                        } else
+                        {
                             EventSizeMenu(type).openMenu(player)
                         }
                     }

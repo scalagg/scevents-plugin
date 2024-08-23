@@ -26,7 +26,9 @@ sealed interface EventType
     val info: CgsGameGeneralInfo
     val mode: CgsGameMode
 
-    object Sumo : EventType
+    val effectiveSizes: Set<ModuleSize>
+
+    data object Sumo : EventType
     {
         override val icon = ItemBuilder
             .of(Material.LEASH)
@@ -72,6 +74,8 @@ sealed interface EventType
             override fun getName() = "Sumo"
         }
 
+        override val effectiveSizes = setOf(ModuleSize.ONE_VS_ONE, ModuleSize.TWO_VS_TWO)
+
         override val info = CgsGameGeneralInfo(
             fancyNameRender = "Sumo",
             gameVersion = 1.0F,
@@ -96,7 +100,7 @@ sealed interface EventType
         }
     }
 
-    object WoolShuffle : EventType
+    data object WoolShuffle : EventType
     {
         override val icon = ItemBuilder
             .of(XMaterial.RED_WOOL)
@@ -140,6 +144,7 @@ sealed interface EventType
             override fun getName() = "Wool Shuffle"
         }
 
+        override val effectiveSizes = setOf(ModuleSize.FFA)
         override val info = CgsGameGeneralInfo(
             fancyNameRender = "Wool Shuffle",
             gameVersion = 1.0F,
@@ -165,6 +170,6 @@ sealed interface EventType
 
     companion object
     {
-        val TYPES: MutableMap<EventType, List<ModuleSize>> = mutableMapOf(Sumo to listOf(ModuleSize.ONE_VS_ONE, ModuleSize.TWO_VS_TWO), WoolShuffle to listOf(ModuleSize.FFA) /*Bonkers*/)
+        val TYPES: List<EventType> = listOf(Sumo, WoolShuffle)
     }
 }
