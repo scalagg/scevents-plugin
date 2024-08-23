@@ -1,22 +1,16 @@
 package gg.scala.events.plugin.game.module
 
-import gg.scala.aware.message.AwareMessage
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
-import gg.scala.cgs.common.states.CgsGameState
-import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
-import gg.scala.events.shared.ScalaEventsChannel
+import gg.scala.events.shared.ModuleSize
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
 import gg.scala.flavor.service.Service
 import gg.scala.flavor.service.ignore.IgnoreAutoScan
-import gg.scala.lemon.util.QuickAccess
 import me.lucko.helper.Events
-import me.lucko.helper.Schedulers
 import me.lucko.helper.terminable.composite.CompositeTerminable
-import me.lucko.helper.utils.Players
 import org.bukkit.event.player.PlayerJoinEvent
 
 /**
@@ -29,6 +23,8 @@ object EventOmnibus
 {
     @Inject
     lateinit var module: EventModule
+
+    var size = ModuleSize.ONE_VS_ONE
 
     @Inject
     lateinit var engine: ScalaEventsGameEngine
@@ -61,7 +57,7 @@ object EventOmnibus
         CgsGameArenaHandler.configure(module.type.mode)
         engine.gameArena = CgsGameArenaHandler.arena
 
-        module.configure(ModuleSize.ONE_VS_ONE)
+        module.configure(size)
 
         configureJoinEventHandlers()
 

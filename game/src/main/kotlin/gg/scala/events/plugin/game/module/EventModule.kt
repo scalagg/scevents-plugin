@@ -4,6 +4,7 @@ import gg.scala.cgs.common.player.nametag.CgsGameNametagAdapter
 import gg.scala.cgs.common.player.scoreboard.CgsGameScoreboardRenderer
 import gg.scala.cgs.common.player.visibility.CgsGameVisibilityAdapter
 import gg.scala.cgs.common.snapshot.CgsGameSnapshot
+import gg.scala.events.shared.ModuleSize
 import gg.scala.events.shared.type.EventType
 
 /**

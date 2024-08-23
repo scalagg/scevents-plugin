@@ -1,4 +1,4 @@
-package gg.scala.events.plugin.game.module
+package gg.scala.events.shared
 
 /**
  * @author TastyCake
@@ -10,5 +10,5 @@ enum class ModuleSize(
 ) {
     ONE_VS_ONE(1, ""),
     TWO_VS_TWO(2, "2v2"),
-    FFA(-1, "FFA"); // Def good idea for some gamemodes
+    FFA(1, "FFA"); // Def good idea for some gamemodes
 }
