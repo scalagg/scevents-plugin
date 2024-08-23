@@ -5,6 +5,7 @@ import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.commons.agnostic.sync.ServerSync
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
+import gg.scala.events.shared.ModuleSize
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.inject.condition.Named
@@ -65,6 +66,14 @@ object EventOrchestrator
                     retrieve("eventType")
                 )
 
+                try {
+                    ModuleSize.valueOf(
+                        retrieve("eventSize")
+                    )
+                } catch (e: Exception) {
+                    ModuleSize.ONE_VS_ONE
+                }.apply { EventOmnibus.size = this }
+
                 val mapping = EventOmnibus
                     .bindings[type.kotlin.objectInstance]
                     ?: return@listen run {
@@ -85,6 +94,9 @@ object EventOrchestrator
                 plugin.flavor {
                     inject(mapping)
                     bind<EventModule>() to mapping
+
+//                    inject(size)
+//                    bind<ModuleSize>() to size
 
                     inject(EventOmnibus)
                 }

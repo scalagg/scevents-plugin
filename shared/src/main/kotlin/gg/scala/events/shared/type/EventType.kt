@@ -5,6 +5,7 @@ import gg.scala.cgs.common.information.CgsGameAwardInfo
 import gg.scala.cgs.common.information.CgsGameGeneralInfo
 import gg.scala.cgs.common.information.arena.CgsGameArena
 import gg.scala.cgs.common.information.mode.CgsGameMode
+import gg.scala.events.shared.ModuleSize
 import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.bukkit.ItemBuilder
 import org.bukkit.Bukkit
@@ -165,6 +166,6 @@ sealed interface EventType
 
     companion object
     {
-        val TYPES: List<EventType> = mutableListOf(Sumo, WoolShuffle /*Bonkers*/)
+        val TYPES: MutableMap<EventType, List<ModuleSize>> = mutableMapOf(Sumo to listOf(ModuleSize.ONE_VS_ONE, ModuleSize.TWO_VS_TWO), WoolShuffle to listOf(ModuleSize.FFA) /*Bonkers*/)
     }
 }

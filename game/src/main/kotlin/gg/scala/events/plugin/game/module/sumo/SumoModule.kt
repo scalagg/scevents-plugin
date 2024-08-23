@@ -12,7 +12,7 @@ import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
-import gg.scala.events.plugin.game.module.ModuleSize
+import gg.scala.events.shared.ModuleSize
 import gg.scala.events.plugin.game.module.team.Team
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
@@ -66,6 +66,8 @@ object SumoModule : EventModule
     lateinit var plugin: ScalaEventsGamePlugin
 
     var currentlyPlaying: Pair<Team, Team>? = null
+
+    var roundDone = false
 
     object ScoreboardRenderer : CgsGameScoreboardRenderer
     {
@@ -232,6 +234,12 @@ object SumoModule : EventModule
                     {
                         it.isCancelled = true
                         return@handler
+                    } else {
+                        if (currentlyPlaying!!.first.players.containsAll(listOf(it.damager.uniqueId, it.entity.uniqueId))
+                            || currentlyPlaying!!.second.players.containsAll(listOf(it.damager.uniqueId, it.entity.uniqueId))) {
+                            it.isCancelled = true
+                            return@handler
+                        }
                     }
                 }
 
@@ -254,6 +262,7 @@ object SumoModule : EventModule
 
         fun startNewRound()
         {
+            roundDone = false
             val active = findAliveParticipants().toMutableList()
             active.shuffle()
 
@@ -387,15 +396,18 @@ object SumoModule : EventModule
                 {
                     val team = getTeam(it.player.uniqueId)
 
-                    if (bothDead(team))
-                    {
-                        return@handler
-                    }
-
                     it.player.health = 0.0
                     it.player.teleport(lobby)
 
-                    teamLose(team)
+                    Schedulers
+                        .sync()
+                        .runLater({
+                            if (roundDone) return@runLater
+                            roundDone = true
+                            if (bothDead(team)) {
+                                teamLose(team)
+                            }
+                        }, 10L)
                 }
             }
 
@@ -447,10 +459,7 @@ object SumoModule : EventModule
 
     fun bothDead(team: Team): Boolean
     {
-        return currentlyPlaying!!.first.players.any {
-            val bukkit = Bukkit.getPlayer(it)
-            bukkit.hasMetadata("spectator")
-        } || currentlyPlaying!!.second.players.any {
+        return team.players.all {
             val bukkit = Bukkit.getPlayer(it)
             bukkit.hasMetadata("spectator")
         }

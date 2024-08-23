@@ -12,7 +12,7 @@ import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.plugin.game.ScalaEventsGamePlugin
 import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
-import gg.scala.events.plugin.game.module.ModuleSize
+import gg.scala.events.shared.ModuleSize
 import gg.scala.events.shared.type.EventType
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Service
