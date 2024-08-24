@@ -2,6 +2,7 @@ package gg.scala.events.plugin.game.module
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.information.arena.CgsGameArenaHandler
+import gg.scala.cgs.common.teams.CgsGameTeamService
 import gg.scala.events.plugin.game.ScalaEventsGameEngine
 import gg.scala.events.shared.ModuleSize
 import gg.scala.events.shared.type.EventType
@@ -53,6 +54,10 @@ object EventOmnibus
     fun configure()
     {
         engine.gameInfo = module.type.info
+
+        // reconfigure teams
+        CgsGameTeamService.teams.clear()
+        CgsGameTeamService.configure()
 
         CgsGameArenaHandler.configure(module.type.mode)
         engine.gameArena = CgsGameArenaHandler.arena

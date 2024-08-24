@@ -27,7 +27,7 @@ class EventSizeMenu(private val type: EventType) : Menu("Selecting team size..."
         type.effectiveSizes.forEach {
             this[10 + size] = ItemBuilder
                 .copyOf(type.icon)
-                .name("${type.info.fancyNameRender} ${it.text}")
+                .name("${CC.GREEN}${type.info.fancyNameRender} ${it.text}")
                 .toButton { player, _ ->
                     player!!.sendMessage("${CC.D_GREEN}Preparing an event for you...")
                     player.closeInventory()
