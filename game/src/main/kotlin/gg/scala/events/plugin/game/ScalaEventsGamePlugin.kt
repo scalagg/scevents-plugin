@@ -9,7 +9,7 @@ import gg.scala.events.plugin.game.module.EventBind
 import gg.scala.events.plugin.game.module.EventModule
 import gg.scala.events.plugin.game.module.EventOmnibus
 import gg.scala.events.shared.ScalaEventsChannel
-import gg.tropic.game.extensions.cosmetics.CosmeticLocalConfig
+import gg.scala.game.extensions.cosmetics.CosmeticLocalConfig
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
 
