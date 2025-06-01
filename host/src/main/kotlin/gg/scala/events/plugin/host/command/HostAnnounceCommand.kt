@@ -27,7 +27,7 @@ object HostAnnounceCommand : ScalaCommand()
     val COOL_DOWN = TimeUnit.SECONDS.toMillis(45L)
 
     @Inject
-    private lateinit var hostEventService: HostEventService
+    lateinit var hostEventService: HostEventService
 
     private var lastAnnouncement = -1L
     private var lastAnnouncementCreator = ""
