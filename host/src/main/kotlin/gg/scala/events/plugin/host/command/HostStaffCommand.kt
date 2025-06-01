@@ -24,25 +24,8 @@ object HostStaffCommand : ScalaCommand() {
 
     @Default
     @HelpCommand
-    @Subcommand("help")
     fun onHelp(player: ScalaPlayer, help: CommandHelp) {
-        player.sendMessage("")
-        player.sendMessage("${CC.RED}${CC.BOLD}STAFF HOST COMMANDS")
-        player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(35)}")
-        player.sendMessage("${CC.YELLOW}/hs forcehost [player]${CC.GRAY} - Force someone to be host")
-        player.sendMessage("${CC.YELLOW}/hs removehost${CC.GRAY} - Remove current host")
-        player.sendMessage("${CC.YELLOW}/hs status${CC.GRAY} - View event status")
-        player.sendMessage("${CC.YELLOW}/hs reset${CC.GRAY} - Reset entire event")
-        player.sendMessage("${CC.YELLOW}/hs revive <player>${CC.GRAY} - Force revive player")
-        player.sendMessage("${CC.YELLOW}/hs kill <player>${CC.GRAY} - Force kill player")
-        player.sendMessage("${CC.YELLOW}/hs reviveall${CC.GRAY} - Force revive all players")
-        player.sendMessage("${CC.YELLOW}/hs killall${CC.GRAY} - Force kill all players")
-        player.sendMessage("${CC.YELLOW}/hs setname <name>${CC.GRAY} - Force set event name")
-        player.sendMessage("${CC.YELLOW}/hs forcepvp [on/off]${CC.GRAY} - Force toggle PVP")
-        player.sendMessage("${CC.YELLOW}/hs forcebuild [on/off]${CC.GRAY} - Force toggle building")
-        player.sendMessage("${CC.YELLOW}/hs announce <message>${CC.GRAY} - Force announce event")
-        player.sendMessage("${CC.YELLOW}/hs spectate${CC.GRAY} - Enter spectator mode")
-        player.sendMessage("")
+        help.showHelp()
     }
 
     @Subcommand("forcehost")

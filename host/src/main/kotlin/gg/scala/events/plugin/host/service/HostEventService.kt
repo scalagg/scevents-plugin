@@ -22,6 +22,7 @@ import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.potion.PotionEffect
@@ -61,6 +62,10 @@ class HostEventService {
     private var minPlayers: Int = 2
     private var eventDescription: String = "A custom hosted event"
     private var autoStartEnabled: Boolean = false
+    
+    // Spawn system
+    private var deadSpawn: Location? = null
+    private var spectatorSpawn: Location? = null
 
     /**
      * Custom nametag provider for host events
@@ -113,6 +118,11 @@ class HostEventService {
                 setPlayerState(player, PlayerState.DEAD)
                 
                 player.gameMode = GameMode.ADVENTURE
+                
+                // Teleport to dead spawn if set (joining players start as dead)
+                deadSpawn?.let { spawn ->
+                    player.teleport(spawn)
+                }
                 player.sendMessage("")
                 player.sendMessage("${CC.GOLD}Welcome to ${CC.YELLOW}$eventName${CC.GOLD}!")
                 player.sendMessage("${CC.GRAY}You are currently ${CC.RED}DEAD${CC.GRAY}.")
@@ -293,6 +303,12 @@ class HostEventService {
             PlayerState.DEAD -> {
                 player.gameMode = GameMode.ADVENTURE
                 clearSpectatorEffects(player)
+                
+                // Teleport to dead spawn if set
+                deadSpawn?.let { spawn ->
+                    player.teleport(spawn)
+                }
+                
                 player.sendMessage("${CC.RED}You are now ${CC.D_RED}DEAD${CC.RED}!")
             }
             PlayerState.HOST -> {
@@ -315,6 +331,11 @@ class HostEventService {
                 )
                 
                 player.setMetadata("spectator", FixedMetadataValue(plugin, true))
+                
+                // Teleport to spectator spawn if set
+                spectatorSpawn?.let { spawn ->
+                    player.teleport(spawn)
+                }
                 
                 player.sendMessage("${CC.AQUA}You are now ${CC.B_AQUA}SPECTATING${CC.AQUA}! You can fly and are invisible to players.")
                 player.sendMessage("${CC.GRAY}You can see other spectators and use ${CC.YELLOW}/spec tp <player>${CC.GRAY} to teleport!")
@@ -562,6 +583,10 @@ class HostEventService {
         autoStartEnabled = false
         playerStates.clear()
         
+        // Reset spawn points
+        deadSpawn = null
+        spectatorSpawn = null
+        
         // Set all online players to dead
         Players.all().forEach { player ->
             setPlayerState(player, PlayerState.DEAD)
@@ -731,6 +756,48 @@ class HostEventService {
         pvpEnabled = false
         buildEnabled = false
         setupMode = false
+        updateEventStatus()
+    }
+
+    /**
+     * Set dead spawn location
+     */
+    fun setDeadSpawn(location: Location) {
+        deadSpawn = location.clone()
+        updateEventStatus()
+    }
+
+    /**
+     * Set spectator spawn location
+     */
+    fun setSpectatorSpawn(location: Location) {
+        spectatorSpawn = location.clone()
+        updateEventStatus()
+    }
+
+    /**
+     * Get dead spawn location
+     */
+    fun getDeadSpawn(): Location? = deadSpawn?.clone()
+
+    /**
+     * Get spectator spawn location
+     */
+    fun getSpectatorSpawn(): Location? = spectatorSpawn?.clone()
+
+    /**
+     * Remove dead spawn
+     */
+    fun removeDeadSpawn() {
+        deadSpawn = null
+        updateEventStatus()
+    }
+
+    /**
+     * Remove spectator spawn
+     */
+    fun removeSpectatorSpawn() {
+        spectatorSpawn = null
         updateEventStatus()
     }
 

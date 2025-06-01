@@ -38,9 +38,6 @@ object HostEventScoreboardAdapter : ScoreboardAdapter() {
     override fun getLines(board: LinkedList<String>, player: Player) {
         val hostService = getHostService()
         
-        // Always show content, even if service isn't ready
-        board += ""
-        
         if (hostService != null) {
             // Event name
             board += "${CC.WHITE}Event: ${CC.PRI}${hostService.getEventName()}"
@@ -63,47 +60,45 @@ object HostEventScoreboardAdapter : ScoreboardAdapter() {
             board += "${CC.WHITE}Status: $stateDisplay"
             board += ""
             
-            // Player counts
+            // Player counts (condensed)
             val alivePlayers = hostService.getAlivePlayers()
             val deadPlayers = hostService.getDeadPlayers()
             val spectatorPlayers = hostService.getSpectatorPlayers()
-            val totalPlayers = Players.all().size
             
-            board += "${CC.WHITE}Alive: ${CC.PRI}${alivePlayers.size}"
-            board += "${CC.WHITE}Dead: ${CC.PRI}${deadPlayers.size}"
-            board += "${CC.WHITE}Spectating: ${CC.PRI}${spectatorPlayers.size}"
-            board += "${CC.WHITE}Total: ${CC.PRI}$totalPlayers"
+            board += "${CC.GREEN}${alivePlayers.size} ${CC.WHITE}alive ${CC.RED}${deadPlayers.size} ${CC.WHITE}dead"
+            if (spectatorPlayers.isNotEmpty()) {
+                board += "${CC.AQUA}${spectatorPlayers.size} ${CC.WHITE}spectating"
+            }
             board += ""
             
-            // Event settings with proper line formatting
+            // Event settings (condensed)
             val pvpStatus = if (hostService.isPvpEnabled()) "${CC.GREEN}${Constants.CHECK_SYMBOL}" else "${CC.RED}${Constants.X_SYMBOL}"
             val buildStatus = if (hostService.isBuildEnabled()) "${CC.GREEN}${Constants.CHECK_SYMBOL}" else "${CC.RED}${Constants.X_SYMBOL}"
+            board += "${CC.WHITE}PVP: $pvpStatus ${CC.WHITE}Build: $buildStatus"
             
-            board += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.WHITE}PVP: $pvpStatus"
-            board += "${CC.GRAY}${Constants.THIN_VERTICAL_LINE} ${CC.WHITE}Building: $buildStatus"
-            
-            // Setup mode indicator
+            // Setup mode indicator (only if active)
             if (hostService.isInSetupMode()) {
-                board += ""
                 board += "${CC.AQUA}${CC.BOLD}SETUP MODE"
             }
             
             board += ""
+            
+            // Help text (shorter)
             if (hostService.isHost(player)) {
-                board += "${CC.GRAY}Use ${CC.YELLOW}/host help"
+                board += "${CC.GRAY}/host help"
             } else if (player.hasPermission("scevents.staff")) {
-                board += "${CC.GRAY}Use ${CC.RED}/hs help"
+                board += "${CC.GRAY}/hs help"
             }
         } else {
-            // Show default content when service isn't ready
+            // Show default content when service isn't ready (simplified)
             board += "${CC.WHITE}Event: ${CC.GRAY}Loading..."
             board += "${CC.WHITE}Host: ${CC.RED}None"
             board += ""
             board += "${CC.WHITE}Status: ${CC.GRAY}Waiting..."
             board += ""
-            board += "${CC.WHITE}Total: ${CC.PRI}${Players.all().size}"
+            board += "${CC.WHITE}Players: ${CC.PRI}${Players.all().size}"
             board += ""
-            board += "${CC.GRAY}System initializing..."
+            board += "${CC.GRAY}Starting up..."
         }
         
         board += ""

@@ -1,5 +1,6 @@
 package gg.scala.events.plugin.host.command
 
+import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.annotation.*
 import gg.scala.commons.annotations.commands.AutoRegister
 import gg.scala.commons.command.ScalaCommand
@@ -98,17 +99,9 @@ object SpectatorCommand : ScalaCommand() {
         }
     }
 
-    @Subcommand("help")
+    @HelpCommand
     @Description("Show spectator commands")
-    fun onHelp(player: ScalaPlayer) {
-        player.sendMessage("")
-        player.sendMessage("${CC.AQUA}${CC.BOLD}SPECTATOR COMMANDS")
-        player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(25)}")
-        player.sendMessage("${CC.YELLOW}/spec tp <player>${CC.GRAY} - Teleport to a player")
-        player.sendMessage("${CC.YELLOW}/spec list${CC.GRAY} - List all players")
-        player.sendMessage("${CC.YELLOW}/spec help${CC.GRAY} - Show this help")
-        player.sendMessage("")
-        player.sendMessage("${CC.GRAY}You are invisible to players but can see other spectators!")
-        player.sendMessage("")
+    fun onHelp(player: ScalaPlayer, help: CommandHelp) {
+        help.showHelp()
     }
 } 

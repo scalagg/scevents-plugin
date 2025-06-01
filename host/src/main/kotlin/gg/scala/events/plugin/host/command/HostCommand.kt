@@ -37,35 +37,8 @@ object HostCommand : ScalaCommand() {
 
     @Default
     @HelpCommand
-    @Subcommand("help")
     fun onHelp(player: ScalaPlayer, help: CommandHelp) {
-        withHostService(player) { hostService ->
-            if (!hostService.isHost(player.bukkit())) {
-                player.sendMessage("${CC.RED}You are not the event host!")
-                return@withHostService
-            }
-            
-            player.sendMessage("")
-            player.sendMessage("${CC.GOLD}${CC.BOLD}HOST COMMANDS")
-            player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(30)}")
-            player.sendMessage("${CC.YELLOW}/host sethost${CC.GRAY} - Become the event host")
-            player.sendMessage("${CC.YELLOW}/host panel${CC.GRAY} - Open management GUI")
-            player.sendMessage("${CC.YELLOW}/host start${CC.GRAY} - Start the event")
-            player.sendMessage("${CC.YELLOW}/host end${CC.GRAY} - End the event")
-            player.sendMessage("${CC.YELLOW}/host name <name>${CC.GRAY} - Set event name")
-            player.sendMessage("${CC.YELLOW}/host revive <player>${CC.GRAY} - Revive a dead player")
-            player.sendMessage("${CC.YELLOW}/host kill <player>${CC.GRAY} - Kill a living player")
-            player.sendMessage("${CC.YELLOW}/host spectate <player>${CC.GRAY} - Make player spectator")
-            player.sendMessage("${CC.YELLOW}/host unspectate <player>${CC.GRAY} - Remove from spectator mode")
-            player.sendMessage("${CC.YELLOW}/host reviveall${CC.GRAY} - Revive all dead players")
-            player.sendMessage("${CC.YELLOW}/host killall${CC.GRAY} - Kill all living players")
-            player.sendMessage("${CC.YELLOW}/host tpalive${CC.GRAY} - Teleport all alive players to you")
-            player.sendMessage("${CC.YELLOW}/host tpdead${CC.GRAY} - Teleport all dead players to you")
-            player.sendMessage("${CC.YELLOW}/host players${CC.GRAY} - List all players with status")
-            player.sendMessage("${CC.YELLOW}/host announce [message]${CC.GRAY} - Announce to network")
-            player.sendMessage("${CC.YELLOW}/host quit${CC.GRAY} - Stop hosting")
-            player.sendMessage("")
-        }
+        help.showHelp()
     }
 
     @Subcommand("debug")
@@ -653,6 +626,122 @@ object HostCommand : ScalaCommand() {
             } catch (e: Exception) {
                 player.sendMessage("${CC.RED}Error: ${e.message}")
             }
+        }
+    }
+
+    @Subcommand("spawn set dead")
+    @Description("Set the spawn location for dead players")
+    fun onSetDeadSpawn(player: ScalaPlayer) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            val location = player.bukkit().location
+            hostService.setDeadSpawn(location)
+            
+            player.sendMessage("${CC.GREEN}Dead spawn set at your current location!")
+            player.sendMessage("${CC.GRAY}World: ${CC.WHITE}${location.world?.name}")
+            player.sendMessage("${CC.GRAY}X: ${CC.WHITE}${location.blockX}, Y: ${CC.WHITE}${location.blockY}, Z: ${CC.WHITE}${location.blockZ}")
+        }
+    }
+
+    @Subcommand("spawn set spectator")
+    @Description("Set the spawn location for spectators")
+    fun onSetSpectatorSpawn(player: ScalaPlayer) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            val location = player.bukkit().location
+            hostService.setSpectatorSpawn(location)
+            
+            player.sendMessage("${CC.GREEN}Spectator spawn set at your current location!")
+            player.sendMessage("${CC.GRAY}World: ${CC.WHITE}${location.world?.name}")
+            player.sendMessage("${CC.GRAY}X: ${CC.WHITE}${location.blockX}, Y: ${CC.WHITE}${location.blockY}, Z: ${CC.WHITE}${location.blockZ}")
+        }
+    }
+
+    @Subcommand("spawn remove dead")
+    @Description("Remove the dead spawn location")
+    fun onRemoveDeadSpawn(player: ScalaPlayer) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            if (hostService.getDeadSpawn() == null) {
+                player.sendMessage("${CC.RED}No dead spawn is currently set!")
+                return@withHostService
+            }
+            
+            hostService.removeDeadSpawn()
+            player.sendMessage("${CC.GREEN}Dead spawn removed! Players will no longer be teleported on death/join.")
+        }
+    }
+
+    @Subcommand("spawn remove spectator")
+    @Description("Remove the spectator spawn location")
+    fun onRemoveSpectatorSpawn(player: ScalaPlayer) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            if (hostService.getSpectatorSpawn() == null) {
+                player.sendMessage("${CC.RED}No spectator spawn is currently set!")
+                return@withHostService
+            }
+            
+            hostService.removeSpectatorSpawn()
+            player.sendMessage("${CC.GREEN}Spectator spawn removed! Spectators will no longer be teleported.")
+        }
+    }
+
+    @Subcommand("spawn info")
+    @Description("View current spawn locations")
+    fun onSpawnInfo(player: ScalaPlayer) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            val deadSpawn = hostService.getDeadSpawn()
+            val spectatorSpawn = hostService.getSpectatorSpawn()
+            
+            player.sendMessage("")
+            player.sendMessage("${CC.GOLD}${CC.BOLD}SPAWN LOCATIONS")
+            player.sendMessage("${CC.GRAY}${CC.STRIKE_THROUGH}${"-".repeat(25)}")
+            
+            if (deadSpawn != null) {
+                player.sendMessage("${CC.RED}Dead Spawn:")
+                player.sendMessage("  ${CC.GRAY}World: ${CC.WHITE}${deadSpawn.world?.name}")
+                player.sendMessage("  ${CC.GRAY}Location: ${CC.WHITE}${deadSpawn.blockX}, ${deadSpawn.blockY}, ${deadSpawn.blockZ}")
+            } else {
+                player.sendMessage("${CC.RED}Dead Spawn: ${CC.GRAY}Not set")
+            }
+            
+            if (spectatorSpawn != null) {
+                player.sendMessage("${CC.AQUA}Spectator Spawn:")
+                player.sendMessage("  ${CC.GRAY}World: ${CC.WHITE}${spectatorSpawn.world?.name}")
+                player.sendMessage("  ${CC.GRAY}Location: ${CC.WHITE}${spectatorSpawn.blockX}, ${spectatorSpawn.blockY}, ${spectatorSpawn.blockZ}")
+            } else {
+                player.sendMessage("${CC.AQUA}Spectator Spawn: ${CC.GRAY}Not set")
+            }
+            
+            player.sendMessage("")
+            if (deadSpawn == null || spectatorSpawn == null) {
+                player.sendMessage("${CC.YELLOW}Tip: Stand where you want the spawn and use:")
+                if (deadSpawn == null) player.sendMessage("${CC.YELLOW}/host spawn set dead")
+                if (spectatorSpawn == null) player.sendMessage("${CC.YELLOW}/host spawn set spectator")
+            }
+            player.sendMessage("")
         }
     }
 } 

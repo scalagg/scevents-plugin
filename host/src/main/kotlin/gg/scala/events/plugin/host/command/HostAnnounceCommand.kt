@@ -6,9 +6,12 @@ import gg.scala.lemon.Lemon
 import gg.scala.lemon.util.QuickAccess
 import gg.scala.lemon.util.QuickAccess.sendGlobalFancyBroadcast
 import gg.scala.commons.acf.BaseCommand
+import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.ConditionFailedException
 import gg.scala.commons.acf.annotation.CommandAlias
 import gg.scala.commons.acf.annotation.CommandPermission
+import gg.scala.commons.acf.annotation.Default
+import gg.scala.commons.acf.annotation.HelpCommand
 import gg.scala.commons.acf.annotation.Optional
 import gg.scala.events.plugin.host.service.HostEventService
 import gg.scala.flavor.inject.Inject
@@ -100,19 +103,9 @@ object HostAnnounceCommand : ScalaCommand()
         hostEventService.announceEvent(broadcastMessage)
     }
 
-    @CommandAlias("hostannounce|heannounce") 
-    @CommandPermission("events.host.announce")
-    fun onHostAnnounceHelp(player: Player)
-    {
-        player.sendMessage("")
-        player.sendMessage("${CC.GOLD}${CC.BOLD}Host Event Announcement")
-        player.sendMessage("${CC.GRAY}Promote your custom event across the network!")
-        player.sendMessage("")
-        player.sendMessage("${CC.YELLOW}/hostannounce ${CC.GRAY}- Announce your event")
-        player.sendMessage("${CC.YELLOW}/hostannounce <message> ${CC.GRAY}- Announce with custom message")
-        player.sendMessage("")
-        player.sendMessage("${CC.GRAY}Cooldown: ${CC.WHITE}45 seconds")
-        player.sendMessage("${CC.GRAY}Permission: ${CC.WHITE}Only event hosts")
-        player.sendMessage("")
+    @Default
+    @HelpCommand
+    fun onHelp(player: Player, help: CommandHelp) {
+        help.showHelp()
     }
 } 
