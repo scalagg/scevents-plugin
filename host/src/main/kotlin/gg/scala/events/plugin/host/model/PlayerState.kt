@@ -17,5 +17,10 @@ enum class PlayerState {
     /**
      * Player is the event host with special privileges
      */
-    HOST
+    HOST,
+    
+    /**
+     * Player is spectating 
+     */
+    SPECTATOR
 } 

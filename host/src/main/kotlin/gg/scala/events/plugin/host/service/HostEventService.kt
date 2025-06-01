@@ -5,6 +5,7 @@ import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.events.plugin.host.model.HostEventState
 import gg.scala.events.plugin.host.model.PlayerState
+import gg.scala.events.plugin.host.visibility.HostEventVisibilityAdapter
 import gg.scala.events.shared.ScalaEventsChannel
 import gg.scala.flavor.inject.Inject
 import gg.scala.flavor.service.Configure
@@ -15,16 +16,21 @@ import me.lucko.helper.utils.Players
 import net.evilblock.cubed.nametag.NametagHandler
 import net.evilblock.cubed.nametag.NametagInfo
 import net.evilblock.cubed.nametag.NametagProvider
+import net.evilblock.cubed.visibility.VisibilityHandler
 import net.evilblock.cubed.serializers.Serializers
 import net.evilblock.cubed.util.CC
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.*
+import org.bukkit.event.inventory.InventoryClickEvent
 import java.util.*
 
 /**
@@ -64,6 +70,7 @@ class HostEventService {
                 PlayerState.ALIVE -> NametagProvider.createNametag("${CC.GREEN}", "", "1")
                 PlayerState.DEAD -> NametagProvider.createNametag("${CC.RED}", "", "2")  
                 PlayerState.HOST -> NametagProvider.createNametag("${CC.GOLD}[HOST] ", "", "0")
+                PlayerState.SPECTATOR -> null // Spectators have no nametag (invisible)
             }
         }
     }
@@ -81,6 +88,13 @@ class HostEventService {
             NametagHandler.registerProvider(HostEventNametagProvider())
         } catch (e: Exception) {
             plugin.logger.warning("Failed to register nametag provider: ${e.message}")
+        }
+        
+        // Register visibility adapter
+        try {
+            VisibilityHandler.registerAdapter("HostEvent", HostEventVisibilityAdapter)
+        } catch (e: Exception) {
+            plugin.logger.warning("Failed to register visibility adapter: ${e.message}")
         }
         
         // Initialize all online players as dead
@@ -110,13 +124,21 @@ class HostEventService {
                 }
                 player.sendMessage("")
                 
+                // Update visibility for the new player
                 updateNametagsForAll()
+                updatePlayerVisibility(player)
             }
 
         // Player quit - cleanup
         Events.subscribe(PlayerQuitEvent::class.java)
             .handler { event ->
-                playerStates.remove(event.player.uniqueId)
+                val player = event.player
+                playerStates.remove(player.uniqueId)
+                
+                // Remove spectator metadata if present
+                if (player.hasMetadata("spectator")) {
+                    player.removeMetadata("spectator", plugin)
+                }
             }
 
         // PVP Control
@@ -143,11 +165,61 @@ class HostEventService {
                 if (!buildEnabled && !isHost(event.player)) {
                     event.isCancelled = true
                 }
+                
+                // Spectators cannot break blocks
+                if (getPlayerState(event.player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
             }
 
         Events.subscribe(BlockPlaceEvent::class.java)
             .handler { event ->
                 if (!buildEnabled && !isHost(event.player)) {
+                    event.isCancelled = true
+                }
+                
+                // Spectators cannot place blocks
+                if (getPlayerState(event.player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
+            }
+
+        // Spectator interaction prevention
+        Events.subscribe(PlayerInteractEvent::class.java)
+            .handler { event ->
+                if (getPlayerState(event.player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
+            }
+
+        Events.subscribe(EntityDamageEvent::class.java)
+            .handler { event ->
+                val player = event.entity as? Player ?: return@handler
+                
+                // Spectators cannot take damage
+                if (getPlayerState(player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
+            }
+
+        Events.subscribe(PlayerPickupItemEvent::class.java)
+            .handler { event ->
+                if (getPlayerState(event.player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
+            }
+
+        Events.subscribe(PlayerDropItemEvent::class.java)
+            .handler { event ->
+                if (getPlayerState(event.player) == PlayerState.SPECTATOR) {
+                    event.isCancelled = true
+                }
+            }
+
+        Events.subscribe(InventoryClickEvent::class.java)
+            .handler { event ->
+                val player = event.whoClicked as? Player ?: return@handler
+                if (getPlayerState(player) == PlayerState.SPECTATOR) {
                     event.isCancelled = true
                 }
             }
@@ -194,26 +266,51 @@ class HostEventService {
     }
 
     /**
-     * Set player state (alive/dead/host)
+     * Set player state (alive/dead/host/spectator)
      */
     fun setPlayerState(player: Player, state: PlayerState) {
+        val previousState = playerStates[player.uniqueId]
         playerStates[player.uniqueId] = state
         
         when (state) {
             PlayerState.ALIVE -> {
                 player.gameMode = GameMode.SURVIVAL
+                clearSpectatorEffects(player)
                 player.sendMessage("${CC.GREEN}You have been revived! You are now ${CC.GREEN}ALIVE${CC.GREEN}!")
             }
             PlayerState.DEAD -> {
                 player.gameMode = GameMode.ADVENTURE
+                clearSpectatorEffects(player)
                 player.sendMessage("${CC.RED}You are now ${CC.D_RED}DEAD${CC.RED}!")
             }
             PlayerState.HOST -> {
                 player.gameMode = GameMode.CREATIVE
+                clearSpectatorEffects(player)
+            }
+            PlayerState.SPECTATOR -> {
+                player.gameMode = GameMode.ADVENTURE
+                player.allowFlight = true
+                player.isFlying = true
+                
+                player.addPotionEffect(
+                    PotionEffect(
+                        PotionEffectType.SPEED,
+                        Int.MAX_VALUE,
+                        1,
+                        true,
+                        false
+                    )
+                )
+                
+                player.setMetadata("spectator", FixedMetadataValue(plugin, true))
+                
+                player.sendMessage("${CC.AQUA}You are now ${CC.B_AQUA}SPECTATING${CC.AQUA}! You can fly and are invisible to players.")
+                player.sendMessage("${CC.GRAY}You can see other spectators and use ${CC.YELLOW}/spec tp <player>${CC.GRAY} to teleport!")
             }
         }
         
         updateNametagsForAll()
+        updatePlayerVisibility(player)
         
         // Check for auto-start if player was revived
         if (state == PlayerState.ALIVE) {
@@ -325,6 +422,41 @@ class HostEventService {
             // Nametag system might not be available, continue without it
             plugin.logger.warning("Nametag system unavailable: ${e.message}")
         }
+    }
+
+    /**
+     * Clear spectator effects and restore normal visibility
+     */
+    private fun clearSpectatorEffects(player: Player) {
+        // Remove spectator effects
+        player.removePotionEffect(PotionEffectType.SPEED)
+        
+        if (player.gameMode != GameMode.CREATIVE) {
+            player.allowFlight = false
+            player.isFlying = false
+        }
+        
+        if (player.hasMetadata("spectator")) {
+            player.removeMetadata("spectator", plugin)
+        }
+    }
+
+    /**
+     * Update player visibility using VisibilityHandler 
+     */
+    private fun updatePlayerVisibility(player: Player) {
+        try {
+            VisibilityHandler.update(player)
+        } catch (e: Exception) {
+            plugin.logger.warning("Failed to update visibility for ${player.name}: ${e.message}")
+        }
+    }
+
+    /**
+     * Get spectator players
+     */
+    fun getSpectatorPlayers(): List<Player> {
+        return Players.all().filter { getPlayerState(it) == PlayerState.SPECTATOR }
     }
 
     /**

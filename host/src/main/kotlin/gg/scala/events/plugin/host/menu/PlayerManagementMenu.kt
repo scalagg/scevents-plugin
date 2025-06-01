@@ -129,12 +129,14 @@ class PlayerManagementMenu : Menu("${CC.YELLOW}${CC.BOLD}Player Management") {
                 PlayerState.ALIVE -> XMaterial.LIME_DYE
                 PlayerState.DEAD -> XMaterial.RED_DYE
                 PlayerState.HOST -> XMaterial.GOLD_INGOT
+                PlayerState.SPECTATOR -> XMaterial.LIGHT_BLUE_DYE
             }
             
             val statusColor = when (state) {
                 PlayerState.ALIVE -> CC.GREEN
                 PlayerState.DEAD -> CC.RED
                 PlayerState.HOST -> CC.GOLD
+                PlayerState.SPECTATOR -> CC.AQUA
             }
             
             buttons[slot] = ItemBuilder
@@ -143,29 +145,60 @@ class PlayerManagementMenu : Menu("${CC.YELLOW}${CC.BOLD}Player Management") {
                 .addToLore(
                     "${CC.GRAY}Status: $statusColor${state.name}",
                     "",
-                    "${CC.YELLOW}Left-click: ${if (state == PlayerState.ALIVE) "Kill" else "Revive"}",
-                    "${CC.YELLOW}Right-click: Teleport to you"
+                    when (state) {
+                        PlayerState.ALIVE -> "${CC.YELLOW}Left-click: Kill"
+                        PlayerState.DEAD -> "${CC.YELLOW}Left-click: Revive"
+                        PlayerState.SPECTATOR -> "${CC.YELLOW}Left-click: Make dead"
+                        PlayerState.HOST -> "${CC.GRAY}Cannot change host state"
+                    },
+                    when (state) {
+                        PlayerState.DEAD -> "${CC.YELLOW}Right-click: Make spectator"
+                        PlayerState.SPECTATOR -> "${CC.YELLOW}Right-click: Teleport to you"
+                        else -> "${CC.YELLOW}Right-click: Teleport to you"
+                    }
                 )
                 .toButton { clickPlayer, clickType ->
                     if (clickPlayer == null) return@toButton
                     
                     when (clickType) {
                         org.bukkit.event.inventory.ClickType.LEFT -> {
-                            if (state == PlayerState.ALIVE) {
-                                hostService.setPlayerState(targetPlayer, PlayerState.DEAD)
-                                clickPlayer.sendMessage("${CC.GREEN}Killed ${targetPlayer.name}!")
-                            } else {
-                                hostService.setPlayerState(targetPlayer, PlayerState.ALIVE)
-                                clickPlayer.sendMessage("${CC.GREEN}Revived ${targetPlayer.name}!")
+                            when (state) {
+                                PlayerState.ALIVE -> {
+                                    hostService.setPlayerState(targetPlayer, PlayerState.DEAD)
+                                    clickPlayer.sendMessage("${CC.GREEN}Killed ${targetPlayer.name}!")
+                                }
+                                PlayerState.DEAD -> {
+                                    hostService.setPlayerState(targetPlayer, PlayerState.ALIVE)
+                                    clickPlayer.sendMessage("${CC.GREEN}Revived ${targetPlayer.name}!")
+                                }
+                                PlayerState.SPECTATOR -> {
+                                    hostService.setPlayerState(targetPlayer, PlayerState.DEAD)
+                                    clickPlayer.sendMessage("${CC.GREEN}${targetPlayer.name} is no longer spectating!")
+                                }
+                                PlayerState.HOST -> {
+                                    clickPlayer.sendMessage("${CC.RED}Cannot change host state!")
+                                    return@toButton
+                                }
                             }
                             Tasks.delayed(1L) {
                                 PlayerManagementMenu().openMenu(clickPlayer)
                             }
                         }
                         org.bukkit.event.inventory.ClickType.RIGHT -> {
-                            targetPlayer.teleport(clickPlayer.location)
-                            clickPlayer.sendMessage("${CC.GREEN}Teleported ${targetPlayer.name} to you!")
-                            targetPlayer.sendMessage("${CC.GREEN}You have been teleported to the host!")
+                            when (state) {
+                                PlayerState.DEAD -> {
+                                    hostService.setPlayerState(targetPlayer, PlayerState.SPECTATOR)
+                                    clickPlayer.sendMessage("${CC.GREEN}${targetPlayer.name} is now spectating!")
+                                    Tasks.delayed(1L) {
+                                        PlayerManagementMenu().openMenu(clickPlayer)
+                                    }
+                                }
+                                else -> {
+                                    targetPlayer.teleport(clickPlayer.location)
+                                    clickPlayer.sendMessage("${CC.GREEN}Teleported ${targetPlayer.name} to you!")
+                                    targetPlayer.sendMessage("${CC.GREEN}You have been teleported to the host!")
+                                }
+                            }
                         }
                         else -> {}
                     }

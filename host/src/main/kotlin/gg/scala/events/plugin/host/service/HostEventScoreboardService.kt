@@ -58,6 +58,7 @@ object HostEventScoreboardAdapter : ScoreboardAdapter() {
                 PlayerState.ALIVE -> "${CC.GREEN}ALIVE"
                 PlayerState.DEAD -> "${CC.RED}DEAD"
                 PlayerState.HOST -> "${CC.GOLD}HOST"
+                PlayerState.SPECTATOR -> "${CC.AQUA}SPECTATING"
             }
             board += "${CC.WHITE}Status: $stateDisplay"
             board += ""
@@ -65,10 +66,12 @@ object HostEventScoreboardAdapter : ScoreboardAdapter() {
             // Player counts
             val alivePlayers = hostService.getAlivePlayers()
             val deadPlayers = hostService.getDeadPlayers()
+            val spectatorPlayers = hostService.getSpectatorPlayers()
             val totalPlayers = Players.all().size
             
             board += "${CC.WHITE}Alive: ${CC.PRI}${alivePlayers.size}"
             board += "${CC.WHITE}Dead: ${CC.PRI}${deadPlayers.size}"
+            board += "${CC.WHITE}Spectating: ${CC.PRI}${spectatorPlayers.size}"
             board += "${CC.WHITE}Total: ${CC.PRI}$totalPlayers"
             board += ""
             

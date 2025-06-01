@@ -55,6 +55,8 @@ object HostCommand : ScalaCommand() {
             player.sendMessage("${CC.YELLOW}/host name <name>${CC.GRAY} - Set event name")
             player.sendMessage("${CC.YELLOW}/host revive <player>${CC.GRAY} - Revive a dead player")
             player.sendMessage("${CC.YELLOW}/host kill <player>${CC.GRAY} - Kill a living player")
+            player.sendMessage("${CC.YELLOW}/host spectate <player>${CC.GRAY} - Make player spectator")
+            player.sendMessage("${CC.YELLOW}/host unspectate <player>${CC.GRAY} - Remove from spectator mode")
             player.sendMessage("${CC.YELLOW}/host reviveall${CC.GRAY} - Revive all dead players")
             player.sendMessage("${CC.YELLOW}/host killall${CC.GRAY} - Kill all living players")
             player.sendMessage("${CC.YELLOW}/host tpalive${CC.GRAY} - Teleport all alive players to you")
@@ -228,6 +230,46 @@ object HostCommand : ScalaCommand() {
         }
     }
 
+    @Subcommand("spectate")
+    @Description("Set a player as spectator (can fly, invisible)")
+    @CommandCompletion("@players")
+    fun onSpectate(player: ScalaPlayer, targetPlayer: Player) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            if (hostService.isHost(targetPlayer)) {
+                player.sendMessage("${CC.RED}You cannot make the host a spectator!")
+                return@withHostService
+            }
+            
+            hostService.setPlayerState(targetPlayer, PlayerState.SPECTATOR)
+            player.sendMessage("${CC.GREEN}${targetPlayer.name} is now spectating!")
+        }
+    }
+
+    @Subcommand("unspectate")
+    @Description("Remove a player from spectator mode")
+    @CommandCompletion("@players")
+    fun onUnspectate(player: ScalaPlayer, targetPlayer: Player) {
+        withHostService(player) { hostService ->
+            if (!hostService.isHost(player.bukkit())) {
+                player.sendMessage("${CC.RED}You are not the event host!")
+                return@withHostService
+            }
+            
+            if (hostService.getPlayerState(targetPlayer) != PlayerState.SPECTATOR) {
+                player.sendMessage("${CC.RED}${targetPlayer.name} is not spectating!")
+                return@withHostService
+            }
+            
+            hostService.setPlayerState(targetPlayer, PlayerState.DEAD)
+            player.sendMessage("${CC.GREEN}${targetPlayer.name} is no longer spectating!")
+        }
+    }
+
     @Subcommand("pvp")
     @Description("Toggle PVP on/off")
     fun onTogglePvp(player: ScalaPlayer) {
@@ -269,6 +311,7 @@ object HostCommand : ScalaCommand() {
             
             val alivePlayers = hostService.getAlivePlayers()
             val deadPlayers = hostService.getDeadPlayers()
+            val spectatorPlayers = hostService.getSpectatorPlayers()
             
             player.sendMessage("")
             player.sendMessage("${CC.GOLD}${CC.BOLD}EVENT STATUS")
@@ -277,6 +320,7 @@ object HostCommand : ScalaCommand() {
             player.sendMessage("${CC.YELLOW}Host: ${CC.WHITE}${player.bukkit().name}")
             player.sendMessage("${CC.YELLOW}Alive Players: ${CC.GREEN}${alivePlayers.size}")
             player.sendMessage("${CC.YELLOW}Dead Players: ${CC.RED}${deadPlayers.size}")
+            player.sendMessage("${CC.YELLOW}Spectators: ${CC.AQUA}${spectatorPlayers.size}")
             player.sendMessage("${CC.YELLOW}PVP: ${if (hostService.isPvpEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}")
             player.sendMessage("${CC.YELLOW}Building: ${if (hostService.isBuildEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}")
             player.sendMessage("")
@@ -286,6 +330,9 @@ object HostCommand : ScalaCommand() {
             }
             if (deadPlayers.isNotEmpty()) {
                 player.sendMessage("${CC.RED}Dead: ${CC.WHITE}${deadPlayers.joinToString(", ") { it.name }}")
+            }
+            if (spectatorPlayers.isNotEmpty()) {
+                player.sendMessage("${CC.AQUA}Spectating: ${CC.WHITE}${spectatorPlayers.joinToString(", ") { it.name }}")
             }
             player.sendMessage("")
         }
