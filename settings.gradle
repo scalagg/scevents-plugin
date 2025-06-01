@@ -1,4 +1,4 @@
 rootProject.name = "scala-scevents"
 include(
-    "shared", "game", "external"
+    "shared", "game", "external", "host"
 )

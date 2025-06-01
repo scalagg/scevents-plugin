@@ -22,6 +22,8 @@ rebel.xml
 # Keep libs
 #!lib/*.jar
 
+WorkSpace/*
+
 .gradle
 **/build/
 !src/**/build/
