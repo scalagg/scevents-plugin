@@ -3,7 +3,6 @@ package gg.scala.events.plugin.host.menu
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.events.plugin.host.service.HostEventService
 import gg.scala.events.plugin.host.model.PlayerState
-import gg.scala.flavor.inject.Inject
 import me.lucko.helper.utils.Players
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
@@ -16,9 +15,6 @@ import org.bukkit.entity.Player
  * Menu for managing players in the event
  */
 class PlayerManagementMenu : Menu("${CC.YELLOW}${CC.BOLD}Player Management") {
-    
-    @Inject
-    lateinit var hostService: HostEventService
 
     init {
         placeholder = true
@@ -36,6 +32,17 @@ class PlayerManagementMenu : Menu("${CC.YELLOW}${CC.BOLD}Player Management") {
 
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = mutableMapOf<Int, Button>()
+        
+        val hostService = HostEventService.instance
+        if (hostService == null) {
+            // Service unavailable
+            buttons[22] = ItemBuilder
+                .of(XMaterial.BARRIER)
+                .name("${CC.RED}${CC.BOLD}Service Unavailable")
+                .addToLore("${CC.RED}Host Event Service is not available.")
+                .toButton()
+            return buttons
+        }
         
         // Mass Actions
         buttons[10] = ItemBuilder

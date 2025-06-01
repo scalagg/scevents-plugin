@@ -2,7 +2,6 @@ package gg.scala.events.plugin.host.menu
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.events.plugin.host.service.HostEventService
-import gg.scala.flavor.inject.Inject
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -13,9 +12,6 @@ import org.bukkit.entity.Player
  * Main management menu for host-controlled events
  */
 class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
-    
-    @Inject
-    lateinit var hostService: HostEventService
 
     init {
         placeholder = true
@@ -83,24 +79,36 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
             }
 
         // Current Event Status
-        val alivePlayers = hostService.getAlivePlayers()
-        val deadPlayers = hostService.getDeadPlayers()
-        
-        buttons[31] = ItemBuilder
-            .of(XMaterial.BOOK)
-            .name("${CC.GOLD}${CC.BOLD}Event Status")
-            .addToLore(
-                "${CC.YELLOW}Event: ${CC.WHITE}${hostService.getEventName()}",
-                "${CC.YELLOW}Host: ${CC.WHITE}${player.name}",
-                "",
-                "${CC.GREEN}Alive: ${CC.WHITE}${alivePlayers.size}",
-                "${CC.RED}Dead: ${CC.WHITE}${deadPlayers.size}",
-                "${CC.GRAY}Total: ${CC.WHITE}${alivePlayers.size + deadPlayers.size}",
-                "",
-                "${CC.YELLOW}PVP: ${if (hostService.isPvpEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}",
-                "${CC.YELLOW}Building: ${if (hostService.isBuildEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}"
-            )
-            .toButton()
+        val hostService = HostEventService.instance
+        if (hostService != null) {
+            val alivePlayers = hostService.getAlivePlayers()
+            val deadPlayers = hostService.getDeadPlayers()
+            
+            buttons[31] = ItemBuilder
+                .of(XMaterial.BOOK)
+                .name("${CC.GOLD}${CC.BOLD}Event Status")
+                .addToLore(
+                    "${CC.YELLOW}Event: ${CC.WHITE}${hostService.getEventName()}",
+                    "${CC.YELLOW}Host: ${CC.WHITE}${player.name}",
+                    "",
+                    "${CC.GREEN}Alive: ${CC.WHITE}${alivePlayers.size}",
+                    "${CC.RED}Dead: ${CC.WHITE}${deadPlayers.size}",
+                    "${CC.GRAY}Total: ${CC.WHITE}${alivePlayers.size + deadPlayers.size}",
+                    "",
+                    "${CC.YELLOW}PVP: ${if (hostService.isPvpEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}",
+                    "${CC.YELLOW}Building: ${if (hostService.isBuildEnabled()) "${CC.GREEN}ON" else "${CC.RED}OFF"}"
+                )
+                .toButton()
+        } else {
+            buttons[31] = ItemBuilder
+                .of(XMaterial.BARRIER)
+                .name("${CC.RED}${CC.BOLD}Service Unavailable")
+                .addToLore(
+                    "${CC.RED}Host Event Service is not available.",
+                    "${CC.GRAY}Please try again later."
+                )
+                .toButton()
+        }
 
         return buttons
     }

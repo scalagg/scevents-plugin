@@ -2,7 +2,6 @@ package gg.scala.events.plugin.host.menu
 
 import com.cryptomorin.xseries.XMaterial
 import gg.scala.events.plugin.host.service.HostEventService
-import gg.scala.flavor.inject.Inject
 import net.evilblock.cubed.menu.Button
 import net.evilblock.cubed.menu.Menu
 import net.evilblock.cubed.util.CC
@@ -14,9 +13,6 @@ import org.bukkit.entity.Player
  * Menu for hosting event actions (start, end, configure)
  */
 class HostEventMenu : Menu("${CC.AQUA}${CC.BOLD}Host Event") {
-    
-    @Inject
-    lateinit var hostService: HostEventService
 
     init {
         placeholder = true
@@ -34,6 +30,17 @@ class HostEventMenu : Menu("${CC.AQUA}${CC.BOLD}Host Event") {
 
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = mutableMapOf<Int, Button>()
+        
+        val hostService = HostEventService.instance
+        if (hostService == null) {
+            // Service unavailable
+            buttons[13] = ItemBuilder
+                .of(XMaterial.BARRIER)
+                .name("${CC.RED}${CC.BOLD}Service Unavailable")
+                .addToLore("${CC.RED}Host Event Service is not available.")
+                .toButton()
+            return buttons
+        }
         
         // Start Event
         buttons[10] = ItemBuilder
