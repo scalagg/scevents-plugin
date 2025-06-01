@@ -2,6 +2,7 @@ package gg.scala.events.plugin.host.service
 
 import gg.scala.aware.message.AwareMessage
 import gg.scala.aware.thread.AwareThreadContext
+import gg.scala.lemon.util.QuickAccess
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.events.plugin.host.model.HostEventState
 import gg.scala.events.plugin.host.model.PlayerState
@@ -31,6 +32,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.*
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.AsyncPlayerChatEvent
 import java.util.*
 
 /**
@@ -221,6 +223,16 @@ class HostEventService {
                 val player = event.whoClicked as? Player ?: return@handler
                 if (getPlayerState(player) == PlayerState.SPECTATOR) {
                     event.isCancelled = true
+                }
+            }
+
+        Events.subscribe(AsyncPlayerChatEvent::class.java)
+            .handler { event ->
+                val player = event.player
+                if (isHost(player)) {
+                    val rankedName = QuickAccess.coloredName(player) ?: "${CC.WHITE}${player.name}"
+                    
+                    event.format = "${CC.GOLD}[HOST] ${rankedName}${CC.WHITE}: %2\$s"
                 }
             }
     }
