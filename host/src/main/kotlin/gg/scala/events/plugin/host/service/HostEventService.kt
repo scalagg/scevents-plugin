@@ -156,15 +156,20 @@ class HostEventService {
         // PVP Control
         Events.subscribe(EntityDamageByEntityEvent::class.java)
             .handler { event ->
+                val damager = event.damager as? Player ?: return@handler
+                val damaged = event.entity as? Player ?: return@handler
+                
+                // Always allow hosts to hit players
+                if (isHost(damager)) {
+                    return@handler
+                }
+                
                 if (!pvpEnabled) {
                     event.isCancelled = true
                     return@handler
                 }
                 
-                // Only allow PVP between alive players
-                val damager = event.damager as? Player ?: return@handler
-                val damaged = event.entity as? Player ?: return@handler
-                
+                // Only allow PVP between alive players (non-hosts)
                 if (getPlayerState(damager) != PlayerState.ALIVE || 
                     getPlayerState(damaged) != PlayerState.ALIVE) {
                     event.isCancelled = true
