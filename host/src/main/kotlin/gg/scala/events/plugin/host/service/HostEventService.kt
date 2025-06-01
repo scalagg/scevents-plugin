@@ -99,11 +99,14 @@ class HostEventService {
                 player.gameMode = GameMode.ADVENTURE
                 player.sendMessage("")
                 player.sendMessage("${CC.GOLD}Welcome to ${CC.YELLOW}$eventName${CC.GOLD}!")
-                player.sendMessage("${CC.GRAY}You are currently ${CC.RED}DEAD${CC.GRAY}. Wait for the host to revive you.")
+                player.sendMessage("${CC.GRAY}You are currently ${CC.RED}DEAD${CC.GRAY}.")
                 
                 currentHost?.let { hostUuid ->
-                    val hostName = Bukkit.getPlayer(hostUuid)?.name ?: "Unknown"
+                    val hostPlayer = Bukkit.getPlayer(hostUuid)
+                    val hostName = hostPlayer?.name ?: "Unknown"
                     player.sendMessage("${CC.GRAY}Host: ${CC.GREEN}$hostName")
+                    
+                    hostPlayer?.sendMessage("${CC.YELLOW}${player.name} ${CC.GRAY}joined and needs to be revived! Use ${CC.GREEN}/host revive ${player.name}")
                 }
                 player.sendMessage("")
                 
