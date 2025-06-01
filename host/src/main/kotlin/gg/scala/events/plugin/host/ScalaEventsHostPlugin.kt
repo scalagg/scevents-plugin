@@ -29,13 +29,19 @@ class ScalaEventsHostPlugin : ExtendedScalaPlugin()
     fun containerEnable()
     {
         logger.info("Independent host-controlled event system enabled!")
-        logger.info("Checking HostEventService availability...")
+        logger.info("Initializing HostEventService...")
         
-        // Check if the service instance is available
-        if (HostEventService.instance != null) {
-            logger.info("✅ HostEventService is available and ready!")
-        } else {
-            logger.warning("⚠️  HostEventService is not yet available - will be initialized soon")
+        // Explicitly create and bind the HostEventService
+        try {
+            val hostService = HostEventService()
+            flavor().inject(hostService)
+            flavor().bind<HostEventService>() to hostService
+            
+            logger.info("✅ HostEventService successfully initialized and bound!")
+            logger.info("✅ Static instance available: ${HostEventService.instance != null}")
+        } catch (e: Exception) {
+            logger.severe("❌ Failed to initialize HostEventService: ${e.message}")
+            e.printStackTrace()
         }
         
         logger.info("System ready for custom event hosting")

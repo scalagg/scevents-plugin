@@ -38,7 +38,7 @@ class HostEventService {
     }
     
     @Inject
-    private lateinit var plugin: ExtendedScalaPlugin
+    lateinit var plugin: ExtendedScalaPlugin
     private var currentHost: UUID? = null
     private var eventName: String = "Custom Event"
     private var pvpEnabled: Boolean = false
