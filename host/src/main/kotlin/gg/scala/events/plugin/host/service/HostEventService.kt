@@ -72,6 +72,7 @@ class HostEventService {
     fun configure() {
         // Set instance reference for static access
         instance = this
+        plugin.logger.info("[HostEventService] Service configured and static instance set!")
         
         setupEventListeners()
         

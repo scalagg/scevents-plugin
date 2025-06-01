@@ -3,6 +3,7 @@ package gg.scala.events.plugin.host
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.annotations.container.ContainerDisable
+import gg.scala.events.plugin.host.service.HostEventService
 import gg.scala.events.shared.ScalaEventsChannel
 import me.lucko.helper.plugin.ap.Plugin
 import me.lucko.helper.plugin.ap.PluginDependency
@@ -28,6 +29,15 @@ class ScalaEventsHostPlugin : ExtendedScalaPlugin()
     fun containerEnable()
     {
         logger.info("Independent host-controlled event system enabled!")
+        logger.info("Checking HostEventService availability...")
+        
+        // Check if the service instance is available
+        if (HostEventService.instance != null) {
+            logger.info("✅ HostEventService is available and ready!")
+        } else {
+            logger.warning("⚠️  HostEventService is not yet available - will be initialized soon")
+        }
+        
         logger.info("System ready for custom event hosting")
     }
 
