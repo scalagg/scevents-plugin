@@ -22,6 +22,8 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
     override fun getButtons(player: Player): Map<Int, Button> {
         val buttons = mutableMapOf<Int, Button>()
         
+        val hostService = HostEventService.instance
+        
         // Event Controls Menu
         buttons[10] = ItemBuilder
             .of(XMaterial.REDSTONE)
@@ -30,10 +32,14 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
                 "${CC.GRAY}Control PVP, Building, and",
                 "${CC.GRAY}other event settings.",
                 "",
-                "${CC.GREEN}Click to open!"
+                if (hostService != null) "${CC.GREEN}Click to open!" else "${CC.RED}Service unavailable!"
             )
             .toButton { _, _ ->
-                EventControlsMenu().openMenu(player)
+                if (hostService != null) {
+                    EventControlsMenu().openMenu(player)
+                } else {
+                    player.sendMessage("${CC.RED}Host Event Service is not available!")
+                }
             }
 
         // Player Management Menu
@@ -44,10 +50,14 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
                 "${CC.GRAY}Manage players in the event.",
                 "${CC.GRAY}Revive, kill, teleport players.",
                 "",
-                "${CC.GREEN}Click to open!"
+                if (hostService != null) "${CC.GREEN}Click to open!" else "${CC.RED}Service unavailable!"
             )
             .toButton { _, _ ->
-                PlayerManagementMenu().openMenu(player)
+                if (hostService != null) {
+                    PlayerManagementMenu().openMenu(player)
+                } else {
+                    player.sendMessage("${CC.RED}Host Event Service is not available!")
+                }
             }
 
         // Host Event Menu
@@ -58,10 +68,14 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
                 "${CC.GRAY}Start, end, and configure",
                 "${CC.GRAY}your custom event.",
                 "",
-                "${CC.GREEN}Click to open!"
+                if (hostService != null) "${CC.GREEN}Click to open!" else "${CC.RED}Service unavailable!"
             )
             .toButton { _, _ ->
-                HostEventMenu().openMenu(player)
+                if (hostService != null) {
+                    HostEventMenu().openMenu(player)
+                } else {
+                    player.sendMessage("${CC.RED}Host Event Service is not available!")
+                }
             }
 
         // Settings Menu
@@ -72,14 +86,17 @@ class ManagementMenu : Menu("${CC.GOLD}${CC.BOLD}Event Management") {
                 "${CC.GRAY}Configure event settings",
                 "${CC.GRAY}and preferences.",
                 "",
-                "${CC.GREEN}Click to open!"
+                if (hostService != null) "${CC.GREEN}Click to open!" else "${CC.RED}Service unavailable!"
             )
             .toButton { _, _ ->
-                SettingsMenu().openMenu(player)
+                if (hostService != null) {
+                    SettingsMenu().openMenu(player)
+                } else {
+                    player.sendMessage("${CC.RED}Host Event Service is not available!")
+                }
             }
 
         // Current Event Status
-        val hostService = HostEventService.instance
         if (hostService != null) {
             val alivePlayers = hostService.getAlivePlayers()
             val deadPlayers = hostService.getDeadPlayers()

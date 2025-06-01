@@ -75,12 +75,13 @@ class HostEventMenu : Menu("${CC.AQUA}${CC.BOLD}Host Event") {
             }
 
         // Event Name
+        val eventName = hostService.getEventName() ?: "Unnamed Event"
         buttons[14] = ItemBuilder
             .of(XMaterial.NAME_TAG)
             .name("${CC.YELLOW}${CC.BOLD}Event Name")
             .addToLore(
                 "${CC.GRAY}Current name:",
-                "${CC.WHITE}${hostService.getEventName()}",
+                "${CC.WHITE}$eventName",
                 "",
                 "${CC.YELLOW}Use ${CC.WHITE}/host name <name>",
                 "${CC.YELLOW}to change the event name."
