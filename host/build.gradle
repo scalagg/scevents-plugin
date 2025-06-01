@@ -1,0 +1,20 @@
+repositories {
+    maven { url "https://repo.glaremasters.me/repository/concuncan/" }
+    maven { url "https://repo.codemc.io/repository/maven-snapshots/" }
+}
+
+dependencies {
+    api project(":shared")
+
+    compileOnly "com.grinderwolf:slimeworldmanager-api:2.2.1"
+    compileOnly "com.grinderwolf:slimeworldmanager-plugin:2.2.1"
+    api "net.wesjd:anvilgui:1.9.2-SNAPSHOT"
+
+    compileOnly("gg.scala.cgs:game:1.4.2")
+    compileOnly("gg.scala.lemon:bukkit:1.6.2")
+    compileOnly("gg.scala.game.extensions:scala-core-game-extensions:1.3.2")
+}
+
+shadowJar {
+    relocate 'net.wesjd', 'gg.scala.events.plugin.host.internal.net.wesjd'
+} 
